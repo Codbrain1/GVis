@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Enums/VisualizeBaseEnums.h"
+#include "Common/Structures/SessionStructures.h"
 #include "Visualize/Views/AbstractView.h"
 #include <QObject>
 #include <QStringList>
@@ -34,15 +35,17 @@ class VideoController : public QObject {
                              QObject*              parent = nullptr);
 
     double getSnapshotTimeByIndex(int index) {
-        if (index > 0 && index < static_cast<int>(m_timeSliderSnapshots.size()))
+        if (index >= 0 && index < static_cast<int>(m_timeSliderSnapshots.size()))
             return m_timeSliderSnapshots[index].timestamp;
-        else
-            return 0;
+        return 0;
     };
 
     QUuid getCurrentSnapshotId() const {
         return m_currentVisualizeSnapshotId;
     }
+
+    Session::VideoPlayerDTO playerState() const;
+    QList<QUuid>            playerLayerIds() const;
 
     void initialize();
 
@@ -62,6 +65,7 @@ class VideoController : public QObject {
 
     // зафиксировать ТЕКУЩИЙ кадр как новый эталон
     void handleFixedEtalonSnapshot(const QUuid& referenceSnapshotId);
+    void restorePlayerState(const Session::VideoPlayerDTO& state);
 
   private:
     struct SnapshotToTimestamp {
@@ -74,16 +78,21 @@ class VideoController : public QObject {
     };
 
     void requestLoadFloatWindow(int index);
+    void clearPlayerLayers();
+    void restorePlayerLayersWhenReady();
 
     const int floatWindow = 15;
     QMap<QSpace::Visualize::EntityType,
          QList<std::shared_ptr<QSpace::Visualize::Layers::Layer>>>
         m_snapshotPlayerSate; // слои для текущего snapshot
+    QHash<QUuid, QUuid> m_playerLayerSources;
+    QList<Session::VideoPlayerLayerDTO> m_restoredPlayerLayers;
 
     QUuid m_currentVisualizeSnapshotId; // текущий отображаемый кадр
-    // QUuid m_referenceSnapshotId; // "эталонный" снимок, на который зафиксирован диапазон окраски
+    QUuid m_referenceSnapshotId;
     QUuid m_targetExperimentId; // эксперимент отображаемый с помощью плеера кадров
     std::vector<SnapshotToTimestamp> m_timeSliderSnapshots;
+    bool m_restorePending = false;
 
 
     Core::ObjectRegistry* m_objectRegistry;

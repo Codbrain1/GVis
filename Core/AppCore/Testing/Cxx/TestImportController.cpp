@@ -31,6 +31,45 @@ class TestImportController : public QObject {
         m_controller->initialize();
     }
 
+    void testImportsPhysicalUnitsFromIniFile() {
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+
+        const QString path = directory.filePath("parameters.ini");
+        QFile         file(path);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        file.write("4.25 ---- Km (x 10^10 Msun)\n"
+                   "1.5 ---- Kr (x 10 kpc)\n"
+                   "1.0 ---- Zcool\n");
+        file.close();
+
+        const auto result = m_controller->importIniFile(path);
+
+        QVERIFY(result.has_value());
+        QCOMPARE(result->Km, 4.25);
+        QCOMPARE(result->Kr, 1.5);
+        QVERIFY(!result->haveGamma);
+    }
+
+    void testRejectsInvalidPhysicalUnitsIniFile() {
+        const auto missingResult = m_controller->importIniFile("missing.ini");
+        QVERIFY(!missingResult.has_value());
+        QCOMPARE(missingResult.error(), QSpace::IO::ReadStatus::FileNotFound);
+
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+
+        const QString path = directory.filePath("parameters.ini");
+        QFile         file(path);
+        QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+        file.write("4.25 ---- Km\n0 ---- Kr\n");
+        file.close();
+
+        const auto invalidResult = m_controller->importIniFile(path);
+        QVERIFY(!invalidResult.has_value());
+        QCOMPARE(invalidResult.error(), QSpace::IO::ReadStatus::InvalidFileStructure);
+    }
+
     void testFindsNodeByFilePath() {
         auto node  = std::make_shared<DataNode>(nullptr, "Imported data");
         node->path = "data.bin";
@@ -88,6 +127,25 @@ class TestImportController : public QObject {
         QCOMPARE(node->path, path);
         QCOMPARE(node->type, QSpace::Visualize::EntityType::Gas);
         QVERIFY(node->data != nullptr);
+    }
+
+    void testImportsPhysicalUnitsWhenLoadingExperimentDirectory() {
+        QTemporaryDir directory;
+        QVERIFY(directory.isValid());
+        QVERIFY(!createGasBin(directory.filePath("Gas_001.bin"), 1.0).isEmpty());
+
+        QFile iniFile(directory.filePath("parameters.ini"));
+        QVERIFY(iniFile.open(QIODevice::WriteOnly | QIODevice::Text));
+        iniFile.write("4.25 ---- Km\n1.5 ---- Kr\n");
+        iniFile.close();
+
+        m_controller->importExperiment(directory.path());
+
+        QTRY_COMPARE(m_registry->experimentCount(), 1);
+        const auto experiment = m_registry->getAllExperiments().front();
+        QCOMPARE(experiment->profile.Km, 4.25);
+        QCOMPARE(experiment->profile.Kr, 1.5);
+        QVERIFY(!experiment->profile.haveGamma);
     }
 
     void testImportsBatchIntoGroupedExperimentSnapshots() {

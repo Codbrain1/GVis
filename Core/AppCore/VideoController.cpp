@@ -2,6 +2,7 @@
 #include "Common/Logger/Logger.h"
 #include "Core/LayerManager/LayerManager.h"
 #include "Core/ObjectRegistry/ObjectRegistry.h"
+#include "Session/Reflection.h"
 #include "Visualize/Layers/Layer.h"
 #include "Visualize/Views/View3D/AbstractView3D.h"
 #include <qtmetamacros.h>
@@ -23,7 +24,52 @@ VideoController::VideoController(Core::ObjectRegistry* objectRegistry,
 void VideoController::initialize() {
 }
 
+Session::VideoPlayerDTO VideoController::playerState() const {
+    Session::VideoPlayerDTO state;
+    state.experimentId       = m_targetExperimentId;
+    state.referenceSnapshotId = m_referenceSnapshotId;
+    state.currentSnapshotId  = m_currentVisualizeSnapshotId;
+
+    for (const auto& layers : m_snapshotPlayerSate) {
+        for (const auto& layer : layers) {
+            if (!layer || !m_playerLayerSources.contains(layer->layerId()))
+                continue;
+
+            auto settings = layer->getSettings();
+            if (!settings)
+                continue;
+
+            state.layers.append({m_playerLayerSources.value(layer->layerId()),
+                                 Reflection::QObjectToVariantMap(settings.get())});
+        }
+    }
+    return state;
+}
+
+QList<QUuid> VideoController::playerLayerIds() const {
+    QList<QUuid> layerIds;
+    for (const auto& layers : m_snapshotPlayerSate) {
+        for (const auto& layer : layers) {
+            if (layer)
+                layerIds.append(layer->layerId());
+        }
+    }
+    return layerIds;
+}
+
+void VideoController::clearPlayerLayers() {
+    for (const auto& layers : m_snapshotPlayerSate) {
+        for (const auto& layer : layers) {
+            if (layer)
+                m_layerManager->removeLayer(layer->layerId());
+        }
+    }
+    m_snapshotPlayerSate.clear();
+    m_playerLayerSources.clear();
+}
+
 void VideoController::handleNodeDataLoaded(const QUuid& nodeId) {
+    restorePlayerLayersWhenReady();
     for (const auto& layers : m_snapshotPlayerSate) {
         for (const auto& layer : layers) {
             if (!layer || layer->dataNodeId() != nodeId)
@@ -63,8 +109,8 @@ void VideoController::handleTargetExperimentChange(const QUuid& experimentId) {
     emit snapshotsListSizeChanged(int(size));
 
     // ---- по умолчанию эталон — первый снимок (как вы и просили) ----
-    handleFixedEtalonSnapshot(m_timeSliderSnapshots[0].targetSnapshot);
     handleActivateVisualizeSnapshot(1);
+    handleFixedEtalonSnapshot(m_timeSliderSnapshots[0].targetSnapshot);
 }
 
 void VideoController::handleFixedEtalonSnapshot(const QUuid& referenceSnapshotId) {
@@ -74,15 +120,8 @@ void VideoController::handleFixedEtalonSnapshot(const QUuid& referenceSnapshotId
                            << referenceSnapshotId;
         return;
     }
-    // удаляем старое состояние, снимка
-    for (const auto& [key, list] : m_snapshotPlayerSate.asKeyValueRange()) {
-        for (const auto& layer : list) {
-            if (layer) {
-                m_layerManager->removeLayer(layer->layerId());
-            }
-        }
-    }
-    m_snapshotPlayerSate.clear();
+    clearPlayerLayers();
+    m_referenceSnapshotId = referenceSnapshotId;
 
     // копируем настройки снимка для последующего повторения
     for (const auto& node : snapshot->components) {
@@ -97,10 +136,37 @@ void VideoController::handleFixedEtalonSnapshot(const QUuid& referenceSnapshotId
                 continue;
             }
             auto newLayer = m_layerManager->createLayerCopy(layer->layerId());
+            if (!newLayer) {
+                qCWarning(LogCore)
+                    << "VideoController: failed to create layer for node" << node->id;
+                continue;
+            }
             m_snapshotPlayerSate[node->type].append(newLayer);
+            m_playerLayerSources.insert(newLayer->layerId(), layer->layerId());
             layer->setVisible(false);
         }
     }
+    const auto restoredLayers = std::move(m_restoredPlayerLayers);
+    for (const auto& restoredLayer : restoredLayers) {
+        for (const auto& layers : m_snapshotPlayerSate) {
+            for (const auto& layer : layers) {
+                if (!layer || m_playerLayerSources.value(layer->layerId()) != restoredLayer.sourceLayerId)
+                    continue;
+
+                if (const auto settings = layer->getSettings()) {
+                    const auto result =
+                        Reflection::variantMapToQObject(restoredLayer.settings, settings.get());
+                    if (!result.success) {
+                        qCWarning(LogCore) << "VideoController: failed to restore player layer settings"
+                                           << layer->layerId();
+                        continue;
+                    }
+                    layer->setVisible(settings->isVisible());
+                }
+            }
+        }
+    }
+
     auto currentSnapshot = m_objectRegistry->getSnapshot(m_currentVisualizeSnapshotId);
     if (!currentSnapshot) {
         qCWarning(LogCore) << "VideoController: snapshot not found:"
@@ -180,6 +246,59 @@ void VideoController::handleActivateVisualizeSnapshot(int index) {
     }
     m_currentVisualizeSnapshotId = targetSnapshotId;
     requestLoadFloatWindow(index);
+}
+
+void VideoController::restorePlayerState(const Session::VideoPlayerDTO& state) {
+    clearPlayerLayers();
+    m_targetExperimentId         = state.experimentId;
+    m_referenceSnapshotId        = state.referenceSnapshotId;
+    m_currentVisualizeSnapshotId = state.currentSnapshotId;
+    m_restoredPlayerLayers       = state.layers;
+    m_timeSliderSnapshots.clear();
+    m_restorePending = !m_targetExperimentId.isNull() && !m_referenceSnapshotId.isNull() &&
+                       !m_currentVisualizeSnapshotId.isNull();
+
+    if (!m_restorePending || !m_objectRegistry->containsExperiment(m_targetExperimentId)) {
+        m_restorePending = false;
+        m_restoredPlayerLayers.clear();
+        return;
+    }
+
+    const auto experiment = m_objectRegistry->getExperiment(m_targetExperimentId);
+    for (const auto& snapshot : experiment->snapshots) {
+        if (snapshot)
+            m_timeSliderSnapshots.emplace_back(snapshot->id, snapshot->timestamp);
+    }
+    std::sort(m_timeSliderSnapshots.begin(), m_timeSliderSnapshots.end());
+    if (m_timeSliderSnapshots.empty()) {
+        m_restorePending = false;
+        m_restoredPlayerLayers.clear();
+        return;
+    }
+
+    emit snapshotsListSizeChanged(static_cast<int>(m_timeSliderSnapshots.size()));
+    restorePlayerLayersWhenReady();
+}
+
+void VideoController::restorePlayerLayersWhenReady() {
+    if (!m_restorePending)
+        return;
+
+    const auto referenceSnapshot = m_objectRegistry->getSnapshot(m_referenceSnapshotId);
+    if (!referenceSnapshot || !referenceSnapshot->isLoaded())
+        return;
+
+    m_restorePending = false;
+    handleFixedEtalonSnapshot(m_referenceSnapshotId);
+
+    const auto currentIndex = std::find_if(m_timeSliderSnapshots.cbegin(),
+                                           m_timeSliderSnapshots.cend(),
+                                           [this](const SnapshotToTimestamp& snapshot) {
+                                               return snapshot.targetSnapshot == m_currentVisualizeSnapshotId;
+                                           });
+    if (currentIndex != m_timeSliderSnapshots.cend())
+        handleActivateVisualizeSnapshot(
+            static_cast<int>(std::distance(m_timeSliderSnapshots.cbegin(), currentIndex)) + 1);
 }
 
 void VideoController::requestLoadFloatWindow(int index) {

@@ -5,10 +5,12 @@
 #include <QObject>
 #include "Session/SessionStorage.h"
 #include "Structures/SessionStructures.h"
+#include <functional>
 #include <memory>
 #include <optional>
 
 namespace QSpace::Core {
+
 class SessionManager : public QObject { // Исправлена опечатка в имени
     Q_OBJECT
   public:
@@ -19,6 +21,9 @@ class SessionManager : public QObject { // Исправлена опечатка
     // Сохранение и загрузка проекта
     bool saveProject(const QString& filePath, QSpace::Session::ProjectFormat format);
     bool loadProject(const QString& filePath);
+    void setVideoPlayerStateHandlers(std::function<Session::VideoPlayerDTO()> saveState,
+                                     std::function<QList<QUuid>()>            playerLayerIds,
+                                     std::function<void(const Session::VideoPlayerDTO&)> restoreState);
 
     // сохранение и загрузка палитр
     bool savePalette(const Visualize::ColorMap& map, const QString& filePath);
@@ -35,6 +40,9 @@ class SessionManager : public QObject { // Исправлена опечатка
     QSpace::Core::ObjectRegistry* m_registry;
     QSpace::Core::LayerManager*   m_layerManager;
     QSpace::Core::ViewManager*    m_viewManager;
+    std::function<Session::VideoPlayerDTO()> m_saveVideoPlayerState;
+    std::function<QList<QUuid>()>            m_playerLayerIds;
+    std::function<void(const Session::VideoPlayerDTO&)> m_restoreVideoPlayerState;
     std::unique_ptr<QSpace::Session::SessionStorage> m_storage_session;
 };
 } // namespace QSpace::Core

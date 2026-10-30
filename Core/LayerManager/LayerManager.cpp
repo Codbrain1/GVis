@@ -219,7 +219,7 @@ std::shared_ptr<Visualize::Layers::Layer> LayerManager::getLayer(const QUuid& la
     return m_layers.value(layerId, nullptr);
 }
 
-void LayerManager::applyPhysicalUnits(const QUuid& nodeId, const PhysicalUnitsProfile& profile) {
+void LayerManager::applyPhysicalUnits(const QUuid& nodeId, const Physics::PhysicalUnitsProfile& profile) {
     for (const auto& layer : getLayersForNode(nodeId)) {
         if (const auto settings = layer ? layer->getSettings() : nullptr)
             settings->setPhysicalUnitsParameters(profile.Km, profile.Kr, profile.gamma, profile.haveGamma);

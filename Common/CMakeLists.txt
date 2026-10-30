@@ -18,6 +18,7 @@ target_sources(CommonMetaObjects PRIVATE
     Structures/FileSchemeStructures.h
     Structures/FileSchemeRegistry.h
     Structures/ObjectRegistryStructures.h
+    Structures/PhysicalStructures.h
     Structures/SessionStructures.h
 )
 set_target_properties(CommonMetaObjects PROPERTIES

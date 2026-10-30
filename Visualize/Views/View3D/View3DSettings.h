@@ -1,6 +1,7 @@
 #pragma once
 #include <QColor>
 #include <QObject>
+#include <algorithm>
 #include <qobject.h>
 #include <qtmetamacros.h>
 
@@ -152,13 +153,33 @@ public:
     void setBackgroundColor(const QColor& c) { if (m_backgroundColor != c) { m_backgroundColor = c; emit changed(); } }
 
     bool orthographic() const { return m_orthographic; }
-    void setOrthographic(bool v) { if (m_orthographic != v) { m_orthographic = v; emit changed(); } }
+    void setOrthographic(bool v) {
+        if (m_orthographic == v)
+            return;
+
+        if (!v) {
+            m_orthographicNearClip     = m_nearClip;
+            m_hasOrthographicNearClip  = true;
+            m_nearClip                 = std::max(m_nearClip, kMinimumPerspectiveNearClip);
+        } else if (m_hasOrthographicNearClip) {
+            m_nearClip = m_orthographicNearClip;
+        }
+
+        m_orthographic = v;
+        emit changed();
+    }
 
     float fovYDegrees() const { return m_fovYDegrees; }
     void setFovYDegrees(float f) { if (!qFuzzyCompare(m_fovYDegrees, f)) { m_fovYDegrees = f; emit changed(); } }
 
     float nearClip() const { return m_nearClip; }
-    void setNearClip(float n) { if (!qFuzzyCompare(m_nearClip, n)) { m_nearClip = n; emit changed(); } }
+    void setNearClip(float n) {
+        const float validNearClip = m_orthographic ? n : std::max(n, kMinimumPerspectiveNearClip);
+        if (!qFuzzyCompare(m_nearClip, validNearClip)) {
+            m_nearClip = validNearClip;
+            emit changed();
+        }
+    }
 
     float farClip() const { return m_farClip; }
     void setFarClip(float f) { if (!qFuzzyCompare(m_farClip, f)) { m_farClip = f; emit changed(); } }
@@ -174,6 +195,8 @@ public:
     void changed();
 
   private:
+    static constexpr float kMinimumPerspectiveNearClip = 0.001f;
+
     // материалы для изучения
     // https://vuzdoc.ru/76377/tehnika/proektsii
 
@@ -189,9 +212,11 @@ public:
     // Параметры bottom и top определяют координаты верхней и нижней плоскости отсечения. Параметры
     // zNear и zFar задают расстояние от точки (0, 0, 0) до ближней и дальней плоскостей отсечения и
     // могут быть положительными и отрицательными.
-    float m_nearClip = -1000.0f; // стоит учесть что в перспективной проекции этот парметр должен
-                                 // быть строго больше нуля
-    float m_farClip = 1000.0f;
+    float m_nearClip = -1000.0f;
+    float m_farClip   = 1000.0f;
+
+    float m_orthographicNearClip    = m_nearClip;
+    bool  m_hasOrthographicNearClip = false;
 
     // Показывать ли координатный гизмо — маленький 3D-компас (обычно в углу экрана)
     bool m_gizmoVisible = true;

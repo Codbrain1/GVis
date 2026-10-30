@@ -7,6 +7,7 @@
 #include "Core/LayerManager/LayerManager.h"
 #include "Core/ObjectRegistry/ObjectRegistry.h"
 #include "Core/ViewManager/ViewManager.h"
+#include "Session/Reflection.h"
 
 using namespace QSpace::Core;
 using namespace QSpace::Core::Controllers;
@@ -54,6 +55,55 @@ class TestVideoViewController : public QObject {
         QVERIFY(layers->getAllLayers().isEmpty());
         viewController->removeView(second);
         QCOMPARE(removed.count(), 2);
+    }
+
+    void testRestoresPlayerLayers() {
+        auto experiment = std::make_shared<Experiment>("Experiment");
+        auto firstSnapshot = std::make_shared<Snapshot>("First", 1.0);
+        auto lastSnapshot = std::make_shared<Snapshot>("Last", 2.0);
+        auto firstNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First", 1.0);
+        auto lastNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Last", 2.0);
+        firstNode->type = QSpace::Visualize::EntityType::Gas;
+        lastNode->type = QSpace::Visualize::EntityType::Gas;
+        firstSnapshot->addComponent(firstNode);
+        lastSnapshot->addComponent(lastNode);
+        experiment->addSnapshot(firstSnapshot);
+        experiment->addSnapshot(lastSnapshot);
+        registry->registerExperiment(experiment);
+
+        QVERIFY(!viewController->createView(ViewType::OpenGL3D).isNull());
+        video->handleTargetExperimentChange(experiment->id);
+        video->handleActivateVisualizeSnapshot(2);
+        const auto state = video->playerState();
+        QCOMPARE(state.experimentId, experiment->id);
+        QCOMPARE(state.referenceSnapshotId, firstSnapshot->id);
+        QCOMPARE(state.currentSnapshotId, lastSnapshot->id);
+
+        const auto previousPlayerLayerIds = video->playerLayerIds();
+        QCOMPARE(previousPlayerLayerIds.size(), 1);
+        const auto playerLayer = layers->getLayer(previousPlayerLayerIds.first());
+        QVERIFY(playerLayer);
+        playerLayer->setVisible(false);
+        playerLayer->getSettings()->setColorByField("RestoredField");
+        const auto stateWithLayerSettings = video->playerState();
+        QCOMPARE(stateWithLayerSettings.layers.size(), 1);
+        const auto serializedState = QSpace::Reflection::gadgetToVariantMap(stateWithLayerSettings);
+        const auto restoredState =
+            QSpace::Reflection::variantMapToGadget<QSpace::Session::VideoPlayerDTO>(serializedState);
+        QCOMPARE(restoredState, stateWithLayerSettings);
+        for (const auto& layerId : previousPlayerLayerIds)
+            layers->removeLayer(layerId);
+
+        auto restored = std::make_unique<VideoController>(registry.get(), views.get(), layers.get());
+        restored->restorePlayerState(restoredState);
+        QCOMPARE(restored->getCurrentSnapshotId(), lastSnapshot->id);
+        const auto restoredPlayerLayerIds = restored->playerLayerIds();
+        QCOMPARE(restoredPlayerLayerIds.size(), 1);
+        const auto restoredPlayerLayer = layers->getLayer(restoredPlayerLayerIds.first());
+        QVERIFY(restoredPlayerLayer);
+        QCOMPARE(restoredPlayerLayer->dataNodeId(), lastNode->id);
+        QVERIFY(!restoredPlayerLayer->getSettings()->isVisible());
+        QCOMPARE(restoredPlayerLayer->getSettings()->colorByField(), QString("RestoredField"));
     }
 
     void testSnapshotSelectionAndPrefetch() {

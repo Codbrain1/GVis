@@ -155,18 +155,44 @@ class ColorMapManagerDTO {
     bool                       operator==(const ColorMapManagerDTO&) const = default;
 };
 
+class VideoPlayerLayerDTO {
+    Q_GADGET
+    Q_PROPERTY(QUuid sourceLayerId MEMBER sourceLayerId)
+    Q_PROPERTY(QVariantMap settings MEMBER settings)
+  public:
+    QUuid       sourceLayerId;
+    QVariantMap settings;
+    bool        operator==(const VideoPlayerLayerDTO&) const = default;
+};
+
+class VideoPlayerDTO {
+    Q_GADGET
+    Q_PROPERTY(QUuid experimentId MEMBER experimentId)
+    Q_PROPERTY(QUuid referenceSnapshotId MEMBER referenceSnapshotId)
+    Q_PROPERTY(QUuid currentSnapshotId MEMBER currentSnapshotId)
+    Q_PROPERTY(QList<VideoPlayerLayerDTO> layers MEMBER layers)
+  public:
+    QUuid                     experimentId;
+    QUuid                     referenceSnapshotId;
+    QUuid                     currentSnapshotId;
+    QList<VideoPlayerLayerDTO> layers;
+    bool                      operator==(const VideoPlayerDTO&) const = default;
+};
+
 class ProjectDTO {
     Q_GADGET
     Q_PROPERTY(QSpace::Session::ObjectRegistryDTO objregDTO MEMBER objregDTO)
     Q_PROPERTY(QSpace::Session::ViewManagerDTO viewmanDTO MEMBER viewmanDTO)
     Q_PROPERTY(QSpace::Session::LayerManagerDTO layermanDTO MEMBER layermanDTO)
     Q_PROPERTY(QSpace::Session::ColorMapManagerDTO colormapmanDTO MEMBER colormapmanDTO)
+    Q_PROPERTY(QSpace::Session::VideoPlayerDTO videoPlayerDTO MEMBER videoPlayerDTO)
 
   public:
     ObjectRegistryDTO  objregDTO;
     ViewManagerDTO     viewmanDTO;
     LayerManagerDTO    layermanDTO;
     ColorMapManagerDTO colormapmanDTO;
+    VideoPlayerDTO     videoPlayerDTO;
 };
 
 struct [[deprecated("Use DataNodeDTO instead")]] DataNodeState {
@@ -214,5 +240,7 @@ Q_DECLARE_METATYPE(QSpace::Session::LayerDTO)
 Q_DECLARE_METATYPE(QSpace::Session::LayerManagerDTO)
 Q_DECLARE_METATYPE(QSpace::Session::FileSchemeRegistryDTO)
 Q_DECLARE_METATYPE(QSpace::Session::ColorMapManagerDTO)
+Q_DECLARE_METATYPE(QSpace::Session::VideoPlayerLayerDTO)
+Q_DECLARE_METATYPE(QSpace::Session::VideoPlayerDTO)
 Q_DECLARE_METATYPE(QSpace::Session::ProjectDTO)
 Q_DECLARE_METATYPE(QSpace::Session::ProjectFormat)

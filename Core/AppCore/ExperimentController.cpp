@@ -26,7 +26,7 @@ QList<std::shared_ptr<Core::Experiment>> ExperimentController::getExperiments() 
 }
 
 bool ExperimentController::updatePhysicalUnits(const QUuid& id,
-                                               const PhysicalUnitsProfile& profile) {
+                                               const Physics::PhysicalUnitsProfile& profile) {
     if (!m_objectRegistry || !m_layerManager || !m_viewManager)
         return false;
     if (profile.Km <= 0.0 || profile.Kr <= 0.0 ||

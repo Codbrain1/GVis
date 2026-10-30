@@ -75,9 +75,9 @@ public:
     LayerSettings::NumericConstraints propertyConstraints(const QString& propName) const override {
         LayerSettings::NumericConstraints c;
         if (propName == "smoothingRadius") {
-            c.min      = 0.001;
+            c.min      = 0.0001;
             c.max      = 50.0;
-            c.step     = 0.01;
+            c.step     = 0.001;
             c.decimals = 8; // Шаг 0.01 и 3 знака!
             return c;
         }

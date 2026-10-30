@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Structures/ObjectRegistryStructures.h"
+#include "Common/Structures/PhysicalStructures.h"
 #include "Visualize/Views/AbstractView.h"
 #include <QObject>
 #include <qobject.h>
@@ -40,7 +41,7 @@ class VIEWMANAGER_EXPORT ViewManager : public QObject {
 
     void renderAllViews();
     void renderView(const QUuid& id);
-    void setActiveExperiment(const PhysicalUnitsProfile& profile);
+    void setActiveExperiment(const Physics::PhysicalUnitsProfile& profile);
 
 
   signals:
@@ -55,7 +56,7 @@ class VIEWMANAGER_EXPORT ViewManager : public QObject {
 
     std::map<QUuid, std::shared_ptr<Visualize::Views::AbstractView>> m_views;
     QUuid                                                            m_mainViewId;
-    PhysicalUnitsProfile                                            m_activeExperimentProfile;
+    Physics::PhysicalUnitsProfile                                  m_activeExperimentProfile;
     bool                                                             m_hasActiveExperiment = false;
 };
 } // namespace QSpace::Core

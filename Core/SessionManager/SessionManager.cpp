@@ -85,6 +85,15 @@ SessionManager::SessionManager(QSpace::Core::ObjectRegistry* registry,
     m_storage_session = std::make_unique<QSpace::Session::SessionStorage>();
 }
 
+void SessionManager::setVideoPlayerStateHandlers(
+    std::function<Session::VideoPlayerDTO()> saveState,
+    std::function<QList<QUuid>()> playerLayerIds,
+    std::function<void(const Session::VideoPlayerDTO&)> restoreState) {
+    m_saveVideoPlayerState    = std::move(saveState);
+    m_playerLayerIds          = std::move(playerLayerIds);
+    m_restoreVideoPlayerState = std::move(restoreState);
+}
+
 // ===================================================
 // savePallete() -- сохраняет палитру
 // loadPallete() -- загружает палитру
@@ -215,6 +224,18 @@ QSpace::Session::ProjectDTO SessionManager::createProjectDTO() const {
         if (const auto layerDto = LayerManagerSerializer::toDTO(m_layerManager))
             dto.layermanDTO = *layerDto;
     }
+    if (m_saveVideoPlayerState && m_playerLayerIds) {
+        dto.videoPlayerDTO = m_saveVideoPlayerState();
+        const QList<QUuid> playerLayerList = m_playerLayerIds();
+        const QSet<QUuid> playerLayerIds(playerLayerList.cbegin(), playerLayerList.cend());
+        dto.layermanDTO.layers.erase(
+            std::remove_if(dto.layermanDTO.layers.begin(),
+                           dto.layermanDTO.layers.end(),
+                           [&playerLayerIds](const Session::LayerDTO& layer) {
+                               return playerLayerIds.contains(layer.layerId);
+                           }),
+            dto.layermanDTO.layers.end());
+    }
     if (m_viewManager) {
         if (const auto viewDto = ViewManagerSerializer::toDTO(m_viewManager))
             dto.viewmanDTO = *viewDto;
@@ -259,6 +280,8 @@ bool SessionManager::fromProjectDTO(const QSpace::Session::ProjectDTO& dto) {
 
     is_succses = is_succses &&
                  LayerManagerSerializer::fromDTO(dto.layermanDTO, m_layerManager, nodeRes, viewRes);
+    if (is_succses && m_restoreVideoPlayerState)
+        m_restoreVideoPlayerState(dto.videoPlayerDTO);
     return is_succses;
 }
 } // namespace QSpace::Core

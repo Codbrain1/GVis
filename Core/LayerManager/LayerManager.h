@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Structures/ObjectRegistryStructures.h"
+#include "Common/Structures/PhysicalStructures.h"
 #include "Visualize/Layers/Layer.h"
 #include "Visualize/Views/AbstractView.h"
 #include <QList>
@@ -38,7 +39,7 @@ class LAYERMANAGER_EXPORT LayerManager : public QObject {
 
     std::shared_ptr<Visualize::Layers::Layer>        getLayer(const QUuid& layerId) const;
     QList<std::shared_ptr<Visualize::Layers::Layer>> getLayersForNode(const QUuid& nodeId) const;
-    void applyPhysicalUnits(const QUuid& nodeId, const PhysicalUnitsProfile& profile);
+    void applyPhysicalUnits(const QUuid& nodeId, const Physics::PhysicalUnitsProfile& profile);
 
     [[deprecated]]
     void updateNodeMasterSettings(const QUuid& nodeId);

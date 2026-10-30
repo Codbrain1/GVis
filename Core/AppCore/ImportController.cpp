@@ -1,5 +1,6 @@
 #include "ImportController.h"
 #include "DataCache.h"
+#include "IO/PhysicalUnitsIniReader.h"
 #include "ImportExperimentWorkflow.h"
 #include "ImportFilesWorkflow.h"
 
@@ -14,13 +15,16 @@
 // Системные и утилитарные заголовки
 #include "Common/Logger/Logger.h"
 #include <QDebug>
+#include <QFile>
 #include <QFileInfo>
+#include <QLocale>
 #include <QRegularExpression>
 #include <qfileinfo.h>
 #include <qloggingcategory.h>
 #include <qobjectdefs.h>
 #include "IO/ReaderFactory.h"
 #include "Structures/FileSchemeStructures.h"
+#include <cmath>
 #include <optional>
 
 namespace QSpace::Core::Controllers {
@@ -141,6 +145,11 @@ void ImportController::loadRestoredNodes() {
 
         onRequestDataLoad(node->id);
     }
+}
+
+std::expected<Physics::PhysicalUnitsProfile, IO::ReadStatus>
+ImportController::importIniFile(const QString& filePath) {
+    return QSpace::IO::importIniFile(filePath);
 }
 
 void ImportController::handleFileReady(const QUuid&           taskId,

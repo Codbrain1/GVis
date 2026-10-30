@@ -9,6 +9,7 @@
 #include "Enums/CoreEnums.h"
 #include "IO/ReadResult.h"
 #include "Physics/Math/MetaDataCalculating.h"
+#include "Structures/ObjectRegistryStructures.h"
 #include "Structures/SessionStructures.h"
 #include <expected>
 #include <memory>
@@ -68,6 +69,8 @@ class ImportController : public QObject {
     void prepareNodesForRestoration(const QMap<QString, Session::DataNodeState>& restoringNodes);
     void loadRestoredNodes();
 
+    std::expected<Physics::PhysicalUnitsProfile, IO::ReadStatus>
+    importIniFile(const QString& filePath);
   signals:
     void markSessionDirty(); // Сигнал для ProjectController
     void nodeDataLoaded(const QUuid& nodeId);

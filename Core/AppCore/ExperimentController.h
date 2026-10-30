@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Common/Structures/ObjectRegistryStructures.h"
+#include "Common/Structures/PhysicalStructures.h"
 #include <QObject>
 #include <QList>
 #include <memory>
@@ -23,7 +24,7 @@ class ExperimentController final : public QObject {
 
     std::shared_ptr<Core::Experiment> getExperimentById(const QUuid& id) const;
     QList<std::shared_ptr<Core::Experiment>> getExperiments() const;
-    bool updatePhysicalUnits(const QUuid& id, const PhysicalUnitsProfile& profile);
+    bool updatePhysicalUnits(const QUuid& id, const Physics::PhysicalUnitsProfile& profile);
 
   signals:
     void experimentChanged(const QUuid& experimentId);

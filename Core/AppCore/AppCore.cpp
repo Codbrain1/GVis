@@ -61,6 +61,10 @@ AppCore::AppCore(QObject* parent) : QObject(parent) {
     m_videoController = std::make_unique<Controllers::VideoController>(m_objectRegistry.get(),
                                                                        m_viewManager.get(),
                                                                        m_layerManager.get());
+    m_sessionManager->setVideoPlayerStateHandlers(
+        [this] { return m_videoController->playerState(); },
+        [this] { return m_videoController->playerLayerIds(); },
+        [this](const Session::VideoPlayerDTO& state) { m_videoController->restorePlayerState(state); });
     // 3. Инициализация моделей данных
     m_dataTreeModel = std::make_unique<QSpace::Models::DataTreeModel>(m_objectRegistry.get(),
                                                                       m_layerManager.get());

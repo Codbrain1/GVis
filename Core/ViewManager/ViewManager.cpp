@@ -159,7 +159,7 @@ void ViewManager::applyActiveExperimentToView(
     }
 }
 
-void ViewManager::setActiveExperiment(const PhysicalUnitsProfile& profile) {
+void ViewManager::setActiveExperiment(const Physics::PhysicalUnitsProfile& profile) {
     m_activeExperimentProfile = profile;
     m_hasActiveExperiment = true;
     for (auto& [id, view] : m_views)

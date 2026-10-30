@@ -18,6 +18,8 @@ target_sources(IO PUBLIC
             ReadResult.h
             SchemePresets.h
             SchemePresets.cpp
+            PhysicalUnitsIniReader.h
+            PhysicalUnitsIniReader.cpp
             ${IO_BIN}
 )   
 

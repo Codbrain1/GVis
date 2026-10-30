@@ -664,6 +664,7 @@ void LayerExplorerWidget::showCustomContextMenuForExperimentInternal(QMenu* menu
         auto* gammaBox      = new QDoubleSpinBox(&dialog);
         auto* gammaCheckBox = new QCheckBox(tr("Использовать gamma"), &dialog);
         auto* buttonBox     = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, &dialog);
+        auto* loadIniButton = new QPushButton(tr("Загрузить параметры из Ini файла"), &dialog);
 
         for (auto* spinBox : {kmSpinBox, krSpinBox, gammaBox}) {
             spinBox->setDecimals(8);
@@ -682,20 +683,57 @@ void LayerExplorerWidget::showCustomContextMenuForExperimentInternal(QMenu* menu
         formLayout->addRow(tr("Km:"), kmSpinBox);
         formLayout->addRow(tr("Kr:"), krSpinBox);
         formLayout->addRow(gammaCheckBox, gammaBox);
+        formLayout->addRow(loadIniButton);
         formLayout->addRow(buttonBox);
 
         connect(gammaCheckBox, &QCheckBox::toggled, gammaBox, &QDoubleSpinBox::setEnabled);
         connect(buttonBox, &QDialogButtonBox::accepted, &dialog, &QDialog::accept);
         connect(buttonBox, &QDialogButtonBox::rejected, &dialog, &QDialog::reject);
+        connect(loadIniButton,
+                &QPushButton::clicked,
+                &dialog,
+                [this, kmSpinBox, krSpinBox, gammaBox, gammaCheckBox, &dialog]() {
+                    const QString iniFilePath = QFileDialog::getOpenFileName(&dialog,
+                                                                             m_root_path,
+                                                                             tr("Выберите INI-файл"),
+                                                                             tr("INI files (*.ini)"));
+                    if (iniFilePath.isEmpty())
+                        return;
 
+                    const auto importController = m_app ? m_app->importController() : nullptr;
+                    if (!importController) {
+                        QMessageBox::warning(&dialog,
+                                             tr("Ошибка чтения ini файла"),
+                                             tr("Контроллер импорта недоступен."));
+                        return;
+                    }
+
+                    const auto res = importController->importIniFile(iniFilePath);
+                    if (!res.has_value()) {
+                        const auto status = res.error();
+                        qCWarning(LogIO) << "Unable to read INI file" << iniFilePath
+                                         << "; ReadStatus:" << static_cast<int>(status);
+                        QMessageBox::warning(
+                            &dialog,
+                            tr("Ошибка чтения ini файла"),
+                            tr("Не удалось прочитать файл. Код ошибки: %1.").arg(static_cast<int>(status)));
+                        return;
+                    }
+
+                    const auto& profile = res.value();
+                    kmSpinBox->setValue(profile.Km);
+                    krSpinBox->setValue(profile.Kr);
+                    gammaBox->setValue(profile.gamma);
+                    gammaCheckBox->setChecked(profile.haveGamma);
+                });
         if (dialog.exec() != QDialog::Accepted) {
             return;
         }
 
-        Core::PhysicalUnitsProfile profile;
-        profile.Km = kmSpinBox->value();
-        profile.Kr = krSpinBox->value();
-        profile.gamma = gammaBox->value();
+        Physics::PhysicalUnitsProfile profile;
+        profile.Km        = kmSpinBox->value();
+        profile.Kr        = krSpinBox->value();
+        profile.gamma     = gammaBox->value();
         profile.haveGamma = gammaCheckBox->isChecked();
         if (!experimentController || !experimentController->updatePhysicalUnits(experimentId, profile)) {
             QMessageBox::warning(this, tr("Внимание"), tr("Не удалось сохранить параметры эксперимента."));

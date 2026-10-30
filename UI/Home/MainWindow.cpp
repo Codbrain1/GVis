@@ -2,10 +2,10 @@
 #include "Common/Logger/Logger.h"
 #include "Core/AppCore/AppCore.h"
 #include "Core/AppCore/ImportController.h"
-#include "Core/DataManager/DataManager.h"
 #include "Core/AppCore/ProjectController.h"
 #include "Core/AppCore/VideoController.h"
 #include "Core/AppCore/ViewController.h"
+#include "Core/DataManager/DataManager.h"
 #include "Core/ViewManager/ViewManager.h"
 #include "Enums/ViewEnums.h"
 #include "Enums/VisualizeBaseEnums.h"
@@ -46,6 +46,7 @@
 #include <quuid.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkType.h>
+
 
 namespace QSpace::UI {
 MainWindow::MainWindow(Core::AppCore* app, QWidget* parent)
