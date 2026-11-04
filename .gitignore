@@ -12,3 +12,5 @@ ToListing.py
 /extern/vtk9.5-dll/*
 !/extern/vtk9.5-dll/.gitkeep
 /coverage/
+/Sandbox/Data/
+/Sandbox/Data/*

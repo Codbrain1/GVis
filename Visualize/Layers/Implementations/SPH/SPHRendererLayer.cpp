@@ -143,6 +143,7 @@ void SPHRendererLayer::uploadBuffers(QOpenGLFunctions_3_3_Core* gl) {
     }
 
     m_particleCount = positions.size();
+    m_settings->setParticleCount(m_particleCount);
     m_normMode      = normMode;
 
     auto bounds = vtkAdapter::getBounds(node);
@@ -220,19 +221,18 @@ void SPHRendererLayer::render(QOpenGLFunctions_3_3_Core* gl, const Visualize::Re
     gl->glEnable(GL_BLEND);
     gl->glBlendFunc(GL_ONE, GL_ONE);
 
-
-
     m_splatProgram.bind();
     m_splatProgram.setUniformValue("uMVP", ctx.mvp);
     m_splatProgram.setUniformValue("uPointScale", ctx.pixelsPerWorldUnit);
     m_splatProgram.setUniformValue("uWorldRadius", m_settings->smoothingRadius());
-    // m_splatProgram.setUniformValue("uKernelType", static_cast<int>(m_settings->kernelType()));
-    // масштабирование в размерные величины
+    m_splatProgram.setUniformValue("uRangeMin", float(m_settings->rangeMin()));
+    m_splatProgram.setUniformValue("uRangeMax", float(m_settings->rangeMax()));
+    m_splatProgram.setUniformValue("uShowOutRangeParticles", m_settings->showOutOfRangeParticles());
 
-
+    const int firstParticle = m_settings->firstVisibleParticle(m_particleCount);
+    const int particleCount = m_settings->visibleParticleCount(m_particleCount);
     m_vaoParticles.bind();
-    // непосредственная отрисовка с заданными параметрами
-    gl->glDrawArrays(GL_POINTS, 0, m_particleCount);
+    gl->glDrawArrays(GL_POINTS, firstParticle, particleCount);
     m_vaoParticles.release();
     m_splatProgram.release();
     gl->glDisable(GL_BLEND);
@@ -282,7 +282,6 @@ void SPHRendererLayer::render(QOpenGLFunctions_3_3_Core* gl, const Visualize::Re
     gl->glBindTexture(GL_TEXTURE_2D, m_physicalFBO->texture());
     gl->glActiveTexture(GL_TEXTURE1);
     gl->glBindTexture(GL_TEXTURE_1D, ColorMapTexture::getOrCreate(gl, m_settings->colorMapId()));
-
 
     float scaleFactor = QSpace::Physics::fieldPhysicalScale(pu, m_settings->colorByField());
 

@@ -14,7 +14,6 @@ class LAYERS_EXPORT ParticlePointsLayerSettings : public LayerSettings {
     Q_PROPERTY(float minPointSizePx              READ minPointSizePx              WRITE setMinPointSizePx              NOTIFY changed)
     Q_PROPERTY(float maxPointSizePx              READ maxPointSizePx              WRITE setMaxPointSizePx              NOTIFY changed)
     Q_PROPERTY(bool  shadeAsSphere               READ shadeAsSphere               WRITE setShadeAsSphere               NOTIFY changed)
-    Q_PROPERTY(bool  showOutRangeParticles       READ showOutRangeParticles       WRITE setShowOutRangeParticles       NOTIFY changed)
 
 public:
     explicit ParticlePointsLayerSettings(QObject* parent = nullptr) : LayerSettings(parent) {}
@@ -36,9 +35,6 @@ public:
     bool shadeAsSphere() const { return m_shadeAsSphere; }
     void setShadeAsSphere(bool v) { if (m_shadeAsSphere != v) { m_shadeAsSphere = v; emit changed(); } }
   
-    bool showOutRangeParticles() { return m_showOutRangeParticles; }
-    void setShowOutRangeParticles(bool s) { if ( m_showOutRangeParticles != s) { m_showOutRangeParticles = s; emit changed(); }}
-
     // clang-format on
 
     // Внутри ParticlePointsLayerSettings
@@ -48,8 +44,7 @@ public:
             {"sizeByField", "Масштаб от поля"},
             {"minPointSizePx", "Мин. размер точки"},
             {"maxPointSizePx", "Макс. размер точки"},
-            {"shadeAsSphere", "Сферическое затенение"},
-            {"showOutRangeParticles", "Отображать частицы вне диапазона"}};
+            {"shadeAsSphere", "Сферическое затенение"}};
         if (particleNames.contains(propName))
             return particleNames.value(propName);
         return LayerSettings::propertyDisplayName(propName);
@@ -67,8 +62,6 @@ public:
     }
 
   private:
-    bool m_showOutRangeParticles = false;
-
     bool  m_autoSizePoint  = false;
     float m_pointSizePx    = 4.0f;
     float m_minPointSizePx = 1.0f;

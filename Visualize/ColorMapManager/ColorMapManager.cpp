@@ -2,6 +2,8 @@
 #include "ColorMapManager.h"
 #include "Common/Logger/Logger.h"
 #include <QList>
+#include <QMetaObject>
+#include <QThread>
 #include <qobject.h>
 #include <quuid.h>
 
@@ -24,6 +26,12 @@ QList<ColorMap> ColorMapManager::getAllMaps() const {
 }
 
 void ColorMapManager::AddCustomMap(const ColorMap& map) {
+    if (QThread::currentThread() != thread()) {
+        QMetaObject::invokeMethod(
+            this, [this, map]() { AddCustomMap(map); }, Qt::QueuedConnection);
+        return;
+    }
+
     m_availableMaps.insert(map.id, map);
     emit paleteAdded(map);
 }
@@ -39,6 +47,8 @@ void ColorMapManager::removeCustomMap(const QUuid& id) {
 }
 
 ColorMapManager::ColorMapManager(QObject* parent) : QObject(parent) {
+    qRegisterMetaType<ColorMap>("QSpace::Visualize::ColorMap");
+
     // При инициализации заполняем карту пресетами
     auto presets = ColorMapPresets::getStandardPresets();
     for (const auto& map : presets) {

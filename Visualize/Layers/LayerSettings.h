@@ -7,6 +7,8 @@
 #include <QUuid>
 #include <QVariantMap>
 #include "LayersExport.h"
+#include <algorithm>
+#include <limits>
 
 namespace QSpace::Visualize::Layers {
 
@@ -35,8 +37,12 @@ class LAYERS_EXPORT LayerSettings : public QObject {
     Q_PROPERTY(double        baseRangeMin  READ baseRangeMin                         NOTIFY calculatedRangeChanged)
     Q_PROPERTY(double        baseRangeMax  READ baseRangeMax                         NOTIFY calculatedRangeChanged)
     Q_PROPERTY(bool          autoRange     READ autoRange     WRITE setAutoRange     NOTIFY changed)
+    Q_PROPERTY(bool          showOutRangeParticles READ showOutOfRangeParticles WRITE setShowOutOfRangeParticles NOTIFY changed)
     Q_PROPERTY(int           zOrder        READ zOrder        WRITE setZOrder        NOTIFY changed)
     Q_PROPERTY(BlendMode     blendMode     READ blendMode     WRITE setBlendMode     NOTIFY changed)
+    Q_PROPERTY(bool show_all_particles  READ showAllParticles    WRITE setShowAllParticles    NOTIFY changed)
+    Q_PROPERTY(int  particle_number_min READ particleNumberMin  WRITE setParticleNumberMin  NOTIFY changed)
+    Q_PROPERTY(int  particle_number_max READ particleNumberMax  WRITE setParticleNumberMax  NOTIFY changed)
     // clang-format on
   public:
     explicit LayerSettings(QObject* parent = nullptr) : QObject(parent) {
@@ -199,6 +205,17 @@ class LAYERS_EXPORT LayerSettings : public QObject {
         }
     }
 
+    bool showOutOfRangeParticles() const {
+        return m_showOutOfRangeParticles;
+    }
+
+    void setShowOutOfRangeParticles(bool value) {
+        if (m_showOutOfRangeParticles != value) {
+            m_showOutOfRangeParticles = value;
+            emit changed();
+        }
+    }
+
     int zOrder() const {
         return m_zOrder;
     }
@@ -221,24 +238,72 @@ class LAYERS_EXPORT LayerSettings : public QObject {
         }
     }
 
-    // QVariantMap toVariantMap() const {
-    //     QVariantMap        map;
-    //     const QMetaObject* mo = metaObject();
-    //     for (int i = QObject::staticMetaObject.propertyCount(); i < mo->propertyCount(); ++i) {
-    //         QMetaProperty prop = mo->property(i);
-    //         map[prop.name()]   = prop.read(this);
-    //     }
-    //     return map;
-    // }
+    bool showAllParticles() const {
+        return m_showAllParticles;
+    }
 
-    // void fromVariantMap(const QVariantMap& map) {
-    //     const QMetaObject* mo = metaObject();
-    //     for (auto it = map.constBegin(); it != map.constEnd(); ++it) {
-    //         int idx = mo->indexOfProperty(it.key().toUtf8().constData());
-    //         if (idx >= 0)
-    //             mo->property(idx).write(this, it.value());
-    //     }
-    // }
+    void setShowAllParticles(bool value) {
+        if (m_showAllParticles != value) {
+            m_showAllParticles = value;
+            emit changed();
+        }
+    }
+
+    int particleNumberMin() const {
+        return m_particleNumberMin;
+    }
+
+    void setParticleNumberMin(int value) {
+        value = std::max(0, value);
+        if (m_particleNumberMin == value)
+            return;
+
+        m_particleNumberMin = value;
+        if (m_particleNumberMax < value)
+            m_particleNumberMax = value;
+        emit changed();
+    }
+
+    int particleNumberMax() const {
+        return m_particleNumberMax;
+    }
+
+    void setParticleNumberMax(int value) {
+        value = std::max(0, value);
+        if (m_particleNumberMax == value)
+            return;
+
+        m_particleNumberMax = value;
+        if (m_particleNumberMin > value)
+            m_particleNumberMin = value;
+        emit changed();
+    }
+
+    void setParticleCount(int count) {
+        count = std::max(0, count);
+        if (m_particleCount == count)
+            return;
+
+        m_particleCount = count;
+        emit calculatedRangeChanged();
+    }
+
+    int firstVisibleParticle(int count) const {
+        if (m_showAllParticles || count <= 0)
+            return 0;
+        return std::clamp(m_particleNumberMin, 0, count);
+    }
+
+    int visibleParticleCount(int count) const {
+        if (count <= 0)
+            return 0;
+        if (m_showAllParticles)
+            return count;
+
+        const int first = firstVisibleParticle(count);
+        const int last  = std::clamp(m_particleNumberMax, 0, count - 1);
+        return std::max(0, last - first + 1);
+    }
 
     virtual QString propertyDisplayName(const QString& propName) const {
         static const QMap<QString, QString> baseNames = {{"isVisible", "Видимость слоя"},
@@ -251,6 +316,10 @@ class LAYERS_EXPORT LayerSettings : public QObject {
                                                          {"baseRangeMin", "Глобальный минимум"},
                                                          {"baseRangeMax", "Глобальный максимум"},
                                                          {"autoRange", "Авто-диапазон"},
+                                                         {"showOutRangeParticles", "Отображать частицы вне диапазона значений"},
+                                                         {"show_all_particles", "Показать все частицы"},
+                                                         {"particle_number_min", "Первый номер частицы"},
+                                                         {"particle_number_max", "Последний номер частицы"},
                                                          {"zOrder", "Порядок отображения (Z)"},
                                                          {"blendMode", "Режим смешивания"}};
         //  {"pickable", "Доступен для выбора"}};
@@ -274,6 +343,11 @@ class LAYERS_EXPORT LayerSettings : public QObject {
             c.max      = 1.0;
             c.step     = 0.05;
             c.decimals = 4;
+        } else if (propName == "particle_number_min" || propName == "particle_number_max") {
+            c.min      = 0.0;
+            c.max      = m_particleCount > 0 ? m_particleCount - 1 : std::numeric_limits<int>::max();
+            c.step     = 1.0;
+            c.decimals = 0;
         } else if (propName == "rangeMin" || propName == "rangeMax" || propName == "baseRangeMin" ||
                    propName == "baseRangeMax") {
             // ДИНАМИЧЕСКИЙ РАСЧЕТ: шаг — это 1% от текущего глобального диапазона
@@ -291,7 +365,9 @@ class LAYERS_EXPORT LayerSettings : public QObject {
     }
 
     virtual bool isPropertyEnabled(const QString& propName) const {
-        if (propName == "rangeMin") {
+        if (propName == "particle_number_min" || propName == "particle_number_max") {
+            return !showAllParticles();
+        } else if (propName == "rangeMin") {
             return !autoRange();
         } else if (propName == "rangeMax") {
             return !autoRange();
@@ -318,12 +394,18 @@ class LAYERS_EXPORT LayerSettings : public QObject {
     double    m_baseRangeMin = 0.0;   // глобальное минимальное значение
     double    m_baseRangeMax = 100.0; // глобальное максимальное значение
     bool      m_autoRange    = true;  // автоматически ли подбирать диапазон окрашивания частиц
+    bool      m_showOutOfRangeParticles = false;
     int       m_zOrder       = 0;
-    BlendMode m_blendMode        = BlendMode::Alpha;
-    double    m_physicalKm       = 3.72;
-    double    m_physicalKr       = 0.9;
-    double    m_physicalGamma    = 5.0 / 3.0;
-    bool      m_hasPhysicalGamma = true;
+    BlendMode m_blendMode    = BlendMode::Alpha;
+    double    m_physicalKm   = 3.72;
+    double    m_physicalKr   = 0.9;
+    double    m_physicalGamma     = 5.0 / 3.0;
+    bool m_showAllParticles  = true;
+    int  m_particleNumberMin = 0;
+    int  m_particleNumberMax = std::numeric_limits<int>::max();
+    int  m_particleCount     = 0;
+
+    bool m_hasPhysicalGamma = true;
 };
 
 } // namespace QSpace::Visualize::Layers

@@ -15,7 +15,11 @@ namespace QSpace::UI {
 class ColorMapEditorDialog : public QDialog {
     Q_OBJECT
   public:
-    explicit ColorMapEditorDialog(const QSpace::Visualize::ColorMap& baseMap, QWidget* parent = nullptr);
+    enum class Mode { Create, Edit };
+
+    explicit ColorMapEditorDialog(const QSpace::Visualize::ColorMap& baseMap,
+                                  Mode                              mode,
+                                  QWidget*                          parent = nullptr);
     ~ColorMapEditorDialog();
     Visualize::ColorMap getEditedMap() const;
   signals:
@@ -33,8 +37,9 @@ class ColorMapEditorDialog : public QDialog {
     void on_spinBoxChanged(double value);
 
   private:
-    Ui::ColorMapEditorDialog* ui; // Теперь это совпадет с именем в .ui
+    Ui::ColorMapEditorDialog* ui;
     Visualize::ColorMap       m_baseMap;
+    Mode                      m_mode;
     void                      populateTable();
 };
 } // namespace QSpace::UI

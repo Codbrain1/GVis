@@ -106,10 +106,13 @@ void PropertyInspector::handleColorMapAdded(const Visualize::ColorMap& map) {
     QSignalBlocker blocker(ui->combo_colormap);
     // Выбираем свежедобавленную палитру
     ui->combo_colormap->setCurrentIndex(ui->combo_colormap->count() - 1);
-    // 7. Обновляем ядро и рендер
-    auto colorMapId = map.id;
-    auto layer      = m_app->layerController()->getLayerById(m_currentElementId);
-    layer->getSettings()->setColorMapId(colorMapId);
+    auto layer = m_app->layerController()->getLayerById(m_currentElementId);
+    if (!layer)
+        return;
+
+    layer->getSettings()->setColorMapId(map.id);
+    ui->colorbarWidget->setColorMap(map);
+    layer->getView().lock()->render();
 }
 void PropertyInspector::handleCreateCustomPalete() {
     if (m_currentNodeId.isNull())
@@ -128,8 +131,8 @@ void PropertyInspector::handleCreateCustomPalete() {
                                       ? baseMapOpt.value()
                                       : Visualize::ColorMapManager::instance().getAllMaps().first();
 
-    // 2. Создаем диалог, передавая базовую палитру
-    ColorMapEditorDialog dialog(baseMap, this);
+    // 2. Создаем новую палитру на основе выбранной
+    ColorMapEditorDialog dialog(baseMap, ColorMapEditorDialog::Mode::Create, this);
     connect(&dialog,
             &ColorMapEditorDialog::savePaletteRequested,
             m_app->projectController(),
@@ -173,7 +176,7 @@ void PropertyInspector::handleEditPalete() {
     }
     Visualize::ColorMap baseMap = baseMapOpt.value();
 
-    ColorMapEditorDialog dialog(baseMap, this);
+    ColorMapEditorDialog dialog(baseMap, ColorMapEditorDialog::Mode::Edit, this);
     connect(&dialog,
             &ColorMapEditorDialog::savePaletteRequested,
             m_app->projectController(),

@@ -1,5 +1,6 @@
 #pragma once
 #include "Common/Structures/ColormapPresets.h"
+#include "colormapmanager_export.h"
 #include <QApplication>
 #include <QColor>
 #include <QIcon>
@@ -16,7 +17,7 @@
 #include <quuid.h>
 
 namespace QSpace::Visualize {
-class ColorMapManager : public QObject {
+class COLORMAPMANAGER_EXPORT ColorMapManager : public QObject {
     Q_OBJECT
   public:
     static ColorMapManager& instance();

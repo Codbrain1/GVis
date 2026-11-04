@@ -10,6 +10,7 @@
 #include "Core/ViewManager/ViewManager.h"
 #include "Core/ViewManager/ViewManagerSerializer.h"
 #include "Session/Reflection.h"
+#include "Visualize/Layers/Implementations/Particle/ParticlePointsLayerSettings.h"
 
 using namespace QSpace::Core;
 using namespace QSpace::Session;
@@ -61,6 +62,31 @@ class TestLayerManagerSerializer : public QObject {
         QVERIFY(!LayerManagerSerializer::fromDTO(layer,
                                                   [node](const QUuid& id) { return id == node->id ? node : nullptr; },
                                                   [&views](const QUuid& id) { return views.getView(id); }));
+    }
+
+    void testParticleFilterSettingsPreserveRange() {
+        QSpace::Visualize::Layers::ParticlePointsLayerSettings settings;
+        settings.setParticleCount(20001);
+        settings.setParticleNumberMin(0);
+        settings.setParticleNumberMax(10000);
+        settings.setShowAllParticles(false);
+        settings.setShowOutOfRangeParticles(true);
+
+        QCOMPARE(settings.firstVisibleParticle(20001), 0);
+        QCOMPARE(settings.visibleParticleCount(20001), 10001);
+
+        settings.setShowAllParticles(true);
+        QCOMPARE(settings.visibleParticleCount(20001), 20001);
+        QCOMPARE(settings.particleNumberMin(), 0);
+        QCOMPARE(settings.particleNumberMax(), 10000);
+
+        const QVariantMap saved = QSpace::Reflection::QObjectToVariantMap(&settings);
+        QSpace::Visualize::Layers::ParticlePointsLayerSettings restored;
+        QVERIFY(QSpace::Reflection::variantMapToQObject(saved, &restored).success);
+        QCOMPARE(restored.particleNumberMin(), 0);
+        QCOMPARE(restored.particleNumberMax(), 10000);
+        QVERIFY(restored.showAllParticles());
+        QVERIFY(restored.showOutOfRangeParticles());
     }
 
     void testRoundTripRestoresMultipleLayersAndState() {

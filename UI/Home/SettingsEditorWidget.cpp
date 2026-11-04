@@ -5,6 +5,7 @@
 #include <QComboBox>
 #include <QDoubleSpinBox>
 #include <QFormLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QMetaProperty>
 #include <QPushButton>
@@ -16,6 +17,9 @@ namespace QSpace::UI {
 SettingsEditorWidget::SettingsEditorWidget(QWidget* parent)
     : QWidget(parent), m_layout(new QFormLayout(this)) {
     m_layout->setLabelAlignment(Qt::AlignLeft);
+    m_layout->setRowWrapPolicy(QFormLayout::DontWrapRows);
+    m_layout->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
+    m_layout->setFormAlignment(Qt::AlignTop | Qt::AlignLeft);
 }
 
 void SettingsEditorWidget::setSettings(QSpace::Visualize::Layers::LayerSettings* settings) {
@@ -118,8 +122,10 @@ void SettingsEditorWidget::createRowForProperty(const QMetaProperty& prop) {
         });
         editorWidget = sb;
     } else if (type == QMetaType::Int) {
-        auto* sb = new QSpinBox(this);
-        sb->setRange(-1000000, 1000000);
+        auto*      sb          = new QSpinBox(this);
+        const auto constraints = m_settings->propertyConstraints(propertyName);
+        sb->setRange(static_cast<int>(constraints.min), static_cast<int>(constraints.max));
+        sb->setSingleStep(static_cast<int>(constraints.step));
         sb->setValue(value.toInt());
         connect(sb, &QSpinBox::valueChanged, this, [this, prop](int val) {
             if (m_settings)
@@ -150,7 +156,13 @@ void SettingsEditorWidget::createRowForProperty(const QMetaProperty& prop) {
     }
 
     if (editorWidget) {
-        m_layout->addRow(labelText, editorWidget);
+        auto* label = new QLabel(labelText, this);
+        label->setWordWrap(true);
+        label->setMinimumWidth(150);
+        label->setMaximumWidth(300);
+        label->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Minimum);
+
+        m_layout->addRow(label, editorWidget);
         m_editors[propertyName] = editorWidget;
     }
 }
@@ -191,9 +203,12 @@ void SettingsEditorWidget::updateUiValues() {
             sb->setSingleStep(constraints.step); // Шаг адаптируется автоматически!
 
             sb->setValue(value.toDouble());
-        } else if (auto* sb = qobject_cast<QSpinBox*>(editorWidget))
+        } else if (auto* sb = qobject_cast<QSpinBox*>(editorWidget)) {
+            const auto constraints = m_settings->propertyConstraints(propName);
+            sb->setRange(static_cast<int>(constraints.min), static_cast<int>(constraints.max));
+            sb->setSingleStep(static_cast<int>(constraints.step));
             sb->setValue(value.toInt());
-        else if (auto* le = qobject_cast<QLineEdit*>(editorWidget))
+        } else if (auto* le = qobject_cast<QLineEdit*>(editorWidget))
             le->setText(value.toString());
         else if (auto* btn = qobject_cast<QPushButton*>(editorWidget))
             updateColorButton(btn, value.value<QColor>());

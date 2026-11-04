@@ -124,6 +124,7 @@ void ParticleRendererLayer::uploadBuffersIfDirty(QOpenGLFunctions_3_3_Core* gl) 
     }
 
     m_particleCount = positions.size();
+    m_settings->setParticleCount(m_particleCount);
     if (m_particleCount == 0) {
         qWarning() << "ParticleRendererLayer: DataNode contains no points";
         m_dirty = false;
@@ -208,11 +209,13 @@ void ParticleRendererLayer::render(QOpenGLFunctions_3_3_Core*      gl,
     m_program.setUniformValue("uShadeAsSphere", m_settings->shadeAsSphere());
     m_program.setUniformValue("uOpacity", float(m_settings->opacity()));
     m_program.setUniformValue("uAutoSizePoint", m_settings->autoSizePoint());
-    m_program.setUniformValue("uShowOutRangeParticles", m_settings->showOutRangeParticles());
+    m_program.setUniformValue("uShowOutRangeParticles", m_settings->showOutOfRangeParticles());
     m_program.setUniformValue("uColorMap", 0);
 
+    const int firstParticle = m_settings->firstVisibleParticle(m_particleCount);
+    const int particleCount = m_settings->visibleParticleCount(m_particleCount);
     m_vao.bind();
-    gl->glDrawArrays(GL_POINTS, 0, m_particleCount);
+    gl->glDrawArrays(GL_POINTS, firstParticle, particleCount);
     m_vao.release();
     m_program.release();
 

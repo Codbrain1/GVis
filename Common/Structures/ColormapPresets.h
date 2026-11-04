@@ -1,5 +1,6 @@
 #pragma once
 #include <QList>
+#include <QMetaType>
 #include <QString>
 #include <QUuid>
 #include <QVector>
@@ -23,6 +24,12 @@ struct ColorMap {
 
     bool operator==(const ColorMap&) const = default;
 };
+
+} // namespace QSpace::Visualize
+
+Q_DECLARE_METATYPE(QSpace::Visualize::ColorMap)
+
+namespace QSpace::Visualize {
 
 class ColorMapPresets {
   public:

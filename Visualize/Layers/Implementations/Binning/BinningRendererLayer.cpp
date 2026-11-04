@@ -12,10 +12,19 @@ void BinningRendererLayer::buildShaders() {
         layout(location = 0) in vec3 aPos;
         layout(location = 1) in float aScalar;
         uniform mat4 uMVP;
+        uniform bool uShowOutRangeParticles;
+        uniform float uRangeMin;
+        uniform float uRangeMax;
         out float vScalar;
         void main() {
-            gl_Position = uMVP * vec4(aPos, 1.0);
-            gl_PointSize = 1.0; // Строго 1 пиксель (ячейка) в FBO-сетке
+            bool inRange = aScalar >= uRangeMin && aScalar <= uRangeMax;
+            if (!uShowOutRangeParticles && !inRange) {
+                gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+                gl_PointSize = 0.0;
+            } else {
+                gl_Position = uMVP * vec4(aPos, 1.0);
+                gl_PointSize = 1.0;
+            }
             vScalar = aScalar;
         }
     )";
@@ -133,6 +142,7 @@ void BinningRendererLayer::uploadBuffersIfDirty(QOpenGLFunctions_3_3_Core* gl) {
     }
 
     m_particleCount = positions.size();
+    m_settings->setParticleCount(m_particleCount);
     if (m_particleCount == 0) {
         m_dirty     = false;
         m_hasBounds = false;
@@ -252,9 +262,14 @@ void BinningRendererLayer::render(QOpenGLFunctions_3_3_Core*      gl,
 
     m_binProgram.bind();
     m_binProgram.setUniformValue("uMVP", ctx.mvp);
+    m_binProgram.setUniformValue("uRangeMin", float(m_settings->rangeMin()));
+    m_binProgram.setUniformValue("uRangeMax", float(m_settings->rangeMax()));
+    m_binProgram.setUniformValue("uShowOutRangeParticles", m_settings->showOutOfRangeParticles());
 
+    const int firstParticle = m_settings->firstVisibleParticle(m_particleCount);
+    const int particleCount = m_settings->visibleParticleCount(m_particleCount);
     m_vaoParticles.bind();
-    gl->glDrawArrays(GL_POINTS, 0, m_particleCount);
+    gl->glDrawArrays(GL_POINTS, firstParticle, particleCount);
     m_vaoParticles.release();
     m_binProgram.release();
 

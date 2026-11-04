@@ -10,8 +10,10 @@
 
 namespace QSpace::UI {
 
-ColorMapEditorDialog::ColorMapEditorDialog(const Visualize::ColorMap& baseMap, QWidget* parent)
-    : QDialog(parent), ui(new Ui::ColorMapEditorDialog), m_baseMap(baseMap) {
+ColorMapEditorDialog::ColorMapEditorDialog(const Visualize::ColorMap& baseMap,
+                                           Mode                              mode,
+                                           QWidget*                          parent)
+    : QDialog(parent), ui(new Ui::ColorMapEditorDialog), m_baseMap(baseMap), m_mode(mode) {
     ui->setupUi(this);
 
     // Связываем стандартные кнопки Ok и Cancel с закрытием диалога
@@ -173,17 +175,11 @@ void ColorMapEditorDialog::populateTable() {
 
 Visualize::ColorMap ColorMapEditorDialog::getEditedMap() const {
     Visualize::ColorMap newMap = m_baseMap;
-    // Генерируем уникальный ID для новой палитры
-    if (m_baseMap.isPreset) {
-        newMap.id       = QUuid::createUuid();
-        newMap.name     = "Custom_" + newMap.id.toString().mid(1, 4);
-        newMap.isPreset = false;
-    } else {
-        // Если палитра была загружена из файла, сохраняем ее ID и имя
-        newMap.id       = m_baseMap.id;
-        newMap.name     = m_baseMap.name;
-        newMap.isPreset = false;
+    if (m_mode == Mode::Create) {
+        newMap.id   = QUuid::createUuid();
+        newMap.name = "Custom_" + newMap.id.toString().mid(1, 4);
     }
+    newMap.isPreset = false;
     // Собираем данные из таблицы
     newMap.points.clear();
     for (int i = 0; i < ui->tableWidget->rowCount(); ++i) {

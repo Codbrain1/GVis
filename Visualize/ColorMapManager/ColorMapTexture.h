@@ -1,4 +1,5 @@
 #pragma once
+#include "colormapmanager_export.h"
 #include <QMap>
 #include <QObject>
 #include <QOpenGLContext>
@@ -13,7 +14,7 @@ namespace QSpace::Visualize::Layers {
 // один и тот же shareContext() — значит один кэш на всё приложение корректен,
 // но привязка к конкретному QOpenGLContext* защищает от случая, когда
 // sharing по каким-то причинам не установлен для конкретного контекста.
-class ColorMapTexture {
+class COLORMAPMANAGER_EXPORT ColorMapTexture {
   public:
     static GLuint getOrCreate(QOpenGLFunctions_3_3_Core* gl, const QUuid& colorMapId);
     static void   invalidate(const QUuid& colorMapId); // сбросить во всех контекстах сразу

@@ -1,9 +1,29 @@
+add_compile_definitions(QT_NO_DEBUG_OUTPUT)
 # --- Добавление новых тестов в песочницу
-# add_sandbox_test(TestvtkPointGaussianMapper  
-#  SOURCES 
-#  test_vtkPointGaussianMapper/main.cpp 
-#   LIBS
-#  QSpace::Visualize QSpace::IO)
+add_sandbox_test(StressTestOneReadFileStandart
+    SOURCES 
+        StressTestOneReadFileStandart/main.cpp 
+    LIBS
+        QSpace::IO  
+)
+add_sandbox_test(StressTestOneReadFileMapped
+    SOURCES 
+        StressTestOneReadFileMapped/main.cpp 
+    LIBS
+        QSpace::IO  
+)
+add_sandbox_test(StressTestBatchReadFileStandart
+    SOURCES
+        StressTestBatchReadFIleStandart/main.cpp
+    LIBS
+        QSpace::IO
+)
+add_sandbox_test(StressTestBatchReadFileMapped
+    SOURCES
+        StressTestBatchReadFIleMapped/main.cpp
+    LIBS
+        QSpace::IO
+)
 # add_sandbox_test(TestVtkVisualize  
 #     SOURCES
 #         test_vtkvisualize/main.cpp 
