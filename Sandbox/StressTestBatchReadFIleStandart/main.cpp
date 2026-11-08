@@ -2,16 +2,21 @@
 #include <QDir>
 #include <QFileInfo>
 
+#include "Common/Interfaces/IReader.h"
 #include "Enums/IOEnums.h"
 #include "Enums/VisualizeBaseEnums.h"
 #include "IO/ReaderFactory.h"
-#include <IO/SchemePresets.h>
+#include "IO/SchemePresets.h"
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
-#include <future>
+#include <condition_variable>
+#include <cstdint>
 #include <iomanip>
 #include <iostream>
+#include <mutex>
+#include <optional>
 #include <thread>
 #include <vector>
 
@@ -66,42 +71,124 @@ bool parseOptions(int argc, char* argv[], CommandLineOptions& options) {
     return true;
 }
 
-QSpace::IO::ReadResult readFile(const QString& path, const QSpace::IO::ReadScheme& scheme) {
-    auto reader = QSpace::IO::createReader(QSpace::IO::FileFormat::BIN);
-    reader->setPolicy(QSpace::IO::FilePolicy::ForceStandart);
-    return reader->read(path, scheme);
-}
-
-void readFilesSequentially(const QFileInfoList&          files,
-                           int                           count,
-                           const QSpace::IO::ReadScheme& scheme) {
-    for (int index = 0; index < count; ++index) {
-        [[maybe_unused]] const auto result = readFile(files[index].absoluteFilePath(), scheme);
+std::vector<QString> extractPaths(const QFileInfoList& files) {
+    std::vector<QString> paths;
+    paths.reserve(files.size());
+    for (const auto& fileInfo : files) {
+        paths.push_back(fileInfo.absoluteFilePath());
     }
+    return paths;
 }
 
-void readFilesInParallel(const QFileInfoList&          files,
-                         int                           count,
-                         unsigned int                  maxThreads,
-                         const QSpace::IO::ReadScheme& scheme) {
-    std::vector<std::future<QSpace::IO::ReadResult>> tasks;
-    tasks.reserve(std::min(count, static_cast<int>(maxThreads)));
-
-    for (int index = 0; index < count; ++index) {
-        tasks.emplace_back(std::async(std::launch::async, [&files, index, &scheme] {
-            return readFile(files[index].absoluteFilePath(), scheme);
-        }));
-
-        if (tasks.size() == maxThreads) {
-            for (auto& task : tasks) {
-                [[maybe_unused]] const auto result = task.get();
-            }
-            tasks.clear();
+// Постоянный пул потоков, чтобы не тратить время на CreateThread и createReader внутри замера
+class ParallelReaderPool {
+  public:
+    ParallelReaderPool(unsigned int                  maxThreads,
+                       const std::vector<QString>&   paths,
+                       const QSpace::IO::ReadScheme& scheme)
+        : threadCount_(std::max(1U, maxThreads)), paths_(paths), scheme_(scheme) {
+        workers_.reserve(threadCount_);
+        for (unsigned int workerId = 0; workerId < threadCount_; ++workerId) {
+            workers_.emplace_back([this, workerId] { workerLoop(workerId); });
         }
     }
 
-    for (auto& task : tasks) {
-        [[maybe_unused]] const auto result = task.get();
+    ~ParallelReaderPool() {
+        {
+            std::lock_guard<std::mutex> lock(mutex_);
+            stop_ = true;
+        }
+        cvStart_.notify_all();
+        for (auto& worker : workers_) {
+            if (worker.joinable()) {
+                worker.join();
+            }
+        }
+    }
+
+    void readFiles(int count, std::vector<std::optional<QSpace::IO::ReadResult>>& results) {
+        std::unique_lock<std::mutex> lock(mutex_);
+        currentCount_    = count;
+        currentResults_  = &results;
+        activeWorkers_   = std::min<unsigned int>(threadCount_, static_cast<unsigned int>(count));
+        finishedWorkers_ = 0;
+        nextIndex_.store(0, std::memory_order_relaxed);
+        ++generation_;
+
+        cvStart_.notify_all();
+        cvDone_.wait(lock, [this] { return finishedWorkers_ == activeWorkers_; });
+    }
+
+  private:
+    void workerLoop(unsigned int workerId) {
+        auto reader = QSpace::IO::createReader(QSpace::IO::FileFormat::BIN);
+        reader->setPolicy(QSpace::IO::FilePolicy::ForceStandart);
+
+        std::uint64_t seenGeneration = 0;
+
+        while (true) {
+            int                                                 count   = 0;
+            std::vector<std::optional<QSpace::IO::ReadResult>>* results = nullptr;
+
+            {
+                std::unique_lock<std::mutex> lock(mutex_);
+                cvStart_.wait(lock, [this, seenGeneration] {
+                    return stop_ || generation_ > seenGeneration;
+                });
+
+                if (stop_) {
+                    return;
+                }
+
+                seenGeneration = generation_;
+                if (workerId >= activeWorkers_) {
+                    continue;
+                }
+
+                count   = currentCount_;
+                results = currentResults_;
+            }
+
+            while (true) {
+                const int index = nextIndex_.fetch_add(1, std::memory_order_relaxed);
+                if (index >= count) {
+                    break;
+                }
+                (*results)[index] = reader->read(paths_[index], scheme_);
+            }
+
+            {
+                std::lock_guard<std::mutex> lock(mutex_);
+                if (++finishedWorkers_ == activeWorkers_) {
+                    cvDone_.notify_one();
+                }
+            }
+        }
+    }
+
+    unsigned int                                        threadCount_;
+    const std::vector<QString>&                         paths_;
+    const QSpace::IO::ReadScheme&                       scheme_;
+    std::vector<std::thread>                            workers_;
+    std::mutex                                          mutex_;
+    std::condition_variable                             cvStart_;
+    std::condition_variable                             cvDone_;
+    std::atomic<int>                                    nextIndex_{0};
+    std::uint64_t                                       generation_      = 0;
+    int                                                 currentCount_    = 0;
+    unsigned int                                        activeWorkers_   = 0;
+    unsigned int                                        finishedWorkers_ = 0;
+    bool                                                stop_            = false;
+    std::vector<std::optional<QSpace::IO::ReadResult>>* currentResults_  = nullptr;
+};
+
+void readFilesSequentially(QSpace::IReader&                                    reader,
+                           const std::vector<QString>&                         paths,
+                           int                                                 count,
+                           const QSpace::IO::ReadScheme&                       scheme,
+                           std::vector<std::optional<QSpace::IO::ReadResult>>& results) {
+    for (int index = 0; index < count; ++index) {
+        results[index] = reader.read(paths[index], scheme);
     }
 }
 
@@ -147,7 +234,9 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    const auto& scheme   = preset->second;
+    const auto&                scheme = preset->second;
+    const std::vector<QString> paths  = extractPaths(files);
+
     const char* modeName = options.mode == ExecutionMode::Sequential ? "sequential" : "parallel";
     std::cout << "Режим: " << modeName;
     if (options.mode == ExecutionMode::Parallel) {
@@ -166,15 +255,27 @@ int main(int argc, char* argv[]) {
               << std::setw(speedWidth) << "Скорость (MB/s)" << "\n"
               << std::string(separatorSize, '-') << "\n";
 
+    // Инициализируем ридеры и пул потоков один раз до начала серии замеров
+    auto sequentialReader = QSpace::IO::createReader(QSpace::IO::FileFormat::BIN);
+    sequentialReader->setPolicy(QSpace::IO::FilePolicy::ForceStandart);
+
+    std::optional<ParallelReaderPool> parallelPool;
+    if (options.mode == ExecutionMode::Parallel) {
+        parallelPool.emplace(options.threads, paths, scheme);
+    }
+
     qint64 totalBytes = 0;
     for (int count = 1; count <= files.size(); ++count) {
         totalBytes += files[count - 1].size();
 
+        // Контейнер под загруженные данные текущего шага (1..count файлов)
+        std::vector<std::optional<QSpace::IO::ReadResult>> results(count);
+
         const auto start = std::chrono::steady_clock::now();
         if (options.mode == ExecutionMode::Sequential) {
-            readFilesSequentially(files, count, scheme);
+            readFilesSequentially(*sequentialReader, paths, count, scheme, results);
         } else {
-            readFilesInParallel(files, count, options.threads, scheme);
+            parallelPool->readFiles(count, results);
         }
         const std::chrono::duration<double, std::milli> elapsed =
             std::chrono::steady_clock::now() - start;
@@ -187,6 +288,8 @@ int main(int argc, char* argv[]) {
                   << std::setprecision(2) << std::setw(sizeWidth) << sizeMB << " | "
                   << std::setw(timeWidth) << elapsedMs << " | " << std::setw(speedWidth) << speedMBs
                   << "\n";
+
+        // Очистка памяти results происходит здесь — ПОСЛЕ остановки таймера
     }
 
     return 0;

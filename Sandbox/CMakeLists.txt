@@ -24,6 +24,31 @@ add_sandbox_test(StressTestBatchReadFileMapped
     LIBS
         QSpace::IO
 )
+add_sandbox_test(StressTestVisualizeSPHData
+    SOURCES
+        StressTestVisualizeSPHData/main.cpp
+        ${PROJECT_SOURCE_DIR}/app/resources/shaders.qrc
+    LIBS
+        QSpace::Common
+        QSpace::Visualize
+        QSpace::IO
+        VTK::CommonCore
+        Qt6::Core
+        Qt6::Gui
+        Qt6::Widgets
+        Qt6::OpenGL
+        Qt6::OpenGLWidgets
+)
+
+if(WIN32)
+    get_filename_component(VTK_INSTALL_DIR "${VTK_DIR}/../../.." ABSOLUTE)
+    add_custom_command(TARGET StressTestVisualizeSPHData POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${VTK_INSTALL_DIR}/bin"
+            "$<TARGET_FILE_DIR:StressTestVisualizeSPHData>"
+        COMMENT "Copying VTK DLLs for StressTestVisualizeSPHData"
+    )
+endif()
 # add_sandbox_test(TestVtkVisualize  
 #     SOURCES
 #         test_vtkvisualize/main.cpp 

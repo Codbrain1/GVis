@@ -27,6 +27,7 @@ target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(IO PUBLIC
         QSpace::Common
         Qt6::Core
+        OpenMP::OpenMP_CXX
 )
 
 add_subdirectory(BIN/Testing)

@@ -27,6 +27,7 @@
 #include <vtkPolyData.h>
 #include <vtkType.h>
 #include <cstddef>
+#include <limits>
 #include <variant>
 
 namespace QSpace::IO {
@@ -544,13 +545,114 @@ bool BINReader::readMmap(QFile& file, ReadContext& context, qint64 expectedDataS
 bool BINReader::readInterleavedMmap(const uchar* startPtr,
                                     ReadContext& context,
                                     double*      rawPointsPtr) const {
-    auto parsers = generateParsers(context, rawPointsPtr);
-    if (parsers.isEmpty())
-        return false;
-    const uchar* currentPtr = startPtr;
+    struct ColumnTarget {
+        int    vtkDataType;
+        int    componentCount;
+        size_t byteOffset;
+        bool   isCoordinate;
+        void*  data;
+    };
+
+    QList<ColumnTarget> targets;
+    targets.reserve(context.config.columnsPolicy.size());
+
+    int    attributeIndex = 0;
+    size_t byteOffset     = 0;
+    for (const auto& column : context.config.columnsPolicy) {
+        size_t typeSize = 0;
+        switch (column.vtkDataType) {
+            case VTK_DOUBLE:
+                typeSize = sizeof(double);
+                break;
+            case VTK_FLOAT:
+                typeSize = sizeof(float);
+                break;
+            case VTK_INT:
+                typeSize = sizeof(int);
+                break;
+            default:
+                Q_ASSERT(false);
+                return false;
+        }
+
+        void* destination = nullptr;
+        if (column.isCoordinate) {
+            if (column.vtkDataType != VTK_DOUBLE && column.vtkDataType != VTK_FLOAT)
+                return false;
+            destination = rawPointsPtr;
+        } else {
+            vtkAbstractArray* array = context.attributArrays[attributeIndex++];
+            switch (column.vtkDataType) {
+                case VTK_DOUBLE:
+                    destination = vtkDoubleArray::SafeDownCast(array)->GetPointer(0);
+                    break;
+                case VTK_FLOAT:
+                    destination = vtkFloatArray::SafeDownCast(array)->GetPointer(0);
+                    break;
+                case VTK_INT:
+                    destination = vtkIntArray::SafeDownCast(array)->GetPointer(0);
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (!destination)
+            return false;
+
+        targets.append(
+            {column.vtkDataType, column.numberOfComponents, byteOffset, column.isCoordinate, destination});
+        byteOffset += typeSize * static_cast<size_t>(column.numberOfComponents);
+    }
+
+#pragma omp parallel for if (context.N >= 32768) schedule(static)
     for (int i = 0; i < context.N; ++i) {
-        for (const auto& parse : parsers) {
-            currentPtr = parse(currentPtr, i);
+        const uchar* particlePtr = startPtr + static_cast<size_t>(i) * context.particleSize;
+        for (const ColumnTarget& target : targets) {
+            const uchar* sourcePtr = particlePtr + target.byteOffset;
+            if (target.isCoordinate) {
+                double* destination = static_cast<double*>(target.data) + static_cast<size_t>(i) * 3;
+                if (target.vtkDataType == VTK_DOUBLE) {
+                    const double* source = reinterpret_cast<const double*>(sourcePtr);
+                    for (int component = 0; component < 3; ++component)
+                        destination[component] = qFromLittleEndian(source[component]);
+                } else {
+                    const float* source = reinterpret_cast<const float*>(sourcePtr);
+                    for (int component = 0; component < 3; ++component)
+                        destination[component] =
+                            static_cast<double>(qFromLittleEndian(source[component]));
+                }
+                continue;
+            }
+
+            switch (target.vtkDataType) {
+                case VTK_DOUBLE: {
+                    const double* source = reinterpret_cast<const double*>(sourcePtr);
+                    double* destination = static_cast<double*>(target.data) +
+                                          static_cast<size_t>(i) * target.componentCount;
+                    for (int component = 0; component < target.componentCount; ++component)
+                        destination[component] = qFromLittleEndian(source[component]);
+                    break;
+                }
+                case VTK_FLOAT: {
+                    const float* source = reinterpret_cast<const float*>(sourcePtr);
+                    float* destination = static_cast<float*>(target.data) +
+                                         static_cast<size_t>(i) * target.componentCount;
+                    for (int component = 0; component < target.componentCount; ++component)
+                        destination[component] = qFromLittleEndian(source[component]);
+                    break;
+                }
+                case VTK_INT: {
+                    const int* source = reinterpret_cast<const int*>(sourcePtr);
+                    int* destination = static_cast<int*>(target.data) +
+                                       static_cast<size_t>(i) * target.componentCount;
+                    for (int component = 0; component < target.componentCount; ++component)
+                        destination[component] = qFromLittleEndian(source[component]);
+                    break;
+                }
+                default:
+                    Q_ASSERT(false);
+                    break;
+            }
         }
     }
     return true;
@@ -612,7 +714,7 @@ bool BINReader::readColumnStream(QFile&               file,
                                  const ColumnMapping& col,
                                  double*              rawPointsPtr,
                                  vtkAbstractArray*    attributArrayPtr) const {
-    constexpr int CHUNK_SIZE = 65536; // 64Кб
+    constexpr int CHUNK_SIZE = 1024 * 1024; // 1 MiB
     QByteArray    buffer(CHUNK_SIZE, 0);
     char*         bufferPtr = buffer.data();
     int           nComp     = col.numberOfComponents;
@@ -714,34 +816,139 @@ bool BINReader::readColumnStream(QFile&               file,
 bool BINReader::readInterleavedStream(QFile&       file,
                                       ReadContext& context,
                                       double*      rawPointsPtr) const {
-    QList<BINReader::ParserFunc> parsers = generateParsers(context, rawPointsPtr);
-    if (parsers.isEmpty())
+    struct ColumnTarget {
+        int    vtkDataType;
+        int    componentCount;
+        size_t byteOffset;
+        bool   isCoordinate;
+        void*  data;
+    };
+
+    QList<ColumnTarget> targets;
+    targets.reserve(context.config.columnsPolicy.size());
+
+    int    attributeIndex = 0;
+    size_t byteOffset     = 0;
+    for (const auto& column : context.config.columnsPolicy) {
+        size_t typeSize = 0;
+        switch (column.vtkDataType) {
+            case VTK_DOUBLE:
+                typeSize = sizeof(double);
+                break;
+            case VTK_FLOAT:
+                typeSize = sizeof(float);
+                break;
+            case VTK_INT:
+                typeSize = sizeof(int);
+                break;
+            default:
+                Q_ASSERT(false);
+                return false;
+        }
+
+        void* destination = nullptr;
+        if (column.isCoordinate) {
+            if (column.vtkDataType != VTK_DOUBLE && column.vtkDataType != VTK_FLOAT)
+                return false;
+            destination = rawPointsPtr;
+        } else {
+            vtkAbstractArray* array = context.attributArrays[attributeIndex++];
+            switch (column.vtkDataType) {
+                case VTK_DOUBLE:
+                    destination = vtkDoubleArray::SafeDownCast(array)->GetPointer(0);
+                    break;
+                case VTK_FLOAT:
+                    destination = vtkFloatArray::SafeDownCast(array)->GetPointer(0);
+                    break;
+                case VTK_INT:
+                    destination = vtkIntArray::SafeDownCast(array)->GetPointer(0);
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (!destination)
+            return false;
+
+        targets.append(
+            {column.vtkDataType, column.numberOfComponents, byteOffset, column.isCoordinate, destination});
+        byteOffset += typeSize * static_cast<size_t>(column.numberOfComponents);
+    }
+
+    const size_t stride = context.particleSize;
+    if (stride == 0 || stride > static_cast<size_t>(std::numeric_limits<int>::max()))
         return false;
-    size_t     stride = context.particleSize;
-    QByteArray rowBuffer(stride, 0);
-    uchar*     rowPtr = reinterpret_cast<uchar*>(rowBuffer.data());
 
-    qCDebug(LogIO) << "readInterleavedStream: stride=" << stride << "bytes, N=" << context.N;
+    constexpr size_t bufferSize = 4 * 1024 * 1024;
+    const size_t rowsPerRead = std::max<size_t>(1, bufferSize / stride);
+    QByteArray buffer(static_cast<qsizetype>(rowsPerRead * stride), Qt::Uninitialized);
 
-    for (int i = 0; i < context.N; ++i) {
-        if (file.read(reinterpret_cast<char*>(rowPtr), stride) != static_cast<qint64>(stride)) {
-            qCCritical(LogIO) << "Unexpected end file at particle!";
+    for (int firstRow = 0; firstRow < context.N;) {
+        const int rowsToRead = static_cast<int>(
+            std::min<size_t>(rowsPerRead, static_cast<size_t>(context.N - firstRow)));
+        const qint64 bytesToRead = static_cast<qint64>(rowsToRead) * static_cast<qint64>(stride);
+        if (file.read(buffer.data(), bytesToRead) != bytesToRead) {
+            qCCritical(LogIO) << "Unexpected end file at particle " << firstRow;
             return false;
         }
-        const uchar* current_ptr = rowPtr;
-        for (const auto& parser : parsers) {
-            current_ptr = parser(current_ptr, i);
-        }
 
-        // Выводим первые 3 частицы для отладки
-        if (i < 3) {
-            const double* dptr = reinterpret_cast<const double*>(rowBuffer.data());
-            qCDebug(LogIO) << "Particle" << i << ": pos=(" << qFromLittleEndian(dptr[0]) << ","
-                           << qFromLittleEndian(dptr[1]) << "," << qFromLittleEndian(dptr[2]) << ")"
-                           << " vel=(" << qFromLittleEndian(dptr[3]) << ","
-                           << qFromLittleEndian(dptr[4]) << "," << qFromLittleEndian(dptr[5]) << ")"
-                           << " mass=" << qFromLittleEndian(dptr[6]);
+        const uchar* bufferStart = reinterpret_cast<const uchar*>(buffer.constData());
+        for (int row = 0; row < rowsToRead; ++row) {
+            const int particleIndex = firstRow + row;
+            const uchar* particlePtr = bufferStart + static_cast<size_t>(row) * stride;
+            for (const ColumnTarget& target : targets) {
+                const uchar* sourcePtr = particlePtr + target.byteOffset;
+                if (target.isCoordinate) {
+                    double* destination = static_cast<double*>(target.data) +
+                                          static_cast<size_t>(particleIndex) * 3;
+                    if (target.vtkDataType == VTK_DOUBLE) {
+                        const double* source = reinterpret_cast<const double*>(sourcePtr);
+                        for (int component = 0; component < 3; ++component)
+                            destination[component] = qFromLittleEndian(source[component]);
+                    } else {
+                        const float* source = reinterpret_cast<const float*>(sourcePtr);
+                        for (int component = 0; component < 3; ++component)
+                            destination[component] =
+                                static_cast<double>(qFromLittleEndian(source[component]));
+                    }
+                    continue;
+                }
+
+                switch (target.vtkDataType) {
+                    case VTK_DOUBLE: {
+                        const double* source = reinterpret_cast<const double*>(sourcePtr);
+                        double* destination = static_cast<double*>(target.data) +
+                                              static_cast<size_t>(particleIndex) *
+                                                  target.componentCount;
+                        for (int component = 0; component < target.componentCount; ++component)
+                            destination[component] = qFromLittleEndian(source[component]);
+                        break;
+                    }
+                    case VTK_FLOAT: {
+                        const float* source = reinterpret_cast<const float*>(sourcePtr);
+                        float* destination = static_cast<float*>(target.data) +
+                                             static_cast<size_t>(particleIndex) *
+                                                 target.componentCount;
+                        for (int component = 0; component < target.componentCount; ++component)
+                            destination[component] = qFromLittleEndian(source[component]);
+                        break;
+                    }
+                    case VTK_INT: {
+                        const int* source = reinterpret_cast<const int*>(sourcePtr);
+                        int* destination = static_cast<int*>(target.data) +
+                                           static_cast<size_t>(particleIndex) *
+                                               target.componentCount;
+                        for (int component = 0; component < target.componentCount; ++component)
+                            destination[component] = qFromLittleEndian(source[component]);
+                        break;
+                    }
+                    default:
+                        Q_ASSERT(false);
+                        break;
+                }
+            }
         }
+        firstRow += rowsToRead;
     }
     return true;
 }
