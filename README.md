@@ -1,10 +1,7 @@
-<div align="center">
+****<div align="center">
 
 # 🌌 GVis 
 
-inkscape icon.svg --export-type=png --export-filename=icon_32.png -w 32 -h 32
-inkscape icon.svg --export-type=png --export-filename=icon_48.png -w 48 -h 48
-inkscape icon.svg --export-type=png --export-filename=icon_256.png -w 256 -h 256
 **High-Performance Desktop Visualizer for Astrophysical Galaxy Simulations & SPH Particle Data**
 
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
@@ -21,11 +18,10 @@ inkscape icon.svg --export-type=png --export-filename=icon_256.png -w 256 -h 256
 
 ## 🔭 Overview
 
-**GVis** (*Galaxy Visualizer*, formerly **GVis-Galaxies**) is a native C++20/Qt 6/OpenGL desktop application engineered for interactive 3D exploration and physical analysis of large-scale astrophysical N-body and **Smoothed Particle Hydrodynamics (SPH)** simulations.
+**GVis** (*Galaxy Visualizer*) is a native C++20/Qt 6/OpenGL desktop application engineered for interactive 3D exploration and physical analysis of large-scale astrophysical N-body and **Smoothed Particle Hydrodynamics (SPH)** simulations.
 
 Unlike script-based plotting libraries in Python (`matplotlib`, `yt`) that render static frames offline, **GVis** offloads kernel splatting, physical weight normalization, and logarithmic transfer functions directly to the GPU via a custom multi-pass OpenGL 3.3 Core pipeline—allowing researchers to rotate, slice, and animate multi-million-particle galaxy evolutions in real time.
 
-<!-- Замените ссылки ниже на реальные скриншоты и GIF из папки docs/images/ -->
 <p align="center">
   <img src="docs/images/demo_preview.png" alt="GVis Interactive SPH Rendering" width="85%">
 </p>
@@ -123,7 +119,7 @@ cmake --build build --parallel
 
 # 🌌 Обзор проекта (RU)
 
-**GVis** (ранее **GVis-Galaxies**) — высокопроизводительное десктопное приложение на C++20, Qt 6 и OpenGL 3.3 Core для интерактивной 3D-визуализации и физического анализа результатов астрофизического моделирования галактик и **SPH-данных (Smoothed Particle Hydrodynamics)**.
+**GVis** — высокопроизводительное десктопное приложение на C++20, Qt 6 и OpenGL 3.3 Core для интерактивной 3D-визуализации и физического анализа результатов астрофизического моделирования галактик и **SPH-данных (Smoothed Particle Hydrodynamics)**.
 
 ### Ключевые возможности
 1. **Трёхпроходный GPU-конвейер SPH-рендеринга:**
@@ -153,9 +149,3 @@ Contributions, bug reports, and feature requests are welcome! Feel free to open 
 
 Distributed under the **MIT License**. See `LICENSE` for more information.
 ````[cite: 1, 2, 3]
-
----
-
-### 💡 Пара советов перед коммитом этого README:
-1. **Добавьте папку `docs/images/`** в репозиторий и положите туда хотя бы один скриншот или короткую GIF-анимацию с именем `demo_preview.gif` (записать экран в GIF под Windows проще всего бесплатной утилитой **ScreenToGif**).
-2. **Файл `LICENSE`:** в бейджах выше указана лицензия **MIT** (самая дружелюбная для открытого научного кода). Если у вас в корне ещё нет файла `LICENSE`, GitHub предложит создать его в два клика через `Add file -> Create new file -> наберите LICENSE -> Choose a license template`.
