@@ -5,7 +5,8 @@
 /old/
 testProject_ru_RU.ts
 testProject_ru.ts
-/Docs/
+/Docs/*
+!/Docs/Images/
 /Sandbox/TEST_DATA/
 listing_rospatent.txt
 ToListing.py
