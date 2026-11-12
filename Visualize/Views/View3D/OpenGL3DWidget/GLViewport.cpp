@@ -193,10 +193,9 @@ Visualize::RenderContext GLViewport::buildRenderContext() {
     // QWidget::size() is expressed in logical pixels, while OpenGL renders to
     // the device-pixel-sized framebuffer owned by QOpenGLWidget.
     const qreal devicePixelRatio = devicePixelRatioF();
-    ctx.viewportPx =
-        QSize(std::max(1, qRound(width() * devicePixelRatio)),
-              std::max(1, qRound(height() * devicePixelRatio)));
-    ctx.orthographic = m_settings->viewport()->orthographic();
+    ctx.viewportPx               = QSize(std::max(1, qRound(width() * devicePixelRatio)),
+                                         std::max(1, qRound(height() * devicePixelRatio)));
+    ctx.orthographic             = m_settings->viewport()->orthographic();
 
     const float aspect = width() > 0 ? float(width()) / float(std::max(1, height()))
                                      : 1.0f; // вычисляем соотношение сторон чтобы при растягивании
@@ -274,6 +273,8 @@ void GLViewport::paintGL() {
                  float(m_backgroundColor.blueF()),
                  1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
 
     m_gridRenderer.render(this, ctx, m_settings->grid());
 
@@ -333,9 +334,9 @@ void GLViewport::mouseMoveEvent(QMouseEvent* event) {
 
     if (event->modifiers() & Qt::ShiftModifier) {
         // --- ПАНОРАМИРОВАНИЕ (PAN) ---
-        float scale = (m_lastContext.pixelsPerWorldUnit > 0.0f)
-                          ? (1.0f / m_lastContext.pixelsPerWorldUnit)
-                          : 0.01f;
+        float       scale            = (m_lastContext.pixelsPerWorldUnit > 0.0f)
+                                           ? (1.0f / m_lastContext.pixelsPerWorldUnit)
+                                           : 0.01f;
         const float devicePixelRatio = float(this->devicePixelRatioF());
 
         m_center +=

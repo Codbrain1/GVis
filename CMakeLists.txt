@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.30) #минимальная версия cmake
 
 # 1. основные сведедения о проекте
 #-------------------------------------------------------------------
-project(QSpace VERSION 1.0 LANGUAGES CXX) # название проекта его версия и язык на котором написан проект
+project(QSpace VERSION 1.2 LANGUAGES CXX) # название проекта его версия и язык на котором написан проект
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-fdiagnostics-color=always)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

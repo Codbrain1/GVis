@@ -9,10 +9,9 @@
 #include <quuid.h>
 #include <memory>
 
-
 namespace QSpace::Core {
 
-class VideoExportManager : public QObject {
+class [[deprecated]] VideoExportManager : public QObject {
     Q_OBJECT
   public:
     VideoExportManager(QSpace::Core::DataManager*                        dataManager,

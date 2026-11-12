@@ -89,21 +89,19 @@ QUuid DataManager::importBatchDataAsync(const QList<IO::BatchTask>& tasks, IO::I
                 }
                 emit progressChanged(taskId, watcher->progressValue(), watcher->progressMaximum());
             });
-    connect(watcher,
-            &QFutureWatcher<IO::ReadResult>::finished,
-            this,
-            [this, watcher, taskId]() {
-                const auto results = watcher->future().results();
-                const bool success = !results.isEmpty() && std::all_of(
-                    results.cbegin(), results.cend(), [](const IO::ReadResult& result) {
-                        return result.isSuccess();
-                    });
-                emit ioFinished(taskId, success);
-                watcher->deleteLater();
+    connect(watcher, &QFutureWatcher<IO::ReadResult>::finished, this, [this, watcher, taskId]() {
+        const auto results = watcher->future().results();
+        const bool success =
+            !results.isEmpty() &&
+            std::all_of(results.cbegin(), results.cend(), [](const IO::ReadResult& result) {
+                return result.isSuccess();
             });
+        emit ioFinished(taskId, success);
+        watcher->deleteLater();
+    });
     auto policy = m_global_policy;
     if (tasks.size() >= 30) {
-        policy = IO::FilePolicy::ForceMapped;
+        policy = IO::FilePolicy::ForceStandart;
     }
     watcher->setFuture(
         m_taskManager->mapIO(tasks, [policy](const IO::BatchTask& t) -> IO::ReadResult {
@@ -157,37 +155,36 @@ void DataManager::importBatchIdendicalDataAsync(const QStringList&    paths,
                 }
                 emit progressChanged(taskId, watcher->progressValue(), watcher->progressMaximum());
             });
-    connect(watcher,
-            &QFutureWatcher<IO::ReadResult>::finished,
-            this,
-            [this, watcher, taskId]() {
-                const auto results = watcher->future().results();
-                const bool success = !results.isEmpty() && std::all_of(
-                    results.cbegin(), results.cend(), [](const IO::ReadResult& result) {
-                        return result.isSuccess();
-                    });
-                emit ioFinished(taskId, success);
-                watcher->deleteLater();
+    connect(watcher, &QFutureWatcher<IO::ReadResult>::finished, this, [this, watcher, taskId]() {
+        const auto results = watcher->future().results();
+        const bool success =
+            !results.isEmpty() &&
+            std::all_of(results.cbegin(), results.cend(), [](const IO::ReadResult& result) {
+                return result.isSuccess();
             });
+        emit ioFinished(taskId, success);
+        watcher->deleteLater();
+    });
     const auto policy = m_global_policy;
     watcher->setFuture(
-        m_taskManager->mapIO(paths, [format, policy, scheme](const QString& path) -> IO::ReadResult {
-            auto reader = IO::createReader(format);
-            if (!reader) {
-                return {nullptr,
-                        path,
-                        "Unsupported file format",
-                        0,
-                        0,
-                        format,
-                        scheme,
-                        IO::ReadStatus::InvalidFormat};
-            }
-            reader->setPolicy(policy);
-            auto result = reader->read(path, scheme);
-            result.path = path;
-            return result;
-        }));
+        m_taskManager->mapIO(paths,
+                             [format, policy, scheme](const QString& path) -> IO::ReadResult {
+                                 auto reader = IO::createReader(format);
+                                 if (!reader) {
+                                     return {nullptr,
+                                             path,
+                                             "Unsupported file format",
+                                             0,
+                                             0,
+                                             format,
+                                             scheme,
+                                             IO::ReadStatus::InvalidFormat};
+                                 }
+                                 reader->setPolicy(policy);
+                                 auto result = reader->read(path, scheme);
+                                 result.path = path;
+                                 return result;
+                             }));
 }
 
 TaskPriority DataManager::getPriority(qint64 fileSize) {
