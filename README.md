@@ -21,7 +21,7 @@
 Unlike script-based plotting libraries in Python (`matplotlib`, `yt`) that render static frames via code, **GVis** provides real-time interactive visualization powered by kernel splatting, physical weight normalization, and logarithmic transfer functions directly on the GPU via a custom multi-pass OpenGL 3.3 Core pipeline—allowing researchers to rotate, slice, and animate multi-million-particle galaxy evolutions on the fly.
 
 <p align="center">
-  <img src="Docs/images/demo_preview.png" alt="GVis Interactive SPH Rendering" width="85%">
+  <img src="Docs/Images/demo_preview.png" alt="GVis Interactive SPH Rendering" width="85%">
 </p>
 
 ---
