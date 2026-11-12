@@ -9,7 +9,7 @@
 #include <QSpinBox>
 #include <QToolButton>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 static void styleColorButton(QPushButton* btn, const QColor& c) {
     btn->setFixedSize(20, 20);
@@ -180,4 +180,4 @@ void PropertyControlFactory::syncEditor(QObject* target, const QMetaProperty& pr
     }
 }
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

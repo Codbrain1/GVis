@@ -1,7 +1,7 @@
 #include "GridRenderer.h"
 #include <QVector>
 
-namespace QSpace::Visualize::Views::View3D {
+namespace GVis::Visualize::Views::View3D {
 
 GridRenderer::GridRenderer(QObject* parent) : QObject(parent) {
 }
@@ -97,4 +97,4 @@ void GridRenderer::render(QOpenGLFunctions_3_3_Core*      gl,
     m_program.release();
 }
 
-} // namespace QSpace::Visualize::Views::View3D
+} // namespace GVis::Visualize::Views::View3D

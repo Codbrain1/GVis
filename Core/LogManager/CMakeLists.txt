@@ -6,5 +6,5 @@ target_sources(LogManager PRIVATE
 target_include_directories(LogManager PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 target_link_libraries(LogManager PUBLIC
             project_config
-            QSpace::Common
+            GVis::Common
 )

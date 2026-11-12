@@ -3,14 +3,15 @@
 #include "Common/Structures/ObjectRegistryStructures.h"
 #include "Common/Structures/SessionStructures.h"
 #include "Core/ObjectRegistry/ObjectRegistry.h"
-#include <qloggingcategory.h>
 #include <QSet>
-#include <algorithm>
+#include <qloggingcategory.h>
 #include "Structures/ObjectRegistryStructures.h"
+#include <algorithm>
 #include <memory>
 #include <optional>
 
-namespace QSpace::Core {
+
+namespace GVis::Core {
 std::optional<Session::ObjectRegistryDTO> ObjectRegistrySerializer::toDTO(Core::ObjectRegistry* registry) {
     Session::ObjectRegistryDTO dto;
     if (!registry) {
@@ -201,4 +202,4 @@ std::shared_ptr<Core::DataNode> ObjectRegistrySerializer::fromDTO(const Session:
     auto dataNode = std::make_shared<Core::DataNode>(dto);
     return dataNode;
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

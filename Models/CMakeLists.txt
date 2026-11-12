@@ -1,11 +1,11 @@
 add_subdirectory(DataTreeModel)
 
 add_library(Models INTERFACE)
-add_library(QSpace::Models ALIAS Models)
+add_library(GVis::Models ALIAS Models)
 target_include_directories(Models INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(Models INTERFACE
             project_config
-            QSpace::Core
+            GVis::Core
             DataTreeModel
             # SceneSettingsModel
             # SessionModel

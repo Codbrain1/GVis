@@ -12,29 +12,46 @@
 #include "Common/Structures/FileSchemeStructures.h"
 #include "IO/BIN/BINReader.h"
 
-using namespace QSpace::IO;
+using namespace GVis::IO;
 
 class TestBINReaderFailures : public QObject {
     Q_OBJECT
 
   private slots:
-    void rejectsNegativeParticleCount() { verifyRejected(makeFile("negative.bin", -1, true), validScheme()); }
-    void rejectsIncompleteHeader() { verifyRejected(makeFile("header.bin", 1, false, false), validScheme()); }
-    void rejectsHeaderWithoutTimestamp() { verifyRejected(makeFile("timestamp.bin", 1, false, false), validScheme()); }
-    void rejectsShortPayload() { verifyRejected(makeFile("short.bin", 2, true, true, 1), validScheme()); }
-    void rejectsLongPayload() { verifyRejected(makeFile("long.bin", 1, true, true, 5), validScheme()); }
+
+    void rejectsNegativeParticleCount() {
+        verifyRejected(makeFile("negative.bin", -1, true), validScheme());
+    }
+
+    void rejectsIncompleteHeader() {
+        verifyRejected(makeFile("header.bin", 1, false, false), validScheme());
+    }
+
+    void rejectsHeaderWithoutTimestamp() {
+        verifyRejected(makeFile("timestamp.bin", 1, false, false), validScheme());
+    }
+
+    void rejectsShortPayload() {
+        verifyRejected(makeFile("short.bin", 2, true, true, 1), validScheme());
+    }
+
+    void rejectsLongPayload() {
+        verifyRejected(makeFile("long.bin", 1, true, true, 5), validScheme());
+    }
 
     void rejectsWrongExtension() {
         QTemporaryDir dir;
         const QString path = dir.filePath("data.dat");
         makeFile(path, 1, true);
-        BINReader reader;
+        BINReader  reader;
         const auto result = reader.read(path, validScheme());
         QCOMPARE(result.status, ReadStatus::InvalidFormat);
         QVERIFY(!result.data);
     }
 
-    void rejectsSchemeWithoutCoordinates() { verifyRejected(makeFile("no-coords.bin", 1, true), schemeWithoutCoordinates()); }
+    void rejectsSchemeWithoutCoordinates() {
+        verifyRejected(makeFile("no-coords.bin", 1, true), schemeWithoutCoordinates());
+    }
 
     void rejectsSeveralCoordinateColumns() {
         auto scheme = std::get<ColumnScheme>(validScheme());
@@ -43,7 +60,7 @@ class TestBINReaderFailures : public QObject {
     }
 
     void rejectsUnsupportedType() {
-        auto scheme = std::get<ColumnScheme>(validScheme());
+        auto scheme                         = std::get<ColumnScheme>(validScheme());
         scheme.columnsPolicy[1].vtkDataType = VTK_SHORT;
         verifyRejected(makeFile("type.bin", 1, true), scheme);
     }
@@ -55,7 +72,7 @@ class TestBINReaderFailures : public QObject {
     }
 
     void rejectsZeroComponents() {
-        auto scheme = std::get<ColumnScheme>(validScheme());
+        auto scheme                                = std::get<ColumnScheme>(validScheme());
         scheme.columnsPolicy[1].numberOfComponents = 0;
         verifyRejected(makeFile("components.bin", 1, true), scheme);
     }
@@ -75,8 +92,9 @@ class TestBINReaderFailures : public QObject {
         QFETCH(int, type);
         QFETCH(bool, interleaved);
         QTemporaryDir dir;
-        const QString path = makeFile(dir.filePath("values.bin"), 2, true, true, -1, interleaved, type);
-        BINReader reader;
+        const QString path =
+            makeFile(dir.filePath("values.bin"), 2, true, true, -1, interleaved, type);
+        BINReader  reader;
         const auto result = reader.read(path, schemeWithComponents(interleaved, type));
         QCOMPARE(result.status, ReadStatus::Succes);
         QCOMPARE(result.timestamp, 42.5);
@@ -99,7 +117,7 @@ class TestBINReaderFailures : public QObject {
     void rejectsZeroSizeFileWhenForceMapped() {
         QTemporaryDir dir;
         const QString path = dir.filePath("empty.bin");
-        QFile file(path);
+        QFile         file(path);
         QVERIFY(file.open(QIODevice::WriteOnly));
         file.close();
         BINReader reader;
@@ -112,7 +130,7 @@ class TestBINReaderFailures : public QObject {
     void mapsValidFileWhenForceMapped() {
         QTemporaryDir dir;
         const QString path = makeFile(dir.filePath("mapped.bin"), 1, true);
-        BINReader reader;
+        BINReader     reader;
         reader.setPolicy(FilePolicy::ForceMapped);
         const auto result = reader.read(path, validScheme());
         QCOMPARE(result.status, ReadStatus::Succes);
@@ -142,24 +160,29 @@ class TestBINReaderFailures : public QObject {
         return scheme;
     }
 
-    template <typename T>
-    static void writeRaw(QDataStream& out, T value) {
+    template <typename T> static void writeRaw(QDataStream& out, T value) {
         const T littleEndian = qToLittleEndian(value);
         out.writeRawData(reinterpret_cast<const char*>(&littleEndian), sizeof(T));
     }
 
-    static QString makeFile(const QString& path, int n, bool payload, bool timestamp = true,
-                            int payloadItems = -1, bool interleaved = true, int attrType = VTK_DOUBLE) {
+    static QString makeFile(const QString& path,
+                            int            n,
+                            bool           payload,
+                            bool           timestamp    = true,
+                            int            payloadItems = -1,
+                            bool           interleaved  = true,
+                            int            attrType     = VTK_DOUBLE) {
         QFile file(path);
         if (!file.open(QIODevice::WriteOnly))
             return {};
         QDataStream out(&file);
         out.setByteOrder(QDataStream::LittleEndian);
         out << n;
-        if (timestamp) out << 42.5;
+        if (timestamp)
+            out << 42.5;
         if (payload) {
-            const int count = payloadItems < 0 ? n : payloadItems;
-            auto writeCoordinates = [&]() {
+            const int count            = payloadItems < 0 ? n : payloadItems;
+            auto      writeCoordinates = [&]() {
                 for (int component = 1; component <= 3; ++component) {
                     for (int i = 0; i < count; ++i)
                         writeRaw(out, static_cast<double>(i * 10 * component));
@@ -205,7 +228,7 @@ class TestBINReaderFailures : public QObject {
     }
 
     static void verifyRejected(const QString& path, const ReadScheme& scheme) {
-        BINReader reader;
+        BINReader  reader;
         const auto result = reader.read(path, scheme);
         QVERIFY(result.status != ReadStatus::Succes);
         QVERIFY(!result.data);
@@ -214,7 +237,3 @@ class TestBINReaderFailures : public QObject {
 
 QTEST_APPLESS_MAIN(TestBINReaderFailures)
 #include "TestBINReaderFailures.moc"
-
-
-
-

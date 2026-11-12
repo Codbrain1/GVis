@@ -11,8 +11,8 @@
 #include "Core/ObjectRegistry/ObjectRegistry.h"
 #include "Core/TaskManager/TaskManager.h"
 
-using namespace QSpace::Core;
-using namespace QSpace::Core::Controllers;
+using namespace GVis::Core;
+using namespace GVis::Core::Controllers;
 
 class TestImportController : public QObject {
     Q_OBJECT
@@ -54,7 +54,7 @@ class TestImportController : public QObject {
     void testRejectsInvalidPhysicalUnitsIniFile() {
         const auto missingResult = m_controller->importIniFile("missing.ini");
         QVERIFY(!missingResult.has_value());
-        QCOMPARE(missingResult.error(), QSpace::IO::ReadStatus::FileNotFound);
+        QCOMPARE(missingResult.error(), GVis::IO::ReadStatus::FileNotFound);
 
         QTemporaryDir directory;
         QVERIFY(directory.isValid());
@@ -67,7 +67,7 @@ class TestImportController : public QObject {
 
         const auto invalidResult = m_controller->importIniFile(path);
         QVERIFY(!invalidResult.has_value());
-        QCOMPARE(invalidResult.error(), QSpace::IO::ReadStatus::InvalidFileStructure);
+        QCOMPARE(invalidResult.error(), GVis::IO::ReadStatus::InvalidFileStructure);
     }
 
     void testFindsNodeByFilePath() {
@@ -125,7 +125,7 @@ class TestImportController : public QObject {
         QCOMPARE(dirtySpy.count(), 1);
         auto node = m_registry->getAllNodes().front();
         QCOMPARE(node->path, path);
-        QCOMPARE(node->type, QSpace::Visualize::EntityType::Gas);
+        QCOMPARE(node->type, GVis::Visualize::EntityType::Gas);
         QVERIFY(node->data != nullptr);
     }
 
@@ -180,8 +180,8 @@ class TestImportController : public QObject {
         const QString path = createGasBin(directory.path() + "/Gas_lazy.bin", 2.5);
         auto          node = std::make_shared<DataNode>(nullptr, "Lazy node");
         node->path         = path;
-        node->format       = QSpace::IO::FileFormat::BIN;
-        node->type         = QSpace::Visualize::EntityType::Gas;
+        node->format       = GVis::IO::FileFormat::BIN;
+        node->type         = GVis::Visualize::EntityType::Gas;
         m_registry->registerNode(node);
 
         QSignalSpy startedSpy(m_dataManager.get(), &DataManager::ioStarted);
@@ -198,8 +198,8 @@ class TestImportController : public QObject {
     void testLazyLoadFailureReleasesRequestLock() {
         auto node    = std::make_shared<DataNode>(nullptr, "Missing node");
         node->path   = QStringLiteral("Gas_missing.bin");
-        node->format = QSpace::IO::FileFormat::BIN;
-        node->type   = QSpace::Visualize::EntityType::Gas;
+        node->format = GVis::IO::FileFormat::BIN;
+        node->type   = GVis::Visualize::EntityType::Gas;
         m_registry->registerNode(node);
 
         QSignalSpy startedSpy(m_dataManager.get(), &DataManager::ioStarted);
@@ -207,11 +207,11 @@ class TestImportController : public QObject {
         QCOMPARE(startedSpy.count(), 1);
         const QUuid taskId = startedSpy.front().front().value<QUuid>();
 
-        QSpace::IO::ReadResult failedResult;
+        GVis::IO::ReadResult failedResult;
         failedResult.path       = node->path;
-        failedResult.status     = QSpace::IO::ReadStatus::FileNotFound;
+        failedResult.status     = GVis::IO::ReadStatus::FileNotFound;
         failedResult.errMessage = QStringLiteral("not found");
-        emit m_dataManager->fileReady(taskId, failedResult, QSpace::IO::ImportRole::ProjectData);
+        emit m_dataManager->fileReady(taskId, failedResult, GVis::IO::ImportRole::ProjectData);
         emit m_dataManager->ioFinished(taskId, false);
 
         m_controller->onRequestDataLoad(node->id);

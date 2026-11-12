@@ -9,21 +9,21 @@
 #include <quuid.h>
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 
 class [[deprecated]] VideoExportManager : public QObject {
     Q_OBJECT
   public:
-    VideoExportManager(QSpace::Core::DataManager*                        dataManager,
-                       std::shared_ptr<QSpace::Visualize::IRenderLayer>  targetLayer,
-                       std::shared_ptr<QSpace::Visualize::VideoExporter> exporter,
-                       QObject*                                          parent = nullptr);
+    VideoExportManager(GVis::Core::DataManager*                        dataManager,
+                       std::shared_ptr<GVis::Visualize::IRenderLayer>  targetLayer,
+                       std::shared_ptr<GVis::Visualize::VideoExporter> exporter,
+                       QObject*                                        parent = nullptr);
 
     // stride: 1 = каждый файл, 2 = через один, 10 = каждый десятый
-    void start(const QStringList&            files,
-               const QSpace::IO::ReadScheme& scheme,
-               QSpace::IO::FileFormat        format,
-               int                           stride = 1);
+    void start(const QStringList&          files,
+               const GVis::IO::ReadScheme& scheme,
+               GVis::IO::FileFormat        format,
+               int                         stride = 1);
 
   signals:
     void progressUpdated(int currentFrame, int totalFrames);
@@ -34,17 +34,17 @@ class [[deprecated]] VideoExportManager : public QObject {
   private slots:
     void fillBuffer();
     void processReadyFrames();
-    void handleFileReady(const QUuid& taskId, QSpace::IO::ReadResult result);
+    void handleFileReady(const QUuid& taskId, GVis::IO::ReadResult result);
 
   private:
-    bool                                              m_isCancelled = false; // Флаг отмены
-    QSpace::Core::DataManager*                        m_dataManager;
-    std::shared_ptr<QSpace::Visualize::IRenderLayer>  m_targetLayer;
-    std::shared_ptr<QSpace::Visualize::VideoExporter> m_exporter;
+    bool                                            m_isCancelled = false; // Флаг отмены
+    GVis::Core::DataManager*                        m_dataManager;
+    std::shared_ptr<GVis::Visualize::IRenderLayer>  m_targetLayer;
+    std::shared_ptr<GVis::Visualize::VideoExporter> m_exporter;
 
-    QStringList            m_files;
-    QSpace::IO::ReadScheme m_scheme;
-    QSpace::IO::FileFormat m_format;
+    QStringList          m_files;
+    GVis::IO::ReadScheme m_scheme;
+    GVis::IO::FileFormat m_format;
 
     int m_stride;
     int m_totalFramesToRender;
@@ -59,4 +59,4 @@ class [[deprecated]] VideoExportManager : public QObject {
     QMap<int, IO::ReadResult> m_readyFrames;  // Отсортированный буфер готовых данных
 };
 
-} // namespace QSpace::Core
+} // namespace GVis::Core

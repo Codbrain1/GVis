@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.30) #минимальная версия cmake
 
 # 1. основные сведедения о проекте
 #-------------------------------------------------------------------
-project(QSpace VERSION 1.2 LANGUAGES CXX) # название проекта его версия и язык на котором написан проект
+project(GVis VERSION 1.2 LANGUAGES CXX) # название проекта его версия и язык на котором написан проект
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     add_compile_options(-fdiagnostics-color=always)
 elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -78,7 +78,7 @@ target_compile_options(project_config INTERFACE -Wall -Wextra -fopenmp)
 target_compile_options(project_config INTERFACE $<$<CONFIG:Release>:-O2>)
 target_compile_options(project_config INTERFACE $<$<CONFIG:Debug>: -O0 -g3 -fno-omit-frame-pointer>)
 target_compile_definitions(project_config INTERFACE
-    $<$<CONFIG:Debug>:QSPACE_PROJECT_DEBUG_MODE>
+    $<$<CONFIG:Debug>:GVis_PROJECT_DEBUG_MODE>
 )
 set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
 
@@ -98,7 +98,7 @@ if(ENABLE_TESTS)
     include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Tests.cmake)
 endif()
 
-add_subdirectory(app/QSpaceDesktop)
+add_subdirectory(app/GVisDesktop)
 add_subdirectory(Common)
 add_subdirectory(Core)
 # add_subdirectory(Filtering)
@@ -114,17 +114,17 @@ add_subdirectory(Sandbox)
 add_subdirectory(extern/QCustomPlot)
 
 include(GNUInstallDirs)
-set(CPACK_PACKAGE_NAME "QSpace")
+set(CPACK_PACKAGE_NAME "GVis")
 set(CPACK_PACKAGE_VENDOR "Shorkin")
 set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
 set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
 set(CPACK_GENERATOR "NSIS")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "QSpace")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "GVis")
 # --- Настройки отображения в Windows (Установка и удаление программ) ---
-set(CPACK_NSIS_DISPLAY_NAME "QSpace Visualization Tool")
+set(CPACK_NSIS_DISPLAY_NAME "GVis Visualization Tool")
 set(CPACK_NSIS_CONTACT "PRIb-231_126178@volsu.ru") # Добавляет контактную информацию
 # set(CPACK_NSIS_URL_INFO_ABOUT "https://твой-сайт.com") # Ссылка на проект
-set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\QSpace.exe") # Иконка для Панели управления
+set(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\GVis.exe") # Иконка для Панели управления
 
 # --- Кастомизация дизайна установщика (MUI2) ---
 # ВАЖНО: Пути должны быть абсолютными. Используем ${CMAKE_SOURCE_DIR}
@@ -139,16 +139,16 @@ set(CPACK_NSIS_MUI_ICON "${CMAKE_SOURCE_DIR}/app/resources/icons/logo.ico")
 # --- Создание ярлыков ---
 # Добавляем программу в меню "Пуск"
 # Формат: "имя_исполняемого_файла_без_exe;Название_Ярлыка"
-set(CPACK_PACKAGE_EXECUTABLES "QSpace;QSpace")
+set(CPACK_PACKAGE_EXECUTABLES "GVis;GVis")
 
 # Команды для создания ярлыка на рабочем столе (выполняются при установке)
 # Обрати внимание на экранирование слешей \\ для NSIS
 set(CPACK_NSIS_CREATE_ICONS_EXTRA "
-  CreateShortCut '$DESKTOP\\\\QSpace.lnk' '$INSTDIR\\\\bin\\\\QSpace.exe'
+  CreateShortCut '$DESKTOP\\\\GVis.lnk' '$INSTDIR\\\\bin\\\\GVis.exe'
 ")
 
 # Команды для удаления ярлыка с рабочего стола (выполняются при удалении)
 set(CPACK_NSIS_DELETE_ICONS_EXTRA "
-  Delete '$DESKTOP\\\\QSpace.lnk'
+  Delete '$DESKTOP\\\\GVis.lnk'
 ")
 include(CPack)

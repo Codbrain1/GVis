@@ -18,9 +18,8 @@ struct SelectExperimentDialogResult {
 class SelectExperimentDialog : public QDialog {
     Q_OBJECT
   public:
-    explicit SelectExperimentDialog(
-        const QList<std::shared_ptr<QSpace::Core::Experiment>>& existingExperiments,
-        QWidget*                                                parent);
+    explicit SelectExperimentDialog(const QList<std::shared_ptr<GVis::Core::Experiment>>& existingExperiments,
+                                    QWidget*                                              parent);
     ~SelectExperimentDialog() = default;
     SelectExperimentDialogResult getResult() const;
   private slots:

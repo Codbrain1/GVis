@@ -11,7 +11,7 @@
 #include <map>
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class VIEWMANAGER_EXPORT ViewManager : public QObject {
     Q_OBJECT
   public:
@@ -56,7 +56,7 @@ class VIEWMANAGER_EXPORT ViewManager : public QObject {
 
     std::map<QUuid, std::shared_ptr<Visualize::Views::AbstractView>> m_views;
     QUuid                                                            m_mainViewId;
-    Physics::PhysicalUnitsProfile                                  m_activeExperimentProfile;
+    Physics::PhysicalUnitsProfile                                    m_activeExperimentProfile;
     bool                                                             m_hasActiveExperiment = false;
 };
-} // namespace QSpace::Core
+} // namespace GVis::Core

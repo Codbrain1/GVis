@@ -13,10 +13,10 @@
 /*_9_*/ Q_DECLARE_LOGGING_CATEGORY(LogRenderer) // отображение различных приметив и данных считанных с помощью IO
 /*_10_*/ Q_DECLARE_LOGGING_CATEGORY(LogUI)      // интерфейс и непосредственное общение с пользователем
 /*_11_*/ Q_DECLARE_LOGGING_CATEGORY(LogSession) // работа настройками а и загрузка проектов
-namespace QSpace::Common {
+namespace GVis::Common {
 
 class Logger {
 public:
-  static void init(const QString &logName = "qspace.log");
+  static void init(const QString &logName = "GVis.log");
 };
-} // namespace QSpace::Common
+} // namespace GVis::Common

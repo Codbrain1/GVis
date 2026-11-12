@@ -7,7 +7,7 @@
 #include <qobject.h>
 #include <quuid.h>
 
-namespace QSpace::Visualize {
+namespace GVis::Visualize {
 ColorMapManager& ColorMapManager::instance() {
     static ColorMapManager _instance;
     return _instance;
@@ -27,8 +27,7 @@ QList<ColorMap> ColorMapManager::getAllMaps() const {
 
 void ColorMapManager::AddCustomMap(const ColorMap& map) {
     if (QThread::currentThread() != thread()) {
-        QMetaObject::invokeMethod(
-            this, [this, map]() { AddCustomMap(map); }, Qt::QueuedConnection);
+        QMetaObject::invokeMethod(this, [this, map]() { AddCustomMap(map); }, Qt::QueuedConnection);
         return;
     }
 
@@ -47,7 +46,7 @@ void ColorMapManager::removeCustomMap(const QUuid& id) {
 }
 
 ColorMapManager::ColorMapManager(QObject* parent) : QObject(parent) {
-    qRegisterMetaType<ColorMap>("QSpace::Visualize::ColorMap");
+    qRegisterMetaType<ColorMap>("GVis::Visualize::ColorMap");
 
     // При инициализации заполняем карту пресетами
     auto presets = ColorMapPresets::getStandardPresets();
@@ -60,7 +59,7 @@ bool ColorMapManager::contains(const QUuid& id) {
     return m_availableMaps.contains(id);
 }
 
-QIcon ColorMapManager::createColorMapIcon(const QSpace::Visualize::ColorMap& map, QSize size) {
+QIcon ColorMapManager::createColorMapIcon(const GVis::Visualize::ColorMap& map, QSize size) {
     QPixmap  pix(size);
     QPainter painter(&pix);
 
@@ -83,4 +82,4 @@ QIcon ColorMapManager::createColorMapIcon(const QSpace::Visualize::ColorMap& map
     return QIcon(pix);
 }
 
-} // namespace QSpace::Visualize
+} // namespace GVis::Visualize

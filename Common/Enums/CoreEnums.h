@@ -2,7 +2,7 @@
 #include <QObject>
 #include <qtmetamacros.h>
 
-namespace QSpace::Core
+namespace GVis::Core
 {
 Q_NAMESPACE
 enum class TaskPriority
@@ -12,4 +12,4 @@ enum class TaskPriority
   Auto
 };
 Q_ENUM_NS(TaskPriority)
-} // namespace QSpace::Core
+} // namespace GVis::Core

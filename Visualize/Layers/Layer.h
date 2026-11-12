@@ -11,8 +11,7 @@
 #include "LayersExport.h"
 #include <memory>
 
-
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 
 class LAYERS_EXPORT Layer : public QObject {
     Q_OBJECT
@@ -46,8 +45,8 @@ class LAYERS_EXPORT Layer : public QObject {
     }
 
     ~Layer() {
-        if (auto view3D = std::dynamic_pointer_cast<QSpace::Visualize::Views::AbstractView3D>(
-                m_view.lock())) {
+        if (auto view3D =
+                std::dynamic_pointer_cast<GVis::Visualize::Views::AbstractView3D>(m_view.lock())) {
             view3D->detachRenderLayer(m_layerId);
         }
     }
@@ -166,4 +165,4 @@ class LAYERS_EXPORT Layer : public QObject {
     bool                                          m_isSyncedWithMaster = true;
 };
 
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers

@@ -8,20 +8,20 @@
 #include <qloggingcategory.h>
 #include <qtoolbutton.h>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 TimeLineWidget::TimeLineWidget(Core::AppCore* app, QWidget* parent)
     : QWidget(parent), ui(new Ui::TimeLineWidget), m_app(app) {
     ui->setupUi(this);
 
     connect(m_app->videoController(),
-            &QSpace::Core::Controllers::VideoController::snapshotsListSizeChanged,
+            &GVis::Core::Controllers::VideoController::snapshotsListSizeChanged,
             this,
             &TimeLineWidget::handleSnapshotsListChangeSize);
     connect(this,
             &TimeLineWidget::currentTimeStampValueChanged,
             m_app->videoController(),
-            &QSpace::Core::Controllers::VideoController::handleActivateVisualizeSnapshot);
+            &GVis::Core::Controllers::VideoController::handleActivateVisualizeSnapshot);
     // 1. Обработка изменения значения (перетаскивание или программный ввод)
     connect(ui->TimeSlider,
             &QSlider::valueChanged,
@@ -32,7 +32,7 @@ TimeLineWidget::TimeLineWidget(Core::AppCore* app, QWidget* parent)
     connect(ui->toolButtonPrev, &QToolButton::clicked, this, &TimeLineWidget::handleToolButtonPrev_clicked);
     connect(ui->toolButtonNext, &QToolButton::clicked, this, &TimeLineWidget::handleToolButtonNext_clicked);
     connect(m_app->videoController(),
-            &QSpace::Core::Controllers::VideoController::changedEtalonLayer,
+            &GVis::Core::Controllers::VideoController::changedEtalonLayer,
             this,
             &TimeLineWidget::handleChangeEtalonSnapshot);
 
@@ -124,4 +124,4 @@ TimeLineWidget::~TimeLineWidget() {
     delete ui;
 }
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

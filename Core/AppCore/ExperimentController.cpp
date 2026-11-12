@@ -4,12 +4,12 @@
 #include "Core/ObjectRegistry/ObjectRegistry.h"
 #include "Core/ViewManager/ViewManager.h"
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 
 ExperimentController::ExperimentController(Core::ObjectRegistry* objectRegistry,
-                                           Core::LayerManager* layerManager,
-                                           Core::ViewManager* viewManager,
-                                           QObject* parent)
+                                           Core::LayerManager*   layerManager,
+                                           Core::ViewManager*    viewManager,
+                                           QObject*              parent)
     : QObject(parent),
       m_objectRegistry(objectRegistry),
       m_layerManager(layerManager),
@@ -25,12 +25,11 @@ QList<std::shared_ptr<Core::Experiment>> ExperimentController::getExperiments() 
                             : QList<std::shared_ptr<Core::Experiment>>{};
 }
 
-bool ExperimentController::updatePhysicalUnits(const QUuid& id,
+bool ExperimentController::updatePhysicalUnits(const QUuid&                         id,
                                                const Physics::PhysicalUnitsProfile& profile) {
     if (!m_objectRegistry || !m_layerManager || !m_viewManager)
         return false;
-    if (profile.Km <= 0.0 || profile.Kr <= 0.0 ||
-        (profile.haveGamma && profile.gamma <= 1.0))
+    if (profile.Km <= 0.0 || profile.Kr <= 0.0 || (profile.haveGamma && profile.gamma <= 1.0))
         return false;
 
     const auto experiment = m_objectRegistry->getExperiment(id);
@@ -54,4 +53,4 @@ bool ExperimentController::updatePhysicalUnits(const QUuid& id,
     return true;
 }
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

@@ -8,7 +8,7 @@
 #include "objectregistry_export.h"
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class OBJECTREGISTRY_EXPORT ObjectRegistry : public QObject {
     Q_OBJECT
     Q_PROPERTY(int nodeCount READ nodeCount NOTIFY nodeAdded)
@@ -86,9 +86,9 @@ class OBJECTREGISTRY_EXPORT ObjectRegistry : public QObject {
 
     Q_INVOKABLE void clear();
   signals:
-    void nodeAdded(std::shared_ptr<QSpace::Core::DataNode> node, const QUuid& parentSnapshotId);
-    void snapshotAdded(std::shared_ptr<QSpace::Core::Snapshot> container, const QUuid& parentExperimentId);
-    void experimentAdded(std::shared_ptr<QSpace::Core::Experiment> experiment);
+    void nodeAdded(std::shared_ptr<GVis::Core::DataNode> node, const QUuid& parentSnapshotId);
+    void snapshotAdded(std::shared_ptr<GVis::Core::Snapshot> container, const QUuid& parentExperimentId);
+    void experimentAdded(std::shared_ptr<GVis::Core::Experiment> experiment);
     void objectRemoved(const QUuid& id);
     void cleared();
 
@@ -106,4 +106,4 @@ class OBJECTREGISTRY_EXPORT ObjectRegistry : public QObject {
     QMap<QUuid, std::shared_ptr<Experiment>> m_experiments;
     void                                     touchNodeInMemory(const QUuid& id);
 };
-} // namespace QSpace::Core
+} // namespace GVis::Core

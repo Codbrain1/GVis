@@ -1,5 +1,5 @@
-qspace_add_test(TestRegisterContainer QSpace::Common ObjectRegistry)
-qspace_add_test(TestRegisterNode QSpace::Common ObjectRegistry)
-qspace_add_test(TestRemovalNode QSpace::Common ObjectRegistry)
-qspace_add_test(TestObjectRegistrySerialization QSpace::Common ObjectRegistry)
+GVis_add_test(TestRegisterContainer GVis::Common ObjectRegistry)
+GVis_add_test(TestRegisterNode GVis::Common ObjectRegistry)
+GVis_add_test(TestRemovalNode GVis::Common ObjectRegistry)
+GVis_add_test(TestObjectRegistrySerialization GVis::Common ObjectRegistry)
 

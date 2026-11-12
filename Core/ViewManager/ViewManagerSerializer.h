@@ -2,11 +2,11 @@
 #include "Core/ViewManager/ViewManager.h"
 #include "viewmanager_export.h"
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class ViewManager;
 }
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class VIEWMANAGER_EXPORT ViewManagerSerializer {
   public:
     static std::optional<Session::ViewManagerDTO> toDTO(Core::ViewManager* viewManager);
@@ -16,4 +16,4 @@ class VIEWMANAGER_EXPORT ViewManagerSerializer {
     static std::optional<Session::ViewDTO> toDTO(const std::shared_ptr<Visualize::Views::AbstractView> view);
     static std::shared_ptr<Visualize::Views::AbstractView> fromDTO(const Session::ViewDTO& dto);
 };
-} // namespace QSpace::Core
+} // namespace GVis::Core

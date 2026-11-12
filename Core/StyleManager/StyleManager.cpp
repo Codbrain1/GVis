@@ -1,7 +1,7 @@
 #include "StyleManager.h"
 #include "Visualize/Layers/Layer.h"
 
-namespace QSpace::Core {
+namespace GVis::Core {
 
 void StyleManager::syncLayerWithMaster(std::shared_ptr<Visualize::Layers::Layer> layer,
                                        std::shared_ptr<DataNode>                 node) {
@@ -38,4 +38,4 @@ void StyleManager::copyStyle(std::shared_ptr<Visualize::Layers::Layer> source,
     // target->update();
 }
 
-} // namespace QSpace::Core
+} // namespace GVis::Core

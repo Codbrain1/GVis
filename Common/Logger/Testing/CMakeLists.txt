@@ -1,2 +1,2 @@
-qspace_add_test(TestLoggerInit QSpace::Common)
-qspace_add_test(TestLoggerMultiThreading QSpace::Common)
+GVis_add_test(TestLoggerInit GVis::Common)
+GVis_add_test(TestLoggerMultiThreading GVis::Common)

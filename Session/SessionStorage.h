@@ -4,10 +4,10 @@
 #include <qstringview.h>
 #include <optional>
 
-namespace QSpace::Session {
+namespace GVis::Session {
 class SessionStorage {
   public:
     static bool                      save(const QString& filePath, const QByteArray& data);
     static std::optional<QByteArray> load(const QString& filePath);
 };
-} // namespace QSpace::Session
+} // namespace GVis::Session

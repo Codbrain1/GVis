@@ -12,17 +12,17 @@
 #include <qloggingcategory.h>
 #include <qmutex.h>
 
-Q_LOGGING_CATEGORY(LogSystem, "QSpace.System")
-Q_LOGGING_CATEGORY(LogCommon, "QSpace.Common")
-Q_LOGGING_CATEGORY(LogIO, "QSpace.IO")
-Q_LOGGING_CATEGORY(LogData, "QSpace.Data")
-Q_LOGGING_CATEGORY(LogCore, "QSpace.Core")
-Q_LOGGING_CATEGORY(LogFiltering, "QSpace.Filtering")
-Q_LOGGING_CATEGORY(LogPhysics, "QSpace.Physics")
-Q_LOGGING_CATEGORY(LogRemote, "QSpace.Remote")
-Q_LOGGING_CATEGORY(LogRenderer, "QSpace.Renderer")
-Q_LOGGING_CATEGORY(LogUI, "QSpace.UI")
-Q_LOGGING_CATEGORY(LogSession, "QSpace.Session")
+Q_LOGGING_CATEGORY(LogSystem, "GVis.System")
+Q_LOGGING_CATEGORY(LogCommon, "GVis.Common")
+Q_LOGGING_CATEGORY(LogIO, "GVis.IO")
+Q_LOGGING_CATEGORY(LogData, "GVis.Data")
+Q_LOGGING_CATEGORY(LogCore, "GVis.Core")
+Q_LOGGING_CATEGORY(LogFiltering, "GVis.Filtering")
+Q_LOGGING_CATEGORY(LogPhysics, "GVis.Physics")
+Q_LOGGING_CATEGORY(LogRemote, "GVis.Remote")
+Q_LOGGING_CATEGORY(LogRenderer, "GVis.Renderer")
+Q_LOGGING_CATEGORY(LogUI, "GVis.UI")
+Q_LOGGING_CATEGORY(LogSession, "GVis.Session")
 
 static std::unique_ptr<QFile> m_log_file;
 static QMutex m_mutex;
@@ -47,7 +47,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
     location = QString("(%1:%2)").arg(filename).arg(context.line);            // номер строки с ошибкой
   }
   // Собираем итоговую строку
-  //  Пример: [2023-10-05 12:00:00.123] [WRN] [QSpace.IO] File header corrupted! (BinaryReader.cpp:45)
+  //  Пример: [2023-10-05 12:00:00.123] [WRN] [GVis.IO] File header corrupted! (BinaryReader.cpp:45)
   QString formatMsg = QString("%1 %2 [%3] %4 %5")
                           .arg(timeStr)   // создания записи
                           .arg(levelText) // тип ошибки
@@ -67,7 +67,7 @@ void messageHandler(QtMsgType type, const QMessageLogContext &context, const QSt
   }
 }
 
-namespace QSpace::Common {
+namespace GVis::Common {
 void Logger::init(const QString &logName) {
   m_log_file = std::make_unique<QFile>(logName);
   if (m_log_file->open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text)) {
@@ -77,4 +77,4 @@ void Logger::init(const QString &logName) {
     std::cerr << "Failed to open log file: " << logName.toStdString() << std::endl;
   }
 }
-} // namespace QSpace::Common
+} // namespace GVis::Common

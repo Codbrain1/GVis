@@ -4,12 +4,12 @@
 #include "Interfaces/IOFactory.h"
 #include <QFileInfo>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 
-VideoExportManager::VideoExportManager(DataManager*                                     dataManager,
-                                       std::shared_ptr<QSpace::Visualize::IRenderLayer> targetLayer,
-                                       std::shared_ptr<QSpace::Visualize::VideoExporter> exporter,
-                                       QObject*                                          parent)
+VideoExportManager::VideoExportManager(DataManager*                                    dataManager,
+                                       std::shared_ptr<GVis::Visualize::IRenderLayer>  targetLayer,
+                                       std::shared_ptr<GVis::Visualize::VideoExporter> exporter,
+                                       QObject*                                        parent)
     : QObject(parent),
       m_dataManager(dataManager),
       m_targetLayer(targetLayer),
@@ -125,4 +125,4 @@ void VideoExportManager::processReadyFrames() {
     }
 }
 
-} // namespace QSpace::Core
+} // namespace GVis::Core

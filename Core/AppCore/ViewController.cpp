@@ -4,7 +4,7 @@
 #include "Core/ViewManager/ViewManager.h"
 #include "Visualize/Views/View3D/AbstractView3D.h"
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 
 ViewController::ViewController(Core::ViewManager*    viewManager,
                                Core::LayerManager*   layerManager,
@@ -145,4 +145,4 @@ void ViewController::setGridVisibleInView(const QUuid& viewId, bool visible) {
         renderer->setGridVisible(visible);
     }
 }
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

@@ -3,7 +3,7 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 ViewContainerWidget::ViewContainerWidget(QWidget* viewWidget, QObject* settingsObject, QWidget* parent)
     : QWidget(parent) {
@@ -32,4 +32,4 @@ void ViewContainerWidget::setSettingsObject(QObject* settingsObject) {
     m_header->setVisible(settingsObject != nullptr);
 }
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

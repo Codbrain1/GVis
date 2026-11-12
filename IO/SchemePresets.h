@@ -5,7 +5,7 @@
 
 #include <qobject.h>
 
-namespace QSpace::IO {
+namespace GVis::IO {
 class ReadSchemePresets {
   public:
     static QList<QPair<PresetKey, ReadScheme>> getStandardPresets();
@@ -16,4 +16,4 @@ class ReadSchemePresets {
     static ReadScheme createScheme_v2_3(Visualize::EntityType type, FileFormat format);
 };
 
-} // namespace QSpace::IO
+} // namespace GVis::IO

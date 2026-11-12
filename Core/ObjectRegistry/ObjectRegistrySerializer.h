@@ -4,12 +4,11 @@
 #include "objectregistry_export.h"
 #include <memory>
 
-
-namespace QSpace::Core {
+namespace GVis::Core {
 class ObjectRegistry;
 }
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class OBJECTREGISTRY_EXPORT ObjectRegistrySerializer {
   public:
     static std::optional<Session::ObjectRegistryDTO> toDTO(Core::ObjectRegistry* registry);
@@ -23,4 +22,4 @@ class OBJECTREGISTRY_EXPORT ObjectRegistrySerializer {
     static std::shared_ptr<Core::Snapshot>       fromDTO(const Session::SnapshotDTO& dto);
     static std::shared_ptr<Core::DataNode>       fromDTO(const Session::DataNodeDTO& dto);
 };
-} // namespace QSpace::Core
+} // namespace GVis::Core

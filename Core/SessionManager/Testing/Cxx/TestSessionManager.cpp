@@ -11,9 +11,9 @@
 #include "Core/ViewManager/ViewManager.h"
 #include "Structures/SessionStructures.h"
 
-using namespace QSpace::Core;
-using namespace QSpace::Session;
-using namespace QSpace::Visualize::Views;
+using namespace GVis::Core;
+using namespace GVis::Session;
+using namespace GVis::Visualize::Views;
 
 class TestSessionManager : public QObject {
     Q_OBJECT
@@ -39,12 +39,10 @@ class TestSessionManager : public QObject {
             QSKIP("ViewFactory could not create a view in this environment");
         }
 
-        auto node    = std::make_shared<DataNode>(nullptr,
-                                                  "Node1",
-                                                  12.5,
-                                                  QSpace::Visualize::EntityType::Stars);
+        auto node =
+            std::make_shared<DataNode>(nullptr, "Node1", 12.5, GVis::Visualize::EntityType::Stars);
         node->path   = "/data/file.bin";
-        node->format = QSpace::IO::FileFormat::BIN;
+        node->format = GVis::IO::FileFormat::BIN;
         node->scheme = QUuid::createUuid();
 
         auto snapshot = std::make_shared<Snapshot>("Snapshot1", 12.5);

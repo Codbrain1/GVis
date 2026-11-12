@@ -3,10 +3,10 @@
 
 #include "Core/FileSchemeRegistry/FileSchemeRegistry.h"
 
-Q_DECLARE_METATYPE(QSpace::IO::PresetKey)
+Q_DECLARE_METATYPE(GVis::IO::PresetKey)
 
-using namespace QSpace;
-using namespace QSpace::Core;
+using namespace GVis;
+using namespace GVis::Core;
 
 class TestFileSchemeRegistry : public QObject {
     Q_OBJECT
@@ -22,14 +22,15 @@ class TestFileSchemeRegistry : public QObject {
     }
 
   private slots:
+
     void initTestCase() {
         qRegisterMetaType<IO::PresetKey>();
     }
 
     void registersStandardPresetsAndFindsThem() {
         FileSchemeRegistry registry;
-        QSignalSpy addedSpy(&registry, &FileSchemeRegistry::readSchemeAdded);
-        const auto presets = IO::ReadSchemePresets::getStandardPresets();
+        QSignalSpy         addedSpy(&registry, &FileSchemeRegistry::readSchemeAdded);
+        const auto         presets = IO::ReadSchemePresets::getStandardPresets();
 
         registry.registerStandartPresets();
 
@@ -60,14 +61,14 @@ class TestFileSchemeRegistry : public QObject {
     }
 
     void registersCustomReadAndWriteSchemesAndEmitsSignals() {
-        FileSchemeRegistry registry;
-        QSignalSpy readAddedSpy(&registry, &FileSchemeRegistry::readSchemeAdded);
-        QSignalSpy writeAddedSpy(&registry, &FileSchemeRegistry::writeSchemeAdded);
-        QSignalSpy readRemovedSpy(&registry, &FileSchemeRegistry::readSchemeRemoved);
-        QSignalSpy writeRemovedSpy(&registry, &FileSchemeRegistry::writeSchemeRemoved);
+        FileSchemeRegistry     registry;
+        QSignalSpy             readAddedSpy(&registry, &FileSchemeRegistry::readSchemeAdded);
+        QSignalSpy             writeAddedSpy(&registry, &FileSchemeRegistry::writeSchemeAdded);
+        QSignalSpy             readRemovedSpy(&registry, &FileSchemeRegistry::readSchemeRemoved);
+        QSignalSpy             writeRemovedSpy(&registry, &FileSchemeRegistry::writeSchemeRemoved);
         const IO::ColumnScheme scheme = customScheme();
 
-        const QUuid readId = registry.registerReadScheme(scheme, "custom read");
+        const QUuid readId  = registry.registerReadScheme(scheme, "custom read");
         const QUuid writeId = registry.registerWriteScheme(scheme, "custom write");
 
         QVERIFY(!readId.isNull());
@@ -76,7 +77,7 @@ class TestFileSchemeRegistry : public QObject {
         QCOMPARE(*registry.getWriteScheme(writeId), IO::WriteScheme{scheme});
         QCOMPARE(registry.allReadSchemes().front().name, QString("custom read"));
         QCOMPARE(registry.allWriteSchemes().front().name, QString("custom write"));
-        const auto readAdded = readAddedSpy.takeFirst();
+        const auto readAdded  = readAddedSpy.takeFirst();
         const auto writeAdded = writeAddedSpy.takeFirst();
         QCOMPARE(readAdded.at(0).toUuid(), readId);
         QCOMPARE(readAdded.at(1).toString(), QString("custom read"));
@@ -93,8 +94,8 @@ class TestFileSchemeRegistry : public QObject {
     }
 
     void managesUserOverridesAndCleansThemUpWhenSchemeIsRemoved() {
-        FileSchemeRegistry registry;
-        QSignalSpy overrideSpy(&registry, &FileSchemeRegistry::userOverrideChanged);
+        FileSchemeRegistry  registry;
+        QSignalSpy          overrideSpy(&registry, &FileSchemeRegistry::userOverrideChanged);
         const IO::PresetKey key{Visualize::EntityType::Gas,
                                 IO::FileFormat::BIN,
                                 IO::ModelingProgrammVersion::V2};
@@ -119,13 +120,13 @@ class TestFileSchemeRegistry : public QObject {
     }
 
     void clearRemovesSchemesOverridesAndEmitsSignal() {
-        FileSchemeRegistry registry;
-        QSignalSpy clearedSpy(&registry, &FileSchemeRegistry::cleared);
+        FileSchemeRegistry  registry;
+        QSignalSpy          clearedSpy(&registry, &FileSchemeRegistry::cleared);
         const IO::PresetKey key{Visualize::EntityType::Stars,
                                 IO::FileFormat::BIN,
                                 IO::ModelingProgrammVersion::V2_3};
-        const QUuid readId = registry.registerReadScheme(customScheme(), "read");
-        const QUuid writeId = registry.registerWriteScheme(customScheme(), "write");
+        const QUuid         readId  = registry.registerReadScheme(customScheme(), "read");
+        const QUuid         writeId = registry.registerWriteScheme(customScheme(), "write");
         registry.setUserOverride(key, readId);
 
         registry.clear();

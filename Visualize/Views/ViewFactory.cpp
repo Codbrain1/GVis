@@ -1,7 +1,7 @@
 #include "Common/Enums/ViewEnums.h"
 #include "View3D/OpenGL3DWidget/OpenGL3DWidget.h"
 
-namespace QSpace::Visualize::Views {
+namespace GVis::Visualize::Views {
 class AbstractView;
 
 namespace ViewFactory {
@@ -14,4 +14,4 @@ std::shared_ptr<AbstractView> createView(ViewType type, QObject* parent = nullpt
     };
 }
 }; // namespace ViewFactory
-} // namespace QSpace::Visualize::Views
+} // namespace GVis::Visualize::Views

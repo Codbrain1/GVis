@@ -6,34 +6,34 @@
 #include <QStringList>
 #include <QUuid>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class DataManager;
 class ObjectRegistry;
 class FileSchemeRegistry;
-}
+} // namespace GVis::Core
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 
 class ImportFilesWorkflow;
 
 class ImportExperimentWorkflow final : public QObject {
     Q_OBJECT
-public:
-    explicit ImportExperimentWorkflow(ImportFilesWorkflow* filesWorkflow,
+  public:
+    explicit ImportExperimentWorkflow(ImportFilesWorkflow*  filesWorkflow,
                                       Core::ObjectRegistry* objectRegistry,
-                                      QObject* parent = nullptr);
+                                      QObject*              parent = nullptr);
 
     void start(const QString& experimentPath, IO::ModelingProgrammVersion version);
-    void start(const QStringList& filePaths,
-               const QString& experimentName,
+    void start(const QStringList&          filePaths,
+               const QString&              experimentName,
                IO::ModelingProgrammVersion version);
 
-signals:
+  signals:
     void taskStarted(const QUuid& taskId, const QUuid& experimentId, int totalFiles);
 
-private:
-    ImportFilesWorkflow* m_filesWorkflow;
+  private:
+    ImportFilesWorkflow*  m_filesWorkflow;
     Core::ObjectRegistry* m_objectRegistry;
 };
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

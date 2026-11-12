@@ -27,7 +27,7 @@
 #include <cmath>
 #include <optional>
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 
 ImportController::ImportController(Core::DataManager*        dataManager,
                                    Core::ObjectRegistry*     objectRegistry,
@@ -149,12 +149,12 @@ void ImportController::loadRestoredNodes() {
 
 std::expected<Physics::PhysicalUnitsProfile, IO::ReadStatus>
 ImportController::importIniFile(const QString& filePath) {
-    return QSpace::IO::importIniFile(filePath);
+    return GVis::IO::importIniFile(filePath);
 }
 
-void ImportController::handleFileReady(const QUuid&           taskId,
-                                       QSpace::IO::ReadResult result,
-                                       QSpace::IO::ImportRole role) {
+void ImportController::handleFileReady(const QUuid&         taskId,
+                                       GVis::IO::ReadResult result,
+                                       GVis::IO::ImportRole role) {
     if (!m_activeTasks.contains(taskId) || role != IO::ImportRole::ProjectData)
         return;
 
@@ -171,11 +171,11 @@ void ImportController::handleFileReady(const QUuid&           taskId,
     Visualize::EntityType type     = IO::Utils::getEntityType(fileName);
 
     // Создаем «каркас» узла (result.data здесь пустой, т.к. прочитан только заголовок)
-    auto node = std::make_shared<Core::DataNode>(
-        result.data,
-        fileName,
-        QSpace::Physics::Math::calculateTimestamp(result.timestamp),
-        type);
+    auto node =
+        std::make_shared<Core::DataNode>(result.data,
+                                         fileName,
+                                         GVis::Physics::Math::calculateTimestamp(result.timestamp),
+                                         type);
 
     // Проверяем: мы восстанавливаем сохраненный проект или импортируем новые файлы?
     if (m_restoringNodes.contains(result.path)) {
@@ -246,4 +246,4 @@ std::shared_ptr<Core::Snapshot> ImportController::findOrCreateSnapshot(const QSt
     return newContainer;
 }
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

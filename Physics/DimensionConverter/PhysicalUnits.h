@@ -1,7 +1,7 @@
 #pragma once
 #include <cmath>
 
-namespace QSpace::Physics {
+namespace GVis::Physics {
 
 // Коэффициенты перевода "код-единиц" симуляции в физические единицы.
 // Формулы взяты из референсной C++/Python программы обработки (l_v, l_r, l_s, l_rho, l_t).
@@ -54,4 +54,4 @@ inline double fieldPhysicalScale(const Physics::PhysicalUnits& units, const QStr
     return 1.0;
 }
 
-} // namespace QSpace::Physics
+} // namespace GVis::Physics

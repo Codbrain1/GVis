@@ -7,7 +7,7 @@
 #include "Enums/LayerEnums.h"
 #include "ParticlePointsLayerSettings.h"
 
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 
 class ParticleRendererLayer : public IOpenGLRenderLayer {
   public:
@@ -70,4 +70,4 @@ class ParticleRendererLayer : public IOpenGLRenderLayer {
     std::shared_ptr<ParticlePointsLayerSettings> m_settings;
 };
 
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers

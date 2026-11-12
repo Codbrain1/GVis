@@ -14,7 +14,7 @@
 #include "Common/Structures/ObjectRegistryStructures.h" // Путь к файлу с DataNode
 #include "Core/ObjectRegistry/ObjectRegistry.h"
 
-using namespace QSpace::Core;
+using namespace GVis::Core;
 
 class TestRegisterNode : public QObject {
     Q_OBJECT
@@ -33,7 +33,7 @@ class TestRegisterNode : public QObject {
         m_registry->registerNode(node);
         QCOMPARE(m_registry->getAllNodes().size(), 1);
         QCOMPARE(spy.count(), 1);
-        auto signaledNode = spy.at(0).at(0).value<std::shared_ptr<QSpace::Core::DataNode>>();
+        auto signaledNode = spy.at(0).at(0).value<std::shared_ptr<GVis::Core::DataNode>>();
         QCOMPARE(signaledNode->id, node->id);
     }
 
@@ -58,9 +58,9 @@ class TestRegisterNode : public QObject {
 
         QSignalSpy snapshots(m_registry.get(), &ObjectRegistry::snapshotAdded);
         QSignalSpy nodes(m_registry.get(), &ObjectRegistry::nodeAdded);
-        auto first = std::make_shared<DataNode>(nullptr, "First", 10.0);
-        auto matching = std::make_shared<DataNode>(nullptr, "Matching", 10.0 + 0.000005);
-        auto distinct = std::make_shared<DataNode>(nullptr, "Distinct", 10.00002);
+        auto       first    = std::make_shared<DataNode>(nullptr, "First", 10.0);
+        auto       matching = std::make_shared<DataNode>(nullptr, "Matching", 10.0 + 0.000005);
+        auto       distinct = std::make_shared<DataNode>(nullptr, "Distinct", 10.00002);
 
         m_registry->registerNodeToExperiment(first, experiment->id);
         m_registry->registerNodeToExperiment(matching, experiment->id);
@@ -79,9 +79,9 @@ class TestRegisterNode : public QObject {
 
     void testLruCacheEvictsLeastRecentlyUsedNodeAndUpdatesData() {
         m_registry->setCacheCapacity(2);
-        auto first = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First");
+        auto first  = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First");
         auto second = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Second");
-        auto third = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Third");
+        auto third  = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Third");
         m_registry->registerNode(first);
         m_registry->registerNode(second);
 
@@ -108,7 +108,7 @@ class TestRegisterNode : public QObject {
 
 // Не забудь зарегистрировать shared_ptr в метасистеме,
 // если это еще не сделано в основном коде, иначе QSignalSpy его не вытащит.
-Q_DECLARE_METATYPE(std::shared_ptr<QSpace::Core::DataNode>)
+Q_DECLARE_METATYPE(std::shared_ptr<GVis::Core::DataNode>)
 
 QTEST_MAIN(TestRegisterNode)
 #include "TestRegisterNode.moc"

@@ -13,7 +13,7 @@
 #include <QSpinBox>
 #include <qcustomplot.h>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 SettingsEditorWidget::SettingsEditorWidget(QWidget* parent)
     : QWidget(parent), m_layout(new QFormLayout(this)) {
     m_layout->setLabelAlignment(Qt::AlignLeft);
@@ -22,7 +22,7 @@ SettingsEditorWidget::SettingsEditorWidget(QWidget* parent)
     m_layout->setFormAlignment(Qt::AlignTop | Qt::AlignLeft);
 }
 
-void SettingsEditorWidget::setSettings(QSpace::Visualize::Layers::LayerSettings* settings) {
+void SettingsEditorWidget::setSettings(GVis::Visualize::Layers::LayerSettings* settings) {
     if (m_settings == settings)
         return;
 
@@ -59,11 +59,11 @@ void SettingsEditorWidget::setSettings(QSpace::Visualize::Layers::LayerSettings*
 
     // Подписываемся на сигнал изменений изнутри движка/модели для автообновления UI
     connect(m_settings,
-            &QSpace::Visualize::Layers::LayerSettings::changed,
+            &GVis::Visualize::Layers::LayerSettings::changed,
             this,
             &SettingsEditorWidget::updateUiValues);
     connect(m_settings,
-            &QSpace::Visualize::Layers::LayerSettings::calculatedRangeChanged,
+            &GVis::Visualize::Layers::LayerSettings::calculatedRangeChanged,
             this,
             &SettingsEditorWidget::updateUiValues);
 }
@@ -228,4 +228,4 @@ void SettingsEditorWidget::clearEditor() {
         delete item;
     }
 }
-} // namespace QSpace::UI
+} // namespace GVis::UI

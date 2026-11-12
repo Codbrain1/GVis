@@ -9,63 +9,70 @@
 #include "Core/LayerManager/LayerManagerSerializer.h"
 #include "Core/ViewManager/ViewManager.h"
 #include "Core/ViewManager/ViewManagerSerializer.h"
-#include "Session/Reflection.h"
 #include "Visualize/Layers/Implementations/Particle/ParticlePointsLayerSettings.h"
+#include "Session/Reflection.h"
 
-using namespace QSpace::Core;
-using namespace QSpace::Session;
-using namespace QSpace::Visualize::Views;
-using QSpace::Visualize::Layers::RenderLayerType;
+
+using namespace GVis::Core;
+using namespace GVis::Session;
+using namespace GVis::Visualize::Views;
+using GVis::Visualize::Layers::RenderLayerType;
 
 class TestLayerManagerSerializer : public QObject {
     Q_OBJECT
 
   private slots:
+
     void testNullManagerAndMissingResolvers() {
         QVERIFY(!LayerManagerSerializer::toDTO(nullptr).has_value());
         LayerManagerDTO dto;
-        LayerDTO layer;
-        layer.layerId = QUuid::createUuid();
-        layer.nodeId = QUuid::createUuid();
-        layer.viewId = QUuid::createUuid();
+        LayerDTO        layer;
+        layer.layerId    = QUuid::createUuid();
+        layer.nodeId     = QUuid::createUuid();
+        layer.viewId     = QUuid::createUuid();
         layer.renderType = RenderLayerType::SPH;
         dto.layers.append(layer);
         LayerManager manager;
         QVERIFY(!LayerManagerSerializer::fromDTO(dto, nullptr, {}, {}));
-        QVERIFY(!LayerManagerSerializer::fromDTO(dto, &manager,
-                                                  [](const QUuid&) { return std::shared_ptr<DataNode>(); },
-                                                  [](const QUuid&) { return std::shared_ptr<AbstractView>(); }));
+        QVERIFY(!LayerManagerSerializer::fromDTO(
+            dto,
+            &manager,
+            [](const QUuid&) { return std::shared_ptr<DataNode>(); },
+            [](const QUuid&) { return std::shared_ptr<AbstractView>(); }));
         QVERIFY(manager.getAllLayers().isEmpty());
     }
 
     void testUnknownNodeAndViewDoNotCreateRenderer() {
         LayerDTO layer;
-        layer.layerId = QUuid::createUuid();
-        layer.nodeId = QUuid::createUuid();
-        layer.viewId = QUuid::createUuid();
+        layer.layerId    = QUuid::createUuid();
+        layer.nodeId     = QUuid::createUuid();
+        layer.viewId     = QUuid::createUuid();
         layer.renderType = RenderLayerType::SPH;
-        QVERIFY(!LayerManagerSerializer::fromDTO(layer,
-                                                  [](const QUuid&) { return std::shared_ptr<DataNode>(); },
-                                                  [](const QUuid&) { return std::shared_ptr<AbstractView>(); }));
+        QVERIFY(!LayerManagerSerializer::fromDTO(
+            layer,
+            [](const QUuid&) { return std::shared_ptr<DataNode>(); },
+            [](const QUuid&) { return std::shared_ptr<AbstractView>(); }));
     }
 
     void testUnknownRenderTypeIsRejected() {
-        const auto node = makeNode();
+        const auto  node = makeNode();
         ViewManager views;
-        const auto viewId = views.createView(ViewType::OpenGL3D);
-        if (viewId.isNull()) QSKIP("OpenGL view is unavailable");
+        const auto  viewId = views.createView(ViewType::OpenGL3D);
+        if (viewId.isNull())
+            QSKIP("OpenGL view is unavailable");
         LayerDTO layer;
-        layer.layerId = QUuid::createUuid();
-        layer.nodeId = node->id;
-        layer.viewId = viewId;
+        layer.layerId    = QUuid::createUuid();
+        layer.nodeId     = node->id;
+        layer.viewId     = viewId;
         layer.renderType = static_cast<RenderLayerType>(999);
-        QVERIFY(!LayerManagerSerializer::fromDTO(layer,
-                                                  [node](const QUuid& id) { return id == node->id ? node : nullptr; },
-                                                  [&views](const QUuid& id) { return views.getView(id); }));
+        QVERIFY(!LayerManagerSerializer::fromDTO(
+            layer,
+            [node](const QUuid& id) { return id == node->id ? node : nullptr; },
+            [&views](const QUuid& id) { return views.getView(id); }));
     }
 
     void testParticleFilterSettingsPreserveRange() {
-        QSpace::Visualize::Layers::ParticlePointsLayerSettings settings;
+        GVis::Visualize::Layers::ParticlePointsLayerSettings settings;
         settings.setParticleCount(20001);
         settings.setParticleNumberMin(0);
         settings.setParticleNumberMax(10000);
@@ -80,9 +87,9 @@ class TestLayerManagerSerializer : public QObject {
         QCOMPARE(settings.particleNumberMin(), 0);
         QCOMPARE(settings.particleNumberMax(), 10000);
 
-        const QVariantMap saved = QSpace::Reflection::QObjectToVariantMap(&settings);
-        QSpace::Visualize::Layers::ParticlePointsLayerSettings restored;
-        QVERIFY(QSpace::Reflection::variantMapToQObject(saved, &restored).success);
+        const QVariantMap                                    saved = GVis::Reflection::QObjectToVariantMap(&settings);
+        GVis::Visualize::Layers::ParticlePointsLayerSettings restored;
+        QVERIFY(GVis::Reflection::variantMapToQObject(saved, &restored).success);
         QCOMPARE(restored.particleNumberMin(), 0);
         QCOMPARE(restored.particleNumberMax(), 10000);
         QVERIFY(restored.showAllParticles());
@@ -90,22 +97,25 @@ class TestLayerManagerSerializer : public QObject {
     }
 
     void testRoundTripRestoresMultipleLayersAndState() {
-        ViewManager sourceViews;
+        ViewManager  sourceViews;
         LayerManager sourceLayers;
-        const auto viewId = sourceViews.createView(ViewType::OpenGL3D);
-        if (viewId.isNull()) QSKIP("OpenGL view is unavailable");
-        const auto view = sourceViews.getView(viewId);
-        const auto firstNode = makeNode();
+        const auto   viewId = sourceViews.createView(ViewType::OpenGL3D);
+        if (viewId.isNull())
+            QSKIP("OpenGL view is unavailable");
+        const auto view       = sourceViews.getView(viewId);
+        const auto firstNode  = makeNode();
         const auto secondNode = makeNode();
-        const auto firstId = sourceLayers.createLayer(firstNode, view);
-        const auto secondId = sourceLayers.createLayer(secondNode, view, RenderLayerType::Particles);
-        if (firstId.isNull() || secondId.isNull()) QSKIP("Layer renderer is unavailable");
-        auto first = sourceLayers.getLayer(firstId);
+        const auto firstId    = sourceLayers.createLayer(firstNode, view);
+        const auto secondId   = sourceLayers.createLayer(secondNode, view, RenderLayerType::Particles);
+        if (firstId.isNull() || secondId.isNull())
+            QSKIP("Layer renderer is unavailable");
+        auto first  = sourceLayers.getLayer(firstId);
         auto second = sourceLayers.getLayer(secondId);
         first->setName("Renamed layer");
         first->setIsSyncedWithMaster(false);
         second->setName("Particle layer");
-        if (auto settings = first->getSettings()) settings->setColorByField("Mass");
+        if (auto settings = first->getSettings())
+            settings->setColorByField("Mass");
 
         const auto dto = LayerManagerSerializer::toDTO(&sourceLayers);
         QVERIFY(dto.has_value());
@@ -113,10 +123,13 @@ class TestLayerManagerSerializer : public QObject {
 
         LayerManager restored;
         QVERIFY(LayerManagerSerializer::fromDTO(
-            *dto, &restored,
+            *dto,
+            &restored,
             [firstNode, secondNode](const QUuid& id) {
-                if (id == firstNode->id) return firstNode;
-                if (id == secondNode->id) return secondNode;
+                if (id == firstNode->id)
+                    return firstNode;
+                if (id == secondNode->id)
+                    return secondNode;
                 return std::shared_ptr<DataNode>();
             },
             [&sourceViews](const QUuid& id) { return sourceViews.getView(id); }));
@@ -131,7 +144,7 @@ class TestLayerManagerSerializer : public QObject {
 
   private:
     static std::shared_ptr<DataNode> makeNode() {
-        auto data = vtkSmartPointer<vtkPolyData>::New();
+        auto data   = vtkSmartPointer<vtkPolyData>::New();
         auto points = vtkSmartPointer<vtkPoints>::New();
         points->InsertNextPoint(0.0, 0.0, 0.0);
         data->SetPoints(points);

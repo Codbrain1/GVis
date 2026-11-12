@@ -2,6 +2,9 @@
 
 # 🌌 GVis 
 
+inkscape icon.svg --export-type=png --export-filename=icon_32.png -w 32 -h 32
+inkscape icon.svg --export-type=png --export-filename=icon_48.png -w 48 -h 48
+inkscape icon.svg --export-type=png --export-filename=icon_256.png -w 256 -h 256
 **High-Performance Desktop Visualizer for Astrophysical Galaxy Simulations & SPH Particle Data**
 
 [![C++20](https://img.shields.io/badge/C%2B%2B-20-00599C?logo=c%2B%2B&logoColor=white)](https://isocpp.org/)
@@ -18,7 +21,7 @@
 
 ## 🔭 Overview
 
-**GVis** (*Galaxy Visualizer*, formerly **QSpace-Galaxies**) is a native C++20/Qt 6/OpenGL desktop application engineered for interactive 3D exploration and physical analysis of large-scale astrophysical N-body and **Smoothed Particle Hydrodynamics (SPH)** simulations.
+**GVis** (*Galaxy Visualizer*, formerly **GVis-Galaxies**) is a native C++20/Qt 6/OpenGL desktop application engineered for interactive 3D exploration and physical analysis of large-scale astrophysical N-body and **Smoothed Particle Hydrodynamics (SPH)** simulations.
 
 Unlike script-based plotting libraries in Python (`matplotlib`, `yt`) that render static frames offline, **GVis** offloads kernel splatting, physical weight normalization, and logarithmic transfer functions directly to the GPU via a custom multi-pass OpenGL 3.3 Core pipeline—allowing researchers to rotate, slice, and animate multi-million-particle galaxy evolutions in real time.
 
@@ -49,7 +52,7 @@ Unlike script-based plotting libraries in Python (`matplotlib`, `yt`) that rende
 * **Dual-Hierarchy Layer Explorer (`DataTreeModel`):** Switch seamlessly between **Snapshot View** (*Experiment $\rightarrow$ Time Step $\rightarrow$ Matter Component $\rightarrow$ Render Layer*) and **Component View** (*Experiment $\rightarrow$ Gas/Stars/DM $\rightarrow$ Snapshots*).
 * **Physical Units Converter (`PhysicalUnits`):** Converts simulation code units into physical astrophysical units ($L_r$ in $\text{kpc}$, $L_v$ in $\text{km/s}$, $\Sigma$ in $M_\odot/\text{pc}^2$, $\rho$ in $M_\odot/\text{pc}^3$, $T$ in $\text{K}$, $t$ in $\text{Myr}$) via `.ini` experiment profiles ($K_m, K_r, \gamma$).
 * **Custom Colormap Studio (`ColorMapEditorDialog`):** Built-in presets (*Viridis, Inferno, Plasma, Magma, CoolToWarm, Rainbow, Grayscale, BWR*) plus an interactive gradient editor with JSON import/export and synchronized `QCustomPlot` colorbars.
-* **Reflection-Driven Sessions (`.qsp` / JSON):** Full project state serialization (experiments, multi-viewport layouts, camera states, layer settings, and custom palettes) powered by Qt's `QMetaObject` reflection.
+* **Reflection-Driven Sessions (`.gvs` / JSON):** Full project state serialization (experiments, multi-viewport layouts, camera states, layer settings, and custom palettes) powered by Qt's `QMetaObject` reflection.
 
 ---
 
@@ -57,7 +60,7 @@ Unlike script-based plotting libraries in Python (`matplotlib`, `yt`) that rende
 
 ```text
 GVis/
-├── app/QSpaceDesktop/       # Application entry point, QSS styling & i18n initialization
+├── app/GVisDesktop/       # Application entry point, QSS styling & i18n initialization
 ├── Common/                  # Shared enums, interfaces (IReader, IRenderLayer), DTOs & Logger
 ├── Core/
 │   ├── AppCore/             # Application controllers (Import, Layer, View, Video, Project, Experiment)
@@ -66,7 +69,7 @@ GVis/
 │   ├── FileSchemeRegistry/  # Binary/Text column mapping schemas & user overrides
 │   ├── LayerManager/        # Render layer lifecycle & master-node synchronization
 │   ├── ViewManager/         # Multi-viewport management & camera synchronization
-│   ├── SessionManager/      # Project (.qsp/JSON) & palette persistence
+│   ├── SessionManager/      # Project (.gvs/JSON) & palette persistence
 │   └── TaskManager/         # Prioritized QThreadPool execution (Compute, Urgent IO, Bulk IO)
 ├── IO/                      # Binary/ASCII readers, INI unit parser & scheme presets
 ├── Models/DataTreeModel/    # Dual-mode QAbstractItemModel (SnapshotView / ComponentView)
@@ -93,8 +96,8 @@ GVis/
 
 ```bash
 # 1. Clone the repository
-git clone [https://github.com/Codbrain1/QSpace-Galaxies.git](https://github.com/Codbrain1/QSpace-Galaxies.git)
-cd QSpace-Galaxies
+git clone [https://github.com/Codbrain1/GVis-Galaxies.git](https://github.com/Codbrain1/GVis-Galaxies.git)
+cd GVis-Galaxies
 
 # 2. Configure with CMake
 cmake -B build -DCMAKE_BUILD_TYPE=Release
@@ -120,7 +123,7 @@ cmake --build build --parallel
 
 # 🌌 Обзор проекта (RU)
 
-**GVis** (ранее **QSpace-Galaxies**) — высокопроизводительное десктопное приложение на C++20, Qt 6 и OpenGL 3.3 Core для интерактивной 3D-визуализации и физического анализа результатов астрофизического моделирования галактик и **SPH-данных (Smoothed Particle Hydrodynamics)**.
+**GVis** (ранее **GVis-Galaxies**) — высокопроизводительное десктопное приложение на C++20, Qt 6 и OpenGL 3.3 Core для интерактивной 3D-визуализации и физического анализа результатов астрофизического моделирования галактик и **SPH-данных (Smoothed Particle Hydrodynamics)**.
 
 ### Ключевые возможности
 1. **Трёхпроходный GPU-конвейер SPH-рендеринга:**
@@ -131,7 +134,7 @@ cmake --build build --parallel
 3. **Умное управление памятью (LRU-кэш + скользящее окно):** в оперативной памяти хранятся только активные снимки (`m_cacheCapacity = 30`), а при прокрутке таймлайна соседние кадры ($\pm 5$ шагов) подгружаются асинхронно в фоновых пулах потоков.
 4. **Перевод в физические единицы:** автоматический пересчёт безразмерных код-единиц симуляции в килопарсеки ($\text{kpc}$), $\text{км/с}$, $M_\odot/\text{пк}^2$, $M_\odot/\text{пк}^3$, Кельвины ($\text{K}$) и миллионы лет ($\text{Myr}$) на основе `.ini`-профиля эксперимента.
 5. **Фиксация эталонного кадра:** настройка палитры, прозрачности и диапазонов по выбранному снимку с автоматическим применением ко всем временным шагам анимации.
-6. **Сериализация сессий через рефлексию Qt:** сохранение и восстановление всего состояния исследования в файл проекта (`.qsp` / JSON) и экспорт пользовательских цветовых палитр.
+6. **Сериализация сессий через рефлексию Qt:** сохранение и восстановление всего состояния исследования в файл проекта (`.gvs` / JSON) и экспорт пользовательских цветовых палитр.
 
 ---
 

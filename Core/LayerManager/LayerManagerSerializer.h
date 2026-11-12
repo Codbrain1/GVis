@@ -5,11 +5,11 @@
 #include "layermanager_export.h"
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class LayerManager;
 }
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class LAYERMANAGER_EXPORT LayerManagerSerializer {
   public:
     using NodeResolver = std::function<std::shared_ptr<DataNode>(const QUuid&)>;
@@ -25,4 +25,4 @@ class LAYERMANAGER_EXPORT LayerManagerSerializer {
     static std::shared_ptr<Visualize::Layers::Layer>
     fromDTO(const Session::LayerDTO& dto, NodeResolver nodeResolver, ViewResolver viewResolver);
 };
-} // namespace QSpace::Core
+} // namespace GVis::Core

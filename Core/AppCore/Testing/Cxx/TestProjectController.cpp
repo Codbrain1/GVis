@@ -14,8 +14,8 @@
 #include "Core/TaskManager/TaskManager.h"
 #include "Core/ViewManager/ViewManager.h"
 
-using namespace QSpace::Core;
-using namespace QSpace::Core::Controllers;
+using namespace GVis::Core;
+using namespace GVis::Core::Controllers;
 
 class TestProjectController : public QObject {
     Q_OBJECT
@@ -29,9 +29,7 @@ class TestProjectController : public QObject {
         views    = std::make_unique<ViewManager>();
         schemes  = std::make_unique<FileSchemeRegistry>();
         schemes->registerStandartPresets();
-        controller = std::make_unique<ImportController>(data.get(),
-                                                        registry.get(),
-                                                        schemes.get());
+        controller = std::make_unique<ImportController>(data.get(), registry.get(), schemes.get());
         controller->initialize();
         session = std::make_unique<SessionManager>(registry.get(), layers.get(), views.get());
         project = std::make_unique<ProjectController>(session.get(),
@@ -49,22 +47,21 @@ class TestProjectController : public QObject {
         QSignalSpy errors(session.get(), &SessionManager::errorOccurred);
         project->createNewProject("Test");
         QCOMPARE(states.count(), 1);
-        QVERIFY(!states.last().at(0).value<QSpace::Session::CurrentSession>().isDirty);
+        QVERIFY(!states.last().at(0).value<GVis::Session::CurrentSession>().isDirty);
         auto node = std::make_shared<DataNode>(nullptr, "Node");
         registry->registerNode(node);
         controller->removeNodeObject(node->id);
-        QVERIFY(states.last().at(0).value<QSpace::Session::CurrentSession>().isDirty);
+        QVERIFY(states.last().at(0).value<GVis::Session::CurrentSession>().isDirty);
         project->saveCurrentProject();
         QCOMPARE(request.count(), 1);
         project->saveCurrentProjectAs(dir.filePath("missing/project.json"));
         QCOMPARE(errors.count(), 1);
-        QVERIFY(states.last().at(0).value<QSpace::Session::CurrentSession>().isDirty);
+        QVERIFY(states.last().at(0).value<GVis::Session::CurrentSession>().isDirty);
         const QString path = dir.filePath("project.json");
         project->saveCurrentProjectAs(path);
         QVERIFY(QFile::exists(path));
-        QVERIFY(!states.last().at(0).value<QSpace::Session::CurrentSession>().isDirty);
-        QCOMPARE(states.last().at(0).value<QSpace::Session::CurrentSession>().projectFilePath,
-                 path);
+        QVERIFY(!states.last().at(0).value<GVis::Session::CurrentSession>().isDirty);
+        QCOMPARE(states.last().at(0).value<GVis::Session::CurrentSession>().projectFilePath, path);
     }
 
     void testOpenFailurePreservesExistingProject() {
@@ -96,8 +93,8 @@ class TestProjectController : public QObject {
         file.close();
         auto node    = std::make_shared<DataNode>(nullptr, "Restored");
         node->path   = binPath;
-        node->format = QSpace::IO::FileFormat::BIN;
-        node->type   = QSpace::Visualize::EntityType::Gas;
+        node->format = GVis::IO::FileFormat::BIN;
+        node->type   = GVis::Visualize::EntityType::Gas;
         registry->registerNode(node);
         const QUuid   id   = node->id;
         const QString path = dir.filePath("project.json");
@@ -109,9 +106,8 @@ class TestProjectController : public QObject {
         QSignalSpy states(project.get(), &ProjectController::sessionStateChanged);
         project->openProject(path);
         QCOMPARE(states.count(), 1);
-        QVERIFY(!states.last().at(0).value<QSpace::Session::CurrentSession>().isDirty);
-        QCOMPARE(states.last().at(0).value<QSpace::Session::CurrentSession>().projectFilePath,
-                 path);
+        QVERIFY(!states.last().at(0).value<GVis::Session::CurrentSession>().isDirty);
+        QCOMPARE(states.last().at(0).value<GVis::Session::CurrentSession>().projectFilePath, path);
         QTRY_VERIFY(registry->getNode(id));
         QTRY_VERIFY(registry->getNode(id)->data != nullptr);
         QCOMPARE(loaded.count(), 1);

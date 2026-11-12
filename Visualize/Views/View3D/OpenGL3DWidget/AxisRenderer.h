@@ -10,7 +10,7 @@
 #include <QVector>
 #include "../View3DSettings.h"
 
-namespace QSpace::Visualize::Views::View3D {
+namespace GVis::Visualize::Views::View3D {
 
 // Позиция и текст деления оси в мировых координатах — используется GLViewport,
 // чтобы спроецировать точку в 2D и нарисовать подпись через QPainter поверх OpenGL-кадра.
@@ -56,4 +56,4 @@ class AxisRenderer : public QObject {
     QColor                   m_cachedColorX, m_cachedColorY, m_cachedColorZ;
 };
 
-} // namespace QSpace::Visualize::Views::View3D
+} // namespace GVis::Visualize::Views::View3D

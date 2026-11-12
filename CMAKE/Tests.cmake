@@ -1,5 +1,5 @@
 find_package(Qt6 REQUIRED COMPONENTS Test Concurrent)
-function(qspace_add_test TestName)
+function(GVis_add_test TestName)
     set(test_libs ${ARGN})
     add_executable(${TestName} Cxx/${TestName}.cpp)
     
@@ -16,7 +16,7 @@ function(qspace_add_test TestName)
     set_tests_properties(${TestName} PROPERTIES ENVIRONMENT 
         "PATH=${QT_BIN_DIR}\;${VTK_BIN_DIR}\;$ENV{PATH}"
     )
-endfunction(qspace_add_test TestName)
+endfunction(GVis_add_test TestName)
 
 function(add_sandbox_test NAME)
     # Парсим аргументы. Ожидаем списки после ключевых слов SOURCES и LIBS

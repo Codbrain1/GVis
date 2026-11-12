@@ -5,14 +5,14 @@
 #include <QUuid>
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class ObjectRegistry;
 class LayerManager;
 class ViewManager;
 class DataNode;
-}
+} // namespace GVis::Core
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 
 class LayerController final : public QObject {
     Q_OBJECT
@@ -26,8 +26,8 @@ class LayerController final : public QObject {
 
   public slots:
     void createDefaultLayers(const QUuid& nodeId);
-    void createLayer(const QUuid&                          nodeId,
-                     const QUuid&                          viewId,
+    void createLayer(const QUuid&                       nodeId,
+                     const QUuid&                       viewId,
                      Visualize::Layers::RenderLayerType renderType);
     void duplicateLayer(const QUuid& layerId);
     void removeLayer(const QUuid& layerId);
@@ -48,4 +48,4 @@ class LayerController final : public QObject {
     Core::ViewManager*    m_viewManager;
 };
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

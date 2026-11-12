@@ -43,7 +43,7 @@
            </widget>
           </item>
           <item row="2" column="1" colspan="2">
-           <widget class="QSpace::UI::ColorMapComboBox" name="combo_colormap"/>
+           <widget class="GVis::UI::ColorMapComboBox" name="combo_colormap"/>
           </item>
           <item row="0" column="0" colspan="3">
            <widget class="ColorBarWidget" name="colorbarWidget" native="true">
@@ -107,7 +107,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QSpace::UI::ColorMapComboBox</class>
+   <class>GVis::UI::ColorMapComboBox</class>
    <extends>QComboBox</extends>
    <header>UI/Home/ColorMapComboBox.h</header>
   </customwidget>

@@ -13,7 +13,7 @@
 #include <memory>
 
 // Forward declarations для ускорения компиляции
-namespace QSpace::Core {
+namespace GVis::Core {
 class TaskManager;
 class DataManager;
 class ObjectRegistry;
@@ -21,23 +21,23 @@ class ViewManager;
 class LayerManager;
 class SessionManager;
 class FileSchemeRegistry;
-} // namespace QSpace::Core
+} // namespace GVis::Core
 
-namespace QSpace::Models {
+namespace GVis::Models {
 class DataTreeModel;
-} // namespace QSpace::Models
+} // namespace GVis::Models
 
 // Forward declarations Контроллеров
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 class ViewController;
 class ProjectController;
 class VideoController;
 class ImportController;
 class LayerController;
 class ExperimentController;
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class AppCore : public QObject {
     Q_OBJECT
   public:
@@ -55,27 +55,27 @@ class AppCore : public QObject {
     // @SECTION: модели данных
     // ---------------------------------------------------------
     Models::DataTreeModel* dataTreeModel() const;
-    DataManager*            dataManager() const;
+    DataManager*           dataManager() const;
 
     // ---------------------------------------------------------
     // @SECTION: контроллеры
     // ---------------------------------------------------------
 
-    Controllers::ViewController*    viewController() const;
-    Controllers::ImportController*  importController() const;
+    Controllers::ViewController*       viewController() const;
+    Controllers::ImportController*     importController() const;
     Controllers::LayerController*      layerController() const;
     Controllers::ExperimentController* experimentController() const;
     Controllers::ProjectController*    projectController() const;
-    Controllers::VideoController*   videoController() const;
+    Controllers::VideoController*      videoController() const;
 
   private:
     // контроллеры управляющие разными областями программы (менеджерами)
-    std::unique_ptr<Controllers::ViewController>    m_viewController;
-    std::unique_ptr<Controllers::ImportController>  m_importController;
+    std::unique_ptr<Controllers::ViewController>       m_viewController;
+    std::unique_ptr<Controllers::ImportController>     m_importController;
     std::unique_ptr<Controllers::LayerController>      m_layerController;
     std::unique_ptr<Controllers::ExperimentController> m_experimentController;
     std::unique_ptr<Controllers::ProjectController>    m_projectController;
-    std::unique_ptr<Controllers::VideoController>   m_videoController;
+    std::unique_ptr<Controllers::VideoController>      m_videoController;
 
     // менеджеры отвечающие за отдельные части системы
     std::unique_ptr<TaskManager>        m_taskManager;
@@ -89,4 +89,4 @@ class AppCore : public QObject {
     // модели данных
     std::unique_ptr<Models::DataTreeModel> m_dataTreeModel;
 };
-} // namespace QSpace::Core
+} // namespace GVis::Core

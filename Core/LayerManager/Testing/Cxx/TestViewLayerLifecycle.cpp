@@ -7,21 +7,23 @@
 #include "Core/LayerManager/LayerManager.h"
 #include "Core/ViewManager/ViewManager.h"
 
-using namespace QSpace::Core;
-using namespace QSpace::Visualize::Views;
-using QSpace::Visualize::Layers::RenderLayerType;
+using namespace GVis::Core;
+using namespace GVis::Visualize::Views;
+using GVis::Visualize::Layers::RenderLayerType;
 
 class TestViewLayerLifecycle : public QObject {
     Q_OBJECT
 
   private slots:
+
     void testRejectsInvalidInputs() {
         LayerManager manager;
-        ViewManager views;
-        const auto viewId = views.createView(ViewType::OpenGL3D);
-        if (viewId.isNull()) QSKIP("OpenGL view is unavailable");
-        const auto view = views.getView(viewId);
-        const auto loaded = makeNode(true);
+        ViewManager  views;
+        const auto   viewId = views.createView(ViewType::OpenGL3D);
+        if (viewId.isNull())
+            QSKIP("OpenGL view is unavailable");
+        const auto view     = views.getView(viewId);
+        const auto loaded   = makeNode(true);
         const auto unloaded = makeNode(false);
 
         QVERIFY(manager.createLayer(nullptr, view).isNull());
@@ -33,15 +35,17 @@ class TestViewLayerLifecycle : public QObject {
 
     void testMultipleLayersMaintainNodeAndViewIndexes() {
         LayerManager manager;
-        ViewManager views;
-        const auto viewId = views.createView(ViewType::OpenGL3D);
-        if (viewId.isNull()) QSKIP("OpenGL view is unavailable");
+        ViewManager  views;
+        const auto   viewId = views.createView(ViewType::OpenGL3D);
+        if (viewId.isNull())
+            QSKIP("OpenGL view is unavailable");
         const auto view = views.getView(viewId);
         const auto node = makeNode(true);
 
-        const auto first = manager.createLayer(node, view);
+        const auto first  = manager.createLayer(node, view);
         const auto second = manager.createLayer(node, view);
-        if (first.isNull() || second.isNull()) QSKIP("Layer renderer is unavailable");
+        if (first.isNull() || second.isNull())
+            QSKIP("Layer renderer is unavailable");
         QVERIFY(first != second);
         QCOMPARE(manager.getAllLayers().size(), 2);
         QCOMPARE(manager.getLayersForNode(node->id).size(), 2);
@@ -59,17 +63,19 @@ class TestViewLayerLifecycle : public QObject {
 
     void testRemovesAllLayersForViewAndDetachesRenderers() {
         LayerManager manager;
-        ViewManager views;
-        const auto firstViewId = views.createView(ViewType::OpenGL3D);
-        const auto secondViewId = views.createView(ViewType::OpenGL3D);
-        if (firstViewId.isNull() || secondViewId.isNull()) QSKIP("OpenGL views are unavailable");
-        const auto firstView = views.getView(firstViewId);
+        ViewManager  views;
+        const auto   firstViewId  = views.createView(ViewType::OpenGL3D);
+        const auto   secondViewId = views.createView(ViewType::OpenGL3D);
+        if (firstViewId.isNull() || secondViewId.isNull())
+            QSKIP("OpenGL views are unavailable");
+        const auto firstView  = views.getView(firstViewId);
         const auto secondView = views.getView(secondViewId);
-        const auto node = makeNode(true);
+        const auto node       = makeNode(true);
 
-        const auto first = manager.createLayer(node, firstView);
+        const auto first  = manager.createLayer(node, firstView);
         const auto second = manager.createLayer(node, secondView);
-        if (first.isNull() || second.isNull()) QSKIP("Layer renderer is unavailable");
+        if (first.isNull() || second.isNull())
+            QSKIP("Layer renderer is unavailable");
         manager.removeAllLayersForView(firstView.get());
         QVERIFY(!manager.getLayer(first));
         QVERIFY(manager.getLayer(second));
@@ -85,7 +91,7 @@ class TestViewLayerLifecycle : public QObject {
     static std::shared_ptr<DataNode> makeNode(bool loaded) {
         vtkSmartPointer<vtkPolyData> data;
         if (loaded) {
-            data = vtkSmartPointer<vtkPolyData>::New();
+            data        = vtkSmartPointer<vtkPolyData>::New();
             auto points = vtkSmartPointer<vtkPoints>::New();
             points->InsertNextPoint(0.0, 0.0, 0.0);
             data->SetPoints(points);

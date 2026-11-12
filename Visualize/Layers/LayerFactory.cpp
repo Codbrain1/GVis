@@ -4,7 +4,7 @@
 #include "Implementations/Particle/ParticleRendererLayer.h"
 #include "Implementations/SPH/SPHRendererLayer.h"
 
-namespace QSpace::Visualize::Layers::LayerFactory {
+namespace GVis::Visualize::Layers::LayerFactory {
 
 namespace {} // namespace
 
@@ -62,4 +62,4 @@ std::shared_ptr<IRenderLayer> createLayerRenderer(Layers::RenderLayerType type) 
     qWarning() << "LayerFactory::createLayerRenderer: unknown RenderLayerType";
     return nullptr;
 }
-} // namespace QSpace::Visualize::Layers::LayerFactory
+} // namespace GVis::Visualize::Layers::LayerFactory

@@ -21,7 +21,7 @@ class MainWindow;
 } // namespace Ui
 QT_END_NAMESPACE
 
-namespace QSpace::UI {
+namespace GVis::UI {
 class ToastNotification;
 
 class MainWindow : public QMainWindow {
@@ -41,7 +41,7 @@ class MainWindow : public QMainWindow {
     void handleProjectSave();
     void handleProjectOpen();
     void handleSavePathSelection();
-    void handleSessionStateChange(const QSpace::Session::CurrentSession& session);
+    void handleSessionStateChange(const GVis::Session::CurrentSession& session);
     // void handleExportFinished(bool success);
     void handleLayerSelectionsChange(const QList<LayerExplorerWidget::SelectedItem>& ids);
     void handleViewCreated(const QUuid& viewId, Visualize::Views::ViewType type);
@@ -49,8 +49,8 @@ class MainWindow : public QMainWindow {
     void handleLayerSelectionChange(const QUuid& layerId);
 
   private:
-    QSpace::Core::AppCore* m_app;
-    Ui::MainWindow*        ui;
+    GVis::Core::AppCore* m_app;
+    Ui::MainWindow*      ui;
     // std::unique_ptr<QProgressDialog>     m_exportProgressDialog;
     std::unique_ptr<LayerExplorerWidget> m_layerExplorerWidget; //
     std::unique_ptr<PropertyInspector>   m_propertyInspector;   // TODO: изменить название widget
@@ -61,4 +61,4 @@ class MainWindow : public QMainWindow {
     QMap<QUuid, QDockWidget*> m_viewDockWidgets; // для хранения соответствия между viewId и их доками
     void                      setupSlots();
 };
-} // namespace QSpace::UI
+} // namespace GVis::UI

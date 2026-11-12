@@ -8,7 +8,7 @@
 class QMenu;
 class QFormLayout;
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 class AutoSettingsToolBar : public QToolBar {
     Q_OBJECT
@@ -56,4 +56,4 @@ class AutoSettingsToolBar : public QToolBar {
     QVector<BoundEditor> m_boundEditors;
 };
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

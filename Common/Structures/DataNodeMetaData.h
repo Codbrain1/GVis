@@ -1,6 +1,6 @@
 #pragma once
 
-namespace QSpace::Core {
+namespace GVis::Core {
 struct DataNodeMetaData { // перенести вычисление метаданных в отдельный модуль physics
     double                               timestamp;
     double                               bounds[6];
@@ -68,4 +68,4 @@ struct DataNodeMetaData { // перенести вычисление метад�
         return !(*this == other);
     }
 };
-} // namespace QSpace::Core
+} // namespace GVis::Core

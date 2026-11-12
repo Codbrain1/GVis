@@ -83,9 +83,9 @@ std::vector<QString> extractPaths(const QFileInfoList& files) {
 // Постоянный пул потоков, чтобы не тратить время на CreateThread и createReader внутри замера
 class ParallelReaderPool {
   public:
-    ParallelReaderPool(unsigned int                  maxThreads,
-                       const std::vector<QString>&   paths,
-                       const QSpace::IO::ReadScheme& scheme)
+    ParallelReaderPool(unsigned int                maxThreads,
+                       const std::vector<QString>& paths,
+                       const GVis::IO::ReadScheme& scheme)
         : threadCount_(std::max(1U, maxThreads)), paths_(paths), scheme_(scheme) {
         workers_.reserve(threadCount_);
         for (unsigned int workerId = 0; workerId < threadCount_; ++workerId) {
@@ -106,7 +106,7 @@ class ParallelReaderPool {
         }
     }
 
-    void readFiles(int count, std::vector<std::optional<QSpace::IO::ReadResult>>& results) {
+    void readFiles(int count, std::vector<std::optional<GVis::IO::ReadResult>>& results) {
         std::unique_lock<std::mutex> lock(mutex_);
         currentCount_    = count;
         currentResults_  = &results;
@@ -121,14 +121,14 @@ class ParallelReaderPool {
 
   private:
     void workerLoop(unsigned int workerId) {
-        auto reader = QSpace::IO::createReader(QSpace::IO::FileFormat::BIN);
-        reader->setPolicy(QSpace::IO::FilePolicy::ForceStandart);
+        auto reader = GVis::IO::createReader(GVis::IO::FileFormat::BIN);
+        reader->setPolicy(GVis::IO::FilePolicy::ForceStandart);
 
         std::uint64_t seenGeneration = 0;
 
         while (true) {
-            int                                                 count   = 0;
-            std::vector<std::optional<QSpace::IO::ReadResult>>* results = nullptr;
+            int                                               count   = 0;
+            std::vector<std::optional<GVis::IO::ReadResult>>* results = nullptr;
 
             {
                 std::unique_lock<std::mutex> lock(mutex_);
@@ -166,27 +166,27 @@ class ParallelReaderPool {
         }
     }
 
-    unsigned int                                        threadCount_;
-    const std::vector<QString>&                         paths_;
-    const QSpace::IO::ReadScheme&                       scheme_;
-    std::vector<std::thread>                            workers_;
-    std::mutex                                          mutex_;
-    std::condition_variable                             cvStart_;
-    std::condition_variable                             cvDone_;
-    std::atomic<int>                                    nextIndex_{0};
-    std::uint64_t                                       generation_      = 0;
-    int                                                 currentCount_    = 0;
-    unsigned int                                        activeWorkers_   = 0;
-    unsigned int                                        finishedWorkers_ = 0;
-    bool                                                stop_            = false;
-    std::vector<std::optional<QSpace::IO::ReadResult>>* currentResults_  = nullptr;
+    unsigned int                                      threadCount_;
+    const std::vector<QString>&                       paths_;
+    const GVis::IO::ReadScheme&                       scheme_;
+    std::vector<std::thread>                          workers_;
+    std::mutex                                        mutex_;
+    std::condition_variable                           cvStart_;
+    std::condition_variable                           cvDone_;
+    std::atomic<int>                                  nextIndex_{0};
+    std::uint64_t                                     generation_      = 0;
+    int                                               currentCount_    = 0;
+    unsigned int                                      activeWorkers_   = 0;
+    unsigned int                                      finishedWorkers_ = 0;
+    bool                                              stop_            = false;
+    std::vector<std::optional<GVis::IO::ReadResult>>* currentResults_  = nullptr;
 };
 
-void readFilesSequentially(QSpace::IReader&                                    reader,
-                           const std::vector<QString>&                         paths,
-                           int                                                 count,
-                           const QSpace::IO::ReadScheme&                       scheme,
-                           std::vector<std::optional<QSpace::IO::ReadResult>>& results) {
+void readFilesSequentially(GVis::IReader&                                    reader,
+                           const std::vector<QString>&                       paths,
+                           int                                               count,
+                           const GVis::IO::ReadScheme&                       scheme,
+                           std::vector<std::optional<GVis::IO::ReadResult>>& results) {
     for (int index = 0; index < count; ++index) {
         results[index] = reader.read(paths[index], scheme);
     }
@@ -221,11 +221,11 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    const QSpace::IO::PresetKey targetKey{QSpace::Visualize::EntityType::Stars,
-                                          QSpace::IO::FileFormat::BIN,
-                                          QSpace::IO::ModelingProgrammVersion::V2};
-    const auto                  presets = QSpace::IO::ReadSchemePresets::getStandardPresets();
-    const auto                  preset =
+    const GVis::IO::PresetKey targetKey{GVis::Visualize::EntityType::Stars,
+                                        GVis::IO::FileFormat::BIN,
+                                        GVis::IO::ModelingProgrammVersion::V2};
+    const auto                presets = GVis::IO::ReadSchemePresets::getStandardPresets();
+    const auto                preset =
         std::find_if(presets.cbegin(), presets.cend(), [&targetKey](const auto& pair) {
             return pair.first == targetKey;
         });
@@ -256,8 +256,8 @@ int main(int argc, char* argv[]) {
               << std::string(separatorSize, '-') << "\n";
 
     // Инициализируем ридеры и пул потоков один раз до начала серии замеров
-    auto sequentialReader = QSpace::IO::createReader(QSpace::IO::FileFormat::BIN);
-    sequentialReader->setPolicy(QSpace::IO::FilePolicy::ForceStandart);
+    auto sequentialReader = GVis::IO::createReader(GVis::IO::FileFormat::BIN);
+    sequentialReader->setPolicy(GVis::IO::FilePolicy::ForceStandart);
 
     std::optional<ParallelReaderPool> parallelPool;
     if (options.mode == ExecutionMode::Parallel) {
@@ -269,7 +269,7 @@ int main(int argc, char* argv[]) {
         totalBytes += files[count - 1].size();
 
         // Контейнер под загруженные данные текущего шага (1..count файлов)
-        std::vector<std::optional<QSpace::IO::ReadResult>> results(count);
+        std::vector<std::optional<GVis::IO::ReadResult>> results(count);
 
         const auto start = std::chrono::steady_clock::now();
         if (options.mode == ExecutionMode::Sequential) {

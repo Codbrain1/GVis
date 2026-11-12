@@ -4,34 +4,34 @@ add_sandbox_test(StressTestOneReadFileStandart
     SOURCES 
         StressTestOneReadFileStandart/main.cpp 
     LIBS
-        QSpace::IO  
+        GVis::IO  
 )
 add_sandbox_test(StressTestOneReadFileMapped
     SOURCES 
         StressTestOneReadFileMapped/main.cpp 
     LIBS
-        QSpace::IO  
+        GVis::IO  
 )
 add_sandbox_test(StressTestBatchReadFileStandart
     SOURCES
         StressTestBatchReadFIleStandart/main.cpp
     LIBS
-        QSpace::IO
+        GVis::IO
 )
 add_sandbox_test(StressTestBatchReadFileMapped
     SOURCES
         StressTestBatchReadFIleMapped/main.cpp
     LIBS
-        QSpace::IO
+        GVis::IO
 )
 add_sandbox_test(StressTestVisualizeSPHData
     SOURCES
         StressTestVisualizeSPHData/main.cpp
         ${PROJECT_SOURCE_DIR}/app/resources/shaders.qrc
     LIBS
-        QSpace::Common
-        QSpace::Visualize
-        QSpace::IO
+        GVis::Common
+        GVis::Visualize
+        GVis::IO
         VTK::CommonCore
         Qt6::Core
         Qt6::Gui
@@ -53,7 +53,7 @@ endif()
 #     SOURCES
 #         test_vtkvisualize/main.cpp 
 #     LIBS
-#         QSpace::Visualize QSpace::IO VTK::CommonCore
+#         GVis::Visualize GVis::IO VTK::CommonCore
 #         Qt6::3DCore
 #         Qt6::3DExtras
 #         Qt6::3DInput
@@ -66,7 +66,7 @@ endif()
 #     SOURCES
 #         TestSPHVisualize/main.cpp 
 #     LIBS
-#         QSpace::Common QSpace::Visualize QSpace::IO VTK::CommonCore
+#         GVis::Common GVis::Visualize GVis::IO VTK::CommonCore
 #         Qt6::Core
 #         Qt6::Gui
 #         Qt6::Widgets
@@ -78,7 +78,7 @@ endif()
 #     SOURCES
 #         testCONV/main.cpp 
 #     LIBS
-#         QSpace::Visualize QSpace::IO VTK::CommonCore
+#         GVis::Visualize GVis::IO VTK::CommonCore
 #         Qt6::OpenGL
 #         Qt6::OpenGLWidgets
 #         Qt6::Core

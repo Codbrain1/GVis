@@ -47,7 +47,7 @@
 #include <qtreeview.h>
 #include <quuid.h>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 class CustomSortProxyModel : public QSortFilterProxyModel {
     Q_OBJECT
     std::function<bool(const QModelIndex&, const QModelIndex&)> m_comparator;
@@ -159,7 +159,7 @@ void LayerExplorerWidget::setupSlots() {
     connect(this,
             &LayerExplorerWidget::nodeSelectionActivated,
             m_app->layerController(),
-            &QSpace::Core::Controllers::LayerController::onNodeSelectionActivated,
+            &GVis::Core::Controllers::LayerController::onNodeSelectionActivated,
             Qt::QueuedConnection);
     // отвечает за отображение меню с настройками
     connect(ui->toolButton_VisiblePropertyInspector,
@@ -227,11 +227,11 @@ void LayerExplorerWidget::setupSlots() {
     connect(this,
             &LayerExplorerWidget::targetVisualiseExperimentChanged,
             m_app->videoController(),
-            &QSpace::Core::Controllers::VideoController::handleTargetExperimentChange);
+            &GVis::Core::Controllers::VideoController::handleTargetExperimentChange);
     connect(this,
             &LayerExplorerWidget::snapshotCompleteForTimeSlider,
             m_app->videoController(),
-            &QSpace::Core::Controllers::VideoController::handleFixedEtalonSnapshot);
+            &GVis::Core::Controllers::VideoController::handleFixedEtalonSnapshot);
 }
 
 void LayerExplorerWidget::setupToolButtons() {
@@ -997,7 +997,7 @@ void LayerExplorerWidget::handleShowSelected() {
         // Гасим выбранный элемент и всё, что находится внутри него
         setCheckStateRecursiveInternal(sourceIndex, Qt::Checked);
     }
-} // namespace QSpace::UI
+} // namespace GVis::UI
 void LayerExplorerWidget::handleHideUnselected() {
     if (!m_treeModel || !ui || !ui->treeView_Layers)
         return;
@@ -1187,5 +1187,5 @@ QString LayerExplorerWidget::buildItemContextString(const QModelIndex& index, QA
     return path.join(" -> ");
 }
 
-} // namespace QSpace::UI
+} // namespace GVis::UI
 #include "LayerExplorerWidget.moc"

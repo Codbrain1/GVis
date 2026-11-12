@@ -9,18 +9,20 @@
 #include "Core/ViewManager/ViewManager.h"
 #include "Session/Reflection.h"
 
-using namespace QSpace::Core;
-using namespace QSpace::Core::Controllers;
-using QSpace::Visualize::Views::ViewType;
+using namespace GVis::Core;
+using namespace GVis::Core::Controllers;
+using GVis::Visualize::Views::ViewType;
 
 class TestVideoViewController : public QObject {
     Q_OBJECT
   private slots:
+
     void init() {
         registry = std::make_unique<ObjectRegistry>();
-        layers = std::make_unique<LayerManager>();
-        views = std::make_unique<ViewManager>();
-        viewController = std::make_unique<ViewController>(views.get(), layers.get(), registry.get());
+        layers   = std::make_unique<LayerManager>();
+        views    = std::make_unique<ViewManager>();
+        viewController =
+            std::make_unique<ViewController>(views.get(), layers.get(), registry.get());
         viewController->initialize();
         video = std::make_unique<VideoController>(registry.get(), views.get(), layers.get());
         video->initialize();
@@ -29,11 +31,11 @@ class TestVideoViewController : public QObject {
     void testViewAndLayerLifecycle() {
         auto node = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Node");
         registry->registerNode(node);
-        QSignalSpy created(viewController.get(), &ViewController::viewCreated);
-        QSignalSpy removed(viewController.get(), &ViewController::viewRemoved);
-        QSignalSpy layerCreated(layers.get(), &LayerManager::layerCreated);
-        QSignalSpy layerRemoved(layers.get(), &LayerManager::layerRemoved);
-        const QUuid first = viewController->createView(ViewType::OpenGL3D);
+        QSignalSpy  created(viewController.get(), &ViewController::viewCreated);
+        QSignalSpy  removed(viewController.get(), &ViewController::viewRemoved);
+        QSignalSpy  layerCreated(layers.get(), &LayerManager::layerCreated);
+        QSignalSpy  layerRemoved(layers.get(), &LayerManager::layerRemoved);
+        const QUuid first  = viewController->createView(ViewType::OpenGL3D);
         const QUuid second = viewController->createView(ViewType::OpenGL3D);
         QVERIFY(!first.isNull());
         QVERIFY(!second.isNull());
@@ -41,9 +43,11 @@ class TestVideoViewController : public QObject {
         QCOMPARE(layerCreated.count(), 2);
         QCOMPARE(layers->getLayersForNode(node->id).size(), 2);
         layers->setNodeVisibility(node->id, false);
-        for (const auto& layer : layers->getLayersForNode(node->id)) QVERIFY(!layer->getSettings()->isVisible());
+        for (const auto& layer : layers->getLayersForNode(node->id))
+            QVERIFY(!layer->getSettings()->isVisible());
         layers->setNodeVisibility(node->id, true);
-        for (const auto& layer : layers->getLayersForNode(node->id)) QVERIFY(layer->getSettings()->isVisible());
+        for (const auto& layer : layers->getLayersForNode(node->id))
+            QVERIFY(layer->getSettings()->isVisible());
         viewController->removeView(first);
         QCOMPARE(removed.count(), 1);
         QCOMPARE(layerRemoved.count(), 1);
@@ -58,13 +62,15 @@ class TestVideoViewController : public QObject {
     }
 
     void testRestoresPlayerLayers() {
-        auto experiment = std::make_shared<Experiment>("Experiment");
+        auto experiment    = std::make_shared<Experiment>("Experiment");
         auto firstSnapshot = std::make_shared<Snapshot>("First", 1.0);
-        auto lastSnapshot = std::make_shared<Snapshot>("Last", 2.0);
-        auto firstNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First", 1.0);
-        auto lastNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Last", 2.0);
-        firstNode->type = QSpace::Visualize::EntityType::Gas;
-        lastNode->type = QSpace::Visualize::EntityType::Gas;
+        auto lastSnapshot  = std::make_shared<Snapshot>("Last", 2.0);
+        auto firstNode =
+            std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First", 1.0);
+        auto lastNode =
+            std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Last", 2.0);
+        firstNode->type = GVis::Visualize::EntityType::Gas;
+        lastNode->type  = GVis::Visualize::EntityType::Gas;
         firstSnapshot->addComponent(firstNode);
         lastSnapshot->addComponent(lastNode);
         experiment->addSnapshot(firstSnapshot);
@@ -87,14 +93,15 @@ class TestVideoViewController : public QObject {
         playerLayer->getSettings()->setColorByField("RestoredField");
         const auto stateWithLayerSettings = video->playerState();
         QCOMPARE(stateWithLayerSettings.layers.size(), 1);
-        const auto serializedState = QSpace::Reflection::gadgetToVariantMap(stateWithLayerSettings);
+        const auto serializedState = GVis::Reflection::gadgetToVariantMap(stateWithLayerSettings);
         const auto restoredState =
-            QSpace::Reflection::variantMapToGadget<QSpace::Session::VideoPlayerDTO>(serializedState);
+            GVis::Reflection::variantMapToGadget<GVis::Session::VideoPlayerDTO>(serializedState);
         QCOMPARE(restoredState, stateWithLayerSettings);
         for (const auto& layerId : previousPlayerLayerIds)
             layers->removeLayer(layerId);
 
-        auto restored = std::make_unique<VideoController>(registry.get(), views.get(), layers.get());
+        auto restored =
+            std::make_unique<VideoController>(registry.get(), views.get(), layers.get());
         restored->restorePlayerState(restoredState);
         QCOMPARE(restored->getCurrentSnapshotId(), lastSnapshot->id);
         const auto restoredPlayerLayerIds = restored->playerLayerIds();
@@ -108,14 +115,14 @@ class TestVideoViewController : public QObject {
 
     void testSnapshotSelectionAndPrefetch() {
         auto experiment = std::make_shared<Experiment>("Experiment");
-        auto early = std::make_shared<Snapshot>("Early", 1.0);
-        auto late = std::make_shared<Snapshot>("Late", 5.0);
+        auto early      = std::make_shared<Snapshot>("Early", 1.0);
+        auto late       = std::make_shared<Snapshot>("Late", 5.0);
         auto first = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First", 1.0);
-        auto last = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Last", 5.0);
-        auto unloaded = std::make_shared<DataNode>(nullptr, "Unloaded", 5.0);
-        first->type = QSpace::Visualize::EntityType::Gas;
-        last->type = QSpace::Visualize::EntityType::Gas;
-        unloaded->type = QSpace::Visualize::EntityType::Stars;
+        auto last  = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Last", 5.0);
+        auto unloaded  = std::make_shared<DataNode>(nullptr, "Unloaded", 5.0);
+        first->type    = GVis::Visualize::EntityType::Gas;
+        last->type     = GVis::Visualize::EntityType::Gas;
+        unloaded->type = GVis::Visualize::EntityType::Stars;
         early->addComponent(first);
         late->addComponent(last);
         late->addComponent(unloaded);
@@ -135,10 +142,12 @@ class TestVideoViewController : public QObject {
         QCOMPARE(video->getCurrentSnapshotId(), early->id);
         QVERIFY(loadSpy.count() >= 1);
         QCOMPARE(loadSpy.first().first().value<QUuid>(), unloaded->id);
-        auto allLayers = layers->getAllLayers();
-        std::shared_ptr<QSpace::Visualize::Layers::Layer> playback;
+        auto                                            allLayers = layers->getAllLayers();
+        std::shared_ptr<GVis::Visualize::Layers::Layer> playback;
         for (const auto& layer : allLayers)
-            if (layer->layerId() != sourceLayers.front()->layerId() && layer->dataNodeId() == first->id) playback = layer;
+            if (layer->layerId() != sourceLayers.front()->layerId() &&
+                layer->dataNodeId() == first->id)
+                playback = layer;
         QVERIFY(playback);
         QCOMPARE(playback->getSettings()->colorByField(), QString("TestField"));
         video->handleActivateVisualizeSnapshot(2);
@@ -152,11 +161,12 @@ class TestVideoViewController : public QObject {
         QCOMPARE(video->getCurrentSnapshotId(), early->id);
         QCOMPARE(playback->dataNodeId(), first->id);
     }
+
   private:
-    std::unique_ptr<ObjectRegistry> registry;
-    std::unique_ptr<LayerManager> layers;
-    std::unique_ptr<ViewManager> views;
-    std::unique_ptr<ViewController> viewController;
+    std::unique_ptr<ObjectRegistry>  registry;
+    std::unique_ptr<LayerManager>    layers;
+    std::unique_ptr<ViewManager>     views;
+    std::unique_ptr<ViewController>  viewController;
     std::unique_ptr<VideoController> video;
 };
 

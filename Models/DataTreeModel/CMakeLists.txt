@@ -10,7 +10,7 @@ target_sources(DataTreeModel PRIVATE
 target_include_directories(DataTreeModel PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 target_link_libraries(DataTreeModel PUBLIC
             project_config
-            QSpace::Common
-            QSpace::Core
+            GVis::Common
+            GVis::Core
             Qt6::Core
 ) 

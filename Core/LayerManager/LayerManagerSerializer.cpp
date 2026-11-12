@@ -11,7 +11,7 @@
 
 #include "Session/Reflection.h"
 
-namespace QSpace::Core {
+namespace GVis::Core {
 
 std::optional<Session::LayerManagerDTO> LayerManagerSerializer::toDTO(Core::LayerManager* layerManager) {
     if (!layerManager)
@@ -116,4 +116,4 @@ LayerManagerSerializer::fromDTO(const Session::LayerDTO& dto, NodeResolver nodeR
     return layer;
 }
 
-} // namespace QSpace::Core
+} // namespace GVis::Core

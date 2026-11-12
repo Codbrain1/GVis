@@ -15,7 +15,7 @@
 
 // TODO: добавить возможность отменить чтение через std::function<bool()> isCanceled = []{ return
 // false; }
-namespace QSpace::Core {
+namespace GVis::Core {
 DataManager::DataManager(TaskManager* taskManager, QObject* parent)
     : QObject(parent), m_taskManager(taskManager) {
 }
@@ -194,4 +194,4 @@ TaskPriority DataManager::getPriority(qint64 fileSize) {
         return TaskPriority::Bulk;
     }
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

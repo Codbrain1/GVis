@@ -3,16 +3,15 @@
 #include <QPointer>
 #include <QWidget>
 
-
 class QFormLayout;
 class QMetaProperty;
 class QPushButton;
 class QColor;
 
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 class LayerSettings;
 }
-namespace QSpace::UI {
+namespace GVis::UI {
 class SettingsEditorWidget : public QWidget {
     Q_OBJECT
   public:
@@ -20,7 +19,7 @@ class SettingsEditorWidget : public QWidget {
     ~SettingsEditorWidget() = default;
 
     // Назначает текущий объект настроек и полностью перестраивает UI формы
-    void setSettings(QSpace::Visualize::Layers::LayerSettings* settings);
+    void setSettings(GVis::Visualize::Layers::LayerSettings* settings);
 
   private:
     void createRowForProperty(const QMetaProperty& prop);
@@ -28,8 +27,8 @@ class SettingsEditorWidget : public QWidget {
     void updateUiValues();
     void clearEditor();
 
-    QFormLayout*                                       m_layout = nullptr;
-    QPointer<QSpace::Visualize::Layers::LayerSettings> m_settings;
-    QMap<QString, QWidget*>                            m_editors;
+    QFormLayout*                                     m_layout = nullptr;
+    QPointer<GVis::Visualize::Layers::LayerSettings> m_settings;
+    QMap<QString, QWidget*>                          m_editors;
 };
-} // namespace QSpace::UI
+} // namespace GVis::UI

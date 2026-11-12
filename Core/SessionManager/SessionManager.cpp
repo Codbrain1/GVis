@@ -9,17 +9,18 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonParseError>
-#include <algorithm>
 #include <qfileinfo.h>
 #include <qloggingcategory.h>
 #include <qstringview.h>
 #include "Logger/Logger.h"
 #include "Session/ProjectFormatFactory.h"
 #include "Session/Reflection.h"
+#include <algorithm>
 
-namespace QSpace::Core {
+
+namespace GVis::Core {
 namespace {
-QJsonObject colorMapToJson(const QSpace::Visualize::ColorMap& map) {
+QJsonObject colorMapToJson(const GVis::Visualize::ColorMap& map) {
     QJsonObject mapJson;
     mapJson.insert(QStringLiteral("id"), map.id.toString());
     mapJson.insert(QStringLiteral("name"), map.name);
@@ -39,13 +40,13 @@ QJsonObject colorMapToJson(const QSpace::Visualize::ColorMap& map) {
     return mapJson;
 }
 
-std::optional<QSpace::Visualize::ColorMap> colorMapFromJson(const QJsonObject& json) {
+std::optional<GVis::Visualize::ColorMap> colorMapFromJson(const QJsonObject& json) {
     if (!json.contains(QStringLiteral("id")) || !json.contains(QStringLiteral("name")) ||
         !json.contains(QStringLiteral("points"))) {
         return std::nullopt;
     }
 
-    QSpace::Visualize::ColorMap map;
+    GVis::Visualize::ColorMap map;
     map.id       = QUuid::fromString(json.value(QStringLiteral("id")).toString());
     map.name     = json.value(QStringLiteral("name")).toString();
     map.filePath = json.value(QStringLiteral("filePath")).toString();
@@ -57,8 +58,8 @@ std::optional<QSpace::Visualize::ColorMap> colorMapFromJson(const QJsonObject& j
         if (!pointValue.isObject()) {
             return std::nullopt;
         }
-        const QJsonObject             pointJson = pointValue.toObject();
-        QSpace::Visualize::ColorPoint point;
+        const QJsonObject           pointJson = pointValue.toObject();
+        GVis::Visualize::ColorPoint point;
         point.x = pointJson.value(QStringLiteral("x")).toDouble();
         point.r = pointJson.value(QStringLiteral("r")).toDouble();
         point.g = pointJson.value(QStringLiteral("g")).toDouble();
@@ -73,21 +74,21 @@ std::optional<QSpace::Visualize::ColorMap> colorMapFromJson(const QJsonObject& j
 }
 } // namespace
 
-SessionManager::SessionManager(QSpace::Core::ObjectRegistry* registry,
-                               QSpace::Core::LayerManager*   layerManager,
-                               QSpace::Core::ViewManager*    viewManager,
-                               QObject*                      parent)
+SessionManager::SessionManager(GVis::Core::ObjectRegistry* registry,
+                               GVis::Core::LayerManager*   layerManager,
+                               GVis::Core::ViewManager*    viewManager,
+                               QObject*                    parent)
     : QObject(parent),
       m_registry(registry),
       m_layerManager(layerManager),
       m_viewManager(viewManager) {
     // ВАЖНО: Инициализируем хранилище, иначе будет краш!
-    m_storage_session = std::make_unique<QSpace::Session::SessionStorage>();
+    m_storage_session = std::make_unique<GVis::Session::SessionStorage>();
 }
 
 void SessionManager::setVideoPlayerStateHandlers(
-    std::function<Session::VideoPlayerDTO()> saveState,
-    std::function<QList<QUuid>()> playerLayerIds,
+    std::function<Session::VideoPlayerDTO()>            saveState,
+    std::function<QList<QUuid>()>                       playerLayerIds,
     std::function<void(const Session::VideoPlayerDTO&)> restoreState) {
     m_saveVideoPlayerState    = std::move(saveState);
     m_playerLayerIds          = std::move(playerLayerIds);
@@ -141,15 +142,15 @@ std::optional<Visualize::ColorMap> SessionManager::loadPalette(const QString& fi
 // saveProject() -- создает DTO и сохраняет проект
 // loadProject() -- загружает DTO и восстанавливает состояние приложения
 // ===================================================
-bool SessionManager::saveProject(const QString& filePath, QSpace::Session::ProjectFormat format) {
+bool SessionManager::saveProject(const QString& filePath, GVis::Session::ProjectFormat format) {
     if (filePath.isEmpty()) {
         emit errorOccurred("Project file path is empty");
         return false;
     }
 
-    const QSpace::Session::ProjectDTO dto     = createProjectDTO();
-    const auto                        dataMap = QSpace::Reflection::gadgetToVariantMap(dto);
-    const auto                        codec = QSpace::Session::ProjectFormatFactory::create(format);
+    const GVis::Session::ProjectDTO dto     = createProjectDTO();
+    const auto                      dataMap = GVis::Reflection::gadgetToVariantMap(dto);
+    const auto                      codec   = GVis::Session::ProjectFormatFactory::create(format);
     if (!codec) {
         emit errorOccurred("Unsupported project format");
         return false;
@@ -167,13 +168,13 @@ bool SessionManager::loadProject(const QString& filePath) {
         return false;
     }
 
-    const auto format = QSpace::Session::ProjectFormatFactory::fromFilePath(".json");
+    const auto format = GVis::Session::ProjectFormatFactory::fromFilePath(".json");
     if (!format.has_value()) {
         emit errorOccurred("Unsupported project format");
         return false;
     }
 
-    const auto codec = QSpace::Session::ProjectFormatFactory::create(*format);
+    const auto codec = GVis::Session::ProjectFormatFactory::create(*format);
     if (!codec) {
         emit errorOccurred("Unsupported project format");
         return false;
@@ -191,11 +192,10 @@ bool SessionManager::loadProject(const QString& filePath) {
         return false;
     }
 
-    static const QStringList requiredFields = {
-        QStringLiteral("objregDTO"),
-        QStringLiteral("viewmanDTO"),
-        QStringLiteral("layermanDTO"),
-        QStringLiteral("colormapmanDTO")};
+    static const QStringList requiredFields = {QStringLiteral("objregDTO"),
+                                               QStringLiteral("viewmanDTO"),
+                                               QStringLiteral("layermanDTO"),
+                                               QStringLiteral("colormapmanDTO")};
     for (const auto& field : requiredFields) {
         if (!map->contains(field)) {
             emit errorOccurred("Project file has invalid schema");
@@ -203,18 +203,18 @@ bool SessionManager::loadProject(const QString& filePath) {
         }
     }
 
-    const auto dto = QSpace::Reflection::variantMapToGadget<QSpace::Session::ProjectDTO>(*map);
+    const auto dto = GVis::Reflection::variantMapToGadget<GVis::Session::ProjectDTO>(*map);
     if (!fromProjectDTO(dto)) {
         emit errorOccurred("Failed to restore project from DTO");
         return false;
     }
 
-    emit projectLoaded(QSpace::Session::ProjectState{});
+    emit projectLoaded(GVis::Session::ProjectState{});
     return true;
 }
 
-QSpace::Session::ProjectDTO SessionManager::createProjectDTO() const {
-    QSpace::Session::ProjectDTO dto;
+GVis::Session::ProjectDTO SessionManager::createProjectDTO() const {
+    GVis::Session::ProjectDTO dto;
 
     if (m_registry) {
         if (const auto registryDto = ObjectRegistrySerializer::toDTO(m_registry))
@@ -225,9 +225,9 @@ QSpace::Session::ProjectDTO SessionManager::createProjectDTO() const {
             dto.layermanDTO = *layerDto;
     }
     if (m_saveVideoPlayerState && m_playerLayerIds) {
-        dto.videoPlayerDTO = m_saveVideoPlayerState();
+        dto.videoPlayerDTO                 = m_saveVideoPlayerState();
         const QList<QUuid> playerLayerList = m_playerLayerIds();
-        const QSet<QUuid> playerLayerIds(playerLayerList.cbegin(), playerLayerList.cend());
+        const QSet<QUuid>  playerLayerIds(playerLayerList.cbegin(), playerLayerList.cend());
         dto.layermanDTO.layers.erase(
             std::remove_if(dto.layermanDTO.layers.begin(),
                            dto.layermanDTO.layers.end(),
@@ -240,12 +240,12 @@ QSpace::Session::ProjectDTO SessionManager::createProjectDTO() const {
         if (const auto viewDto = ViewManagerSerializer::toDTO(m_viewManager))
             dto.viewmanDTO = *viewDto;
     }
-    dto.colormapmanDTO = QSpace::Visualize::ColorMapManagerSerializer::toDTO();
+    dto.colormapmanDTO = GVis::Visualize::ColorMapManagerSerializer::toDTO();
 
     return dto;
 }
 
-bool SessionManager::fromProjectDTO(const QSpace::Session::ProjectDTO& dto) {
+bool SessionManager::fromProjectDTO(const GVis::Session::ProjectDTO& dto) {
     if (!m_registry || !m_layerManager || !m_viewManager)
         return false;
 
@@ -268,13 +268,13 @@ bool SessionManager::fromProjectDTO(const QSpace::Session::ProjectDTO& dto) {
 
     bool is_succses = ObjectRegistrySerializer::fromDTO(dto.objregDTO, m_registry);
     is_succses      = is_succses && ViewManagerSerializer::fromDTO(dto.viewmanDTO, m_viewManager);
-    QSpace::Visualize::ColorMapManagerSerializer::fromDTO(dto.colormapmanDTO);
+    GVis::Visualize::ColorMapManagerSerializer::fromDTO(dto.colormapmanDTO);
 
     LayerManagerSerializer::NodeResolver nodeRes =
         [&](const QUuid& id) -> std::shared_ptr<DataNode> { return m_registry->getNode(id); };
 
     LayerManagerSerializer::ViewResolver viewRes =
-        [&](const QUuid& id) -> std::shared_ptr<QSpace::Visualize::Views::AbstractView> {
+        [&](const QUuid& id) -> std::shared_ptr<GVis::Visualize::Views::AbstractView> {
         return m_viewManager->getView(id);
     };
 
@@ -284,4 +284,4 @@ bool SessionManager::fromProjectDTO(const QSpace::Session::ProjectDTO& dto) {
         m_restoreVideoPlayerState(dto.videoPlayerDTO);
     return is_succses;
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

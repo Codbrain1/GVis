@@ -1,7 +1,7 @@
 #pragma once
 #include "../../LayerSettings.h"
 
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 // ============================================================
 // Настройки для SPHRendererLayer — splat/resolve пайплайн
 // ============================================================
@@ -111,4 +111,4 @@ public:
     float             m_densityGamma         = 1.0f;
 };
 
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers

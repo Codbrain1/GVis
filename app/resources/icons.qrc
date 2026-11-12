@@ -5,5 +5,6 @@
         <file>icons/viewport_orthographic_off.svg</file>
         <file>icons/orthographic_on.svg</file>
         <file>icons/viewport_orthographic_on.svg</file>
+        <file>icons/logo.svg</file>
     </qresource>
 </RCC>

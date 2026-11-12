@@ -20,7 +20,7 @@
 
 class vtkDataSet;
 
-namespace QSpace::Core {
+namespace GVis::Core {
 
 // CRITICAL: полностью избавится от vtk
 struct DataNode {
@@ -29,8 +29,8 @@ struct DataNode {
     Q_PROPERTY(QUuid id MEMBER id)
     Q_PROPERTY(QString label MEMBER label)
     Q_PROPERTY(QString path MEMBER path)
-    Q_PROPERTY(QSpace::Visualize::EntityType type MEMBER type)
-    Q_PROPERTY(QSpace::IO::FileFormat format MEMBER format)
+    Q_PROPERTY(GVis::Visualize::EntityType type MEMBER type)
+    Q_PROPERTY(GVis::IO::FileFormat format MEMBER format)
     Q_PROPERTY(QUuid scheme MEMBER scheme)
 
   public:
@@ -39,7 +39,7 @@ struct DataNode {
     QString                     path;   // путь к файлу с данными
     Visualize::EntityType       type;   // тип данных для быстрой подстройки визуализации
     vtkSmartPointer<vtkDataSet> data;   // непосредственно данные
-    QSpace::IO::FileFormat      format; // формат файла (бинарный, текстовый и т.д.)
+    GVis::IO::FileFormat        format; // формат файла (бинарный, текстовый и т.д.)
     QUuid                       scheme; // схема для чтения данных, нужна для их восстановления)
 
     DataNodeMetaData stats;
@@ -53,7 +53,7 @@ struct DataNode {
     }
 
     // // Version 1.0
-    DataNode(const QSpace::Session::DataNodeDTO& dto)
+    DataNode(const GVis::Session::DataNodeDTO& dto)
         : id(dto.id),
           label(dto.name),
           path(dto.path),
@@ -85,7 +85,7 @@ class Snapshot {
         : id(QUuid::createUuid()), name(snapshotName), timestamp(ts) {
     }
 
-    Snapshot(const QSpace::Session::SnapshotDTO& dto)
+    Snapshot(const GVis::Session::SnapshotDTO& dto)
         : id(dto.id), name(dto.name), timestamp(dto.timestamp), components() {
     }
 
@@ -115,7 +115,7 @@ struct Experiment {
     Experiment(const QString& expName) : id(QUuid::createUuid()), name(expName) {
     }
 
-    Experiment(const QSpace::Session::ExperimentDTO& dto) : id(dto.id), name(dto.name) {
+    Experiment(const GVis::Session::ExperimentDTO& dto) : id(dto.id), name(dto.name) {
     }
 
     void addSnapshot(std::shared_ptr<Snapshot> snapshot) {
@@ -124,4 +124,4 @@ struct Experiment {
     }
 };
 
-} // namespace QSpace::Core
+} // namespace GVis::Core

@@ -5,8 +5,7 @@
 #include <QString>
 #include <optional>
 
-
-namespace QSpace::Session {
+namespace GVis::Session {
 
 class ProjectFormatFactory {
   public:
@@ -16,4 +15,4 @@ class ProjectFormatFactory {
     static QString                      name(ProjectFormat format);
 };
 
-} // namespace QSpace::Session
+} // namespace GVis::Session

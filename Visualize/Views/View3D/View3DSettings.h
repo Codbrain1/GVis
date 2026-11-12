@@ -1,11 +1,12 @@
 #pragma once
 #include <QColor>
 #include <QObject>
-#include <algorithm>
 #include <qobject.h>
 #include <qtmetamacros.h>
+#include <algorithm>
 
-namespace QSpace::Visualize::Views::View3D {
+
+namespace GVis::Visualize::Views::View3D {
 
 // ============================================================
 // Сетка на плоскости
@@ -129,8 +130,8 @@ class AxisSettings : public QObject {
     QString m_labelZ          = "Z";                  // подпись оси Z
     QString m_unitLabel       = "kpc";                // подпись размерности
     double  m_lengthScale     = 1.0;
-    QString m_labelFontFamily = "Segoe UI";           // тип шрифта
-    int     m_labelFontSize   = 10;                   // размер шрифта
+    QString m_labelFontFamily = "Segoe UI"; // тип шрифта
+    int     m_labelFontSize   = 10;         // размер шрифта
 };
 
 // ============================================================
@@ -213,7 +214,7 @@ public:
     // zNear и zFar задают расстояние от точки (0, 0, 0) до ближней и дальней плоскостей отсечения и
     // могут быть положительными и отрицательными.
     float m_nearClip = -1000.0f;
-    float m_farClip   = 1000.0f;
+    float m_farClip  = 1000.0f;
 
     float m_orthographicNearClip    = m_nearClip;
     bool  m_hasOrthographicNearClip = false;
@@ -275,4 +276,4 @@ class View3DSettings : public QObject {
 // Настройки самого 3D-вьюпорта: камера, фон, проекция, гизмо
 // ============================================================
 
-} // namespace QSpace::Visualize::Views::View3D
+} // namespace GVis::Visualize::Views::View3D

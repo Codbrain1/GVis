@@ -3,7 +3,7 @@
 #include "Visualize/Layers/Layer.h"
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 
 class StyleManager {
   public:
@@ -20,4 +20,4 @@ class StyleManager {
                           std::shared_ptr<DataNode>                 targetNode);
 };
 
-} // namespace QSpace::Core
+} // namespace GVis::Core

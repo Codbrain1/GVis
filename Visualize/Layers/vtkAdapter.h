@@ -19,7 +19,7 @@
 #include <utility>
 
 // TODO временный адаптер для vtk массивов
-namespace QSpace::Visualize::vtkAdapter {
+namespace GVis::Visualize::vtkAdapter {
 
 // vtkDataSet сам по себе не гарантирует наличие точек (например, vtkImageData),
 // поэтому кастуем к vtkPointSet — базовому классу для vtkPolyData/vtkUnstructuredGrid,
@@ -199,4 +199,4 @@ fieldNormolized(const std::shared_ptr<Core::DataNode>& node, const QString& fiel
     }
     return Layers::SPHPointsLayerSettings::NormalizationMode::Unknown;
 }
-} // namespace QSpace::Visualize::vtkAdapter
+} // namespace GVis::Visualize::vtkAdapter

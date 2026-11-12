@@ -13,7 +13,7 @@
 #include "Common/Structures/ObjectRegistryStructures.h" // Путь к файлу с DataNode
 #include "Core/ObjectRegistry/ObjectRegistry.h"
 
-using namespace QSpace::Core;
+using namespace GVis::Core;
 
 class TestRegisterContainer : public QObject {
     Q_OBJECT
@@ -27,11 +27,11 @@ class TestRegisterContainer : public QObject {
 
     void testContainerRegister_Succes() {
         QSignalSpy spy(m_registry.get(), &ObjectRegistry::snapshotAdded);
-        auto       container = std::make_shared<QSpace::Core::Snapshot>("TestContainer");
+        auto       container = std::make_shared<GVis::Core::Snapshot>("TestContainer");
         m_registry->registerSnapshot(container);
         QCOMPARE(m_registry->getAllSnapshots().size(), 1);
         QCOMPARE(spy.count(), 1);
-        auto signalContainer = spy.at(0).at(0).value<std::shared_ptr<QSpace::Core::Snapshot>>();
+        auto signalContainer = spy.at(0).at(0).value<std::shared_ptr<GVis::Core::Snapshot>>();
         QCOMPARE(signalContainer->id, container->id);
     }
 
@@ -46,7 +46,7 @@ class TestRegisterContainer : public QObject {
 
 // Не забудь зарегистрировать shared_ptr в метасистеме,
 // если это еще не сделано в основном коде, иначе QSignalSpy его не вытащит.
-Q_DECLARE_METATYPE(std::shared_ptr<QSpace::Core::DataNode>)
+Q_DECLARE_METATYPE(std::shared_ptr<GVis::Core::DataNode>)
 
 QTEST_MAIN(TestRegisterContainer)
 #include "TestRegisterContainer.moc"

@@ -1,5 +1,5 @@
 #pragma once
-namespace QSpace::Visualize::Layers
+namespace GVis::Visualize::Layers
 {
 enum class RenderLayerType
 {
@@ -35,4 +35,4 @@ inline std::optional<RenderLayerType> rendermodeFromString(const QString &s)
     return RenderLayerType::Binning;
   return std::nullopt;
 }
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers

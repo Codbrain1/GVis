@@ -2,9 +2,10 @@
 #include "Common/Logger/Logger.h"
 #include <vtkGenericOpenGLRenderWindow.h>
 
-namespace QSpace::Visualize {
+namespace GVis::Visualize {
 
-VideoExporter::VideoExporter(VtkView* vtkview, QObject* parent) : QObject(parent), m_vtkView(vtkview) {
+VideoExporter::VideoExporter(VtkView* vtkview, QObject* parent)
+    : QObject(parent), m_vtkView(vtkview) {
     m_windowToImage = vtkSmartPointer<vtkWindowToImageFilter>::New();
     m_windowToImage->SetInput(m_vtkView->getRenderWindow());
     m_windowToImage->SetInputBufferTypeToRGB();
@@ -54,4 +55,4 @@ void VideoExporter::finishExport() {
     }
 }
 
-} // namespace QSpace::Visualize
+} // namespace GVis::Visualize

@@ -1,16 +1,17 @@
 #include "ProjectFormatFactory.h"
 
-#include "JsonProjectFormatCodec.h"
 #include <QFileInfo>
+#include "JsonProjectFormatCodec.h"
 
-namespace QSpace::Session {
+
+namespace GVis::Session {
 
 ProjectFormatCodecPtr ProjectFormatFactory::create(ProjectFormat format) {
     switch (format) {
-    case ProjectFormat::Json:
-        return std::make_unique<JsonProjectFormatCodec>();
-    case ProjectFormat::Xml:
-        return nullptr;
+        case ProjectFormat::Json:
+            return std::make_unique<JsonProjectFormatCodec>();
+        case ProjectFormat::Xml:
+            return nullptr;
     }
 
     return nullptr;
@@ -31,10 +32,10 @@ std::optional<ProjectFormat> ProjectFormatFactory::fromFilePath(const QString& f
 
 QString ProjectFormatFactory::extension(ProjectFormat format) {
     switch (format) {
-    case ProjectFormat::Json:
-        return QStringLiteral("json");
-    case ProjectFormat::Xml:
-        return QStringLiteral("xml");
+        case ProjectFormat::Json:
+            return QStringLiteral("json");
+        case ProjectFormat::Xml:
+            return QStringLiteral("xml");
     }
 
     return {};
@@ -42,13 +43,13 @@ QString ProjectFormatFactory::extension(ProjectFormat format) {
 
 QString ProjectFormatFactory::name(ProjectFormat format) {
     switch (format) {
-    case ProjectFormat::Json:
-        return QStringLiteral("JSON");
-    case ProjectFormat::Xml:
-        return QStringLiteral("XML");
+        case ProjectFormat::Json:
+            return QStringLiteral("JSON");
+        case ProjectFormat::Xml:
+            return QStringLiteral("XML");
     }
 
     return {};
 }
 
-} // namespace QSpace::Session
+} // namespace GVis::Session

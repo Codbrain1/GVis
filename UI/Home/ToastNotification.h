@@ -8,7 +8,7 @@ class QLabel;
 class QToolButton;
 class QTimer;
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 class ToastNotification final : public QFrame {
     Q_OBJECT
@@ -30,11 +30,11 @@ class ToastNotification final : public QFrame {
     void showNextError();
     void positionInParent();
 
-    QLabel*      m_titleLabel;
-    QLabel*      m_messageLabel;
-    QToolButton* m_closeButton;
-    QTimer*      m_hideTimer;
+    QLabel*             m_titleLabel;
+    QLabel*             m_messageLabel;
+    QToolButton*        m_closeButton;
+    QTimer*             m_hideTimer;
     QList<ErrorMessage> m_pendingErrors;
 };
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

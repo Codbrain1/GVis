@@ -1,4 +1,4 @@
-"""Create equal-size BIN files compatible with QSpace Stars / BIN / V2.
+"""Create equal-size BIN files compatible with GVis Stars / BIN / V2.
 
 Each file contains:
     int32   particle_count (little-endian)
@@ -86,7 +86,7 @@ def write_file(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Create equal-size QSpace Stars/BIN/V2 stress-test files."
+        description="Create equal-size GVis Stars/BIN/V2 stress-test files."
     )
     parser.add_argument(
         "--output-dir",

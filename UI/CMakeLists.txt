@@ -1,6 +1,6 @@
 set(CMAKE_AUTOUIC ON)
 add_library(UI STATIC)
-add_library(QSpace::UI ALIAS UI)
+add_library(GVis::UI ALIAS UI)
 target_sources(UI PRIVATE
     Home/MainWindow.h
     Home/MainWindow.cpp
@@ -37,9 +37,9 @@ target_sources(UI PRIVATE
 target_include_directories(UI PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(UI PUBLIC
     project_config
-    QSpace::Core
-    QSpace::Visualize
-    QSpace::Physics
+    GVis::Core
+    GVis::Visualize
+    GVis::Physics
     Qt6::Widgets
     Qt6::Core
     Qt6::Gui

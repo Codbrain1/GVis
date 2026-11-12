@@ -3,8 +3,7 @@
 #include "Common/Structures/PhysicalStructures.h"
 #include <expected>
 
-
-namespace QSpace::IO {
+namespace GVis::IO {
 std::expected<Physics::PhysicalUnitsProfile, IO::ReadStatus> importIniFile(const QString& filePath);
 
-} // namespace QSpace::IO
+} // namespace GVis::IO

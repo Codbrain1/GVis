@@ -1,5 +1,5 @@
-qspace_add_test(TestReflectionGadgetToVariantMap QSpace::Session QSpace::Common)
-qspace_add_test(TestReflectionObjectSerialize QSpace::Session QSpace::Common)
+GVis_add_test(TestReflectionGadgetToVariantMap GVis::Session GVis::Common)
+GVis_add_test(TestReflectionObjectSerialize GVis::Session GVis::Common)
 
 target_sources(TestReflectionGadgetToVariantMap PRIVATE
     TestGadgets.h

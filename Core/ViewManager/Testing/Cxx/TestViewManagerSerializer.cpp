@@ -5,16 +5,16 @@
 #include <QSignalSpy>
 #include <QtTest>
 
-using namespace QSpace::Core;
-using namespace QSpace::Session;
-using namespace QSpace::Visualize::Views;
+using namespace GVis::Core;
+using namespace GVis::Session;
+using namespace GVis::Visualize::Views;
 
 class TestViewManagerSerialize : public QObject {
     Q_OBJECT
 
     static ViewDTO makeOpenGLViewDTO(const QUuid& id, const QString& name = "View") {
         ViewDTO view;
-        view.id = id;
+        view.id   = id;
         view.name = name;
         view.type = ViewType::OpenGL3D;
         return view;
@@ -42,7 +42,7 @@ class TestViewManagerSerialize : public QObject {
 
 void TestViewManagerSerialize::testSerializeEmptyManager() {
     ViewManager manager;
-    const auto dto = ViewManagerSerializer::toDTO(&manager);
+    const auto  dto = ViewManagerSerializer::toDTO(&manager);
     QVERIFY(dto.has_value());
     QVERIFY(dto->mainViewId.isNull());
     QVERIFY(dto->views.isEmpty());
@@ -50,7 +50,7 @@ void TestViewManagerSerialize::testSerializeEmptyManager() {
 
 void TestViewManagerSerialize::testCreateMultipleViewsAndSerializeNameAndSettings() {
     ViewManager manager;
-    const auto firstId = createOpenGLView(manager);
+    const auto  firstId = createOpenGLView(manager);
     QVERIFY(!firstId.isNull());
     const auto secondId = createOpenGLView(manager);
     QVERIFY(!secondId.isNull());
@@ -63,8 +63,9 @@ void TestViewManagerSerialize::testCreateMultipleViewsAndSerializeNameAndSetting
     QCOMPARE(dto->mainViewId, secondId);
     QCOMPARE(dto->views.size(), 2);
 
-    const auto first = std::find_if(dto->views.cbegin(), dto->views.cend(),
-                                    [firstId](const ViewDTO& view) { return view.id == firstId; });
+    const auto first = std::find_if(dto->views.cbegin(), dto->views.cend(), [firstId](const ViewDTO& view) {
+        return view.id == firstId;
+    });
     QVERIFY(first != dto->views.cend());
     QCOMPARE(first->name, QString("Primary 3D"));
     QCOMPARE(first->type, ViewType::OpenGL3D);
@@ -75,7 +76,7 @@ void TestViewManagerSerialize::testCreateMultipleViewsAndSerializeNameAndSetting
 
 void TestViewManagerSerialize::testRemoveMainView() {
     ViewManager manager;
-    const auto firstId = createOpenGLView(manager);
+    const auto  firstId = createOpenGLView(manager);
     QVERIFY(!firstId.isNull());
     const auto secondId = createOpenGLView(manager);
     QVERIFY(!secondId.isNull());
@@ -88,7 +89,7 @@ void TestViewManagerSerialize::testRemoveMainView() {
 
 void TestViewManagerSerialize::testRemoveRegularViewAndUnknownId() {
     ViewManager manager;
-    const auto mainId = createOpenGLView(manager);
+    const auto  mainId = createOpenGLView(manager);
     QVERIFY(!mainId.isNull());
     const auto regularId = createOpenGLView(manager);
     QVERIFY(!regularId.isNull());
@@ -104,7 +105,7 @@ void TestViewManagerSerialize::testRemoveRegularViewAndUnknownId() {
 
 void TestViewManagerSerialize::testSetUnknownViewAsMainDoesNotChangeMainView() {
     ViewManager manager;
-    const auto mainId = createOpenGLView(manager);
+    const auto  mainId = createOpenGLView(manager);
     QVERIFY(!mainId.isNull());
     manager.setMainView(QUuid::createUuid());
     QCOMPARE(manager.getMainViewId(), mainId);
@@ -112,9 +113,9 @@ void TestViewManagerSerialize::testSetUnknownViewAsMainDoesNotChangeMainView() {
 
 void TestViewManagerSerialize::testSignalsForCreateAndRemove() {
     ViewManager manager;
-    QSignalSpy createdSpy(&manager, &ViewManager::viewCreated);
-    QSignalSpy removedSpy(&manager, &ViewManager::viewRemoved);
-    const auto id = createOpenGLView(manager);
+    QSignalSpy  createdSpy(&manager, &ViewManager::viewCreated);
+    QSignalSpy  removedSpy(&manager, &ViewManager::viewRemoved);
+    const auto  id = createOpenGLView(manager);
     QVERIFY(!id.isNull());
     QCOMPARE(createdSpy.count(), 1);
     QCOMPARE(createdSpy.first().at(0).toUuid(), id);
@@ -129,7 +130,7 @@ void TestViewManagerSerialize::testUnsupportedViewTypeIsRejected() {
     ViewManager manager;
     QVERIFY(manager.createView(ViewType::QCustonPlot2D).isNull());
     ViewManagerDTO dto;
-    dto.mainViewId = QUuid::createUuid();
+    dto.mainViewId   = QUuid::createUuid();
     auto unsupported = makeOpenGLViewDTO(dto.mainViewId);
     unsupported.type = ViewType::QCustonPlot2D;
     dto.views.append(unsupported);
@@ -157,8 +158,8 @@ void TestViewManagerSerialize::testDeserializeWithMissingMainView() {
 void TestViewManagerSerialize::testDeserializeUnknownViewType() {
     ViewManagerDTO dto;
     dto.mainViewId = QUuid::createUuid();
-    auto view = makeOpenGLViewDTO(dto.mainViewId);
-    view.type = static_cast<ViewType>(999);
+    auto view      = makeOpenGLViewDTO(dto.mainViewId);
+    view.type      = static_cast<ViewType>(999);
     dto.views.append(view);
     ViewManager manager;
     QVERIFY(!ViewManagerSerializer::fromDTO(dto, &manager));
@@ -177,14 +178,14 @@ void TestViewManagerSerialize::testDeserializeDuplicateViewIds() {
 
 void TestViewManagerSerialize::testDeserializeRestoresNameAndSettings() {
     ViewManager source;
-    const auto id = createOpenGLView(source);
+    const auto  id = createOpenGLView(source);
     QVERIFY(!id.isNull());
     auto sourceView = source.getView(id);
     sourceView->setViewName("Restored 3D view");
     auto dto = ViewManagerSerializer::toDTO(&source);
     QVERIFY(dto.has_value());
-    auto& viewDto = dto->views.first();
-    auto gridSettings = viewDto.settings.value("grid").toMap();
+    auto& viewDto      = dto->views.first();
+    auto  gridSettings = viewDto.settings.value("grid").toMap();
     gridSettings.insert("visible", true);
     gridSettings.insert("extent", 42.0f);
     viewDto.settings.insert("grid", gridSettings);

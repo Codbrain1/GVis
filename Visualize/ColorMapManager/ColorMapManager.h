@@ -1,6 +1,5 @@
 #pragma once
 #include "Common/Structures/ColormapPresets.h"
-#include "colormapmanager_export.h"
 #include <QApplication>
 #include <QColor>
 #include <QIcon>
@@ -15,8 +14,10 @@
 #include <qobject.h>
 #include <qtmetamacros.h>
 #include <quuid.h>
+#include "colormapmanager_export.h"
 
-namespace QSpace::Visualize {
+
+namespace GVis::Visualize {
 class COLORMAPMANAGER_EXPORT ColorMapManager : public QObject {
     Q_OBJECT
   public:
@@ -31,7 +32,7 @@ class COLORMAPMANAGER_EXPORT ColorMapManager : public QObject {
     void  AddCustomMap(const ColorMap& map);
     void  removeCustomMap(const QUuid& id);
     bool  contains(const QUuid& id);
-    QIcon createColorMapIcon(const QSpace::Visualize::ColorMap& map, QSize size = QSize(80, 16));
+    QIcon createColorMapIcon(const GVis::Visualize::ColorMap& map, QSize size = QSize(80, 16));
   signals:
     void paleteAdded(const ColorMap& colorMap);
 
@@ -41,4 +42,4 @@ class COLORMAPMANAGER_EXPORT ColorMapManager : public QObject {
     // Храним мапу для быстрого доступа по UUID
     QMap<QUuid, ColorMap> m_availableMaps;
 };
-} // namespace QSpace::Visualize
+} // namespace GVis::Visualize

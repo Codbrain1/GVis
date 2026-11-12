@@ -17,7 +17,7 @@
 #include <Common/Structures/FileSchemeStructures.h>
 #include <concepts>
 
-namespace QSpace::Reflection {
+namespace GVis::Reflection {
 
 struct DeserializationResult {
     bool        success            = false; // Удалось ли записать хотя бы одно свойство
@@ -63,7 +63,7 @@ DeserializationResult variantMapToQObject(const QVariantMap& map, QObject* obj);
 template <typename T>
     requires std::derived_from<T, QObject>
 inline QVariantMap QObjectToVariantMap(const T* obj) {
-    return QSpace::Reflection::details::QObjectToVariantMap(obj);
+    return GVis::Reflection::details::QObjectToVariantMap(obj);
 }
 
 // раскладывает из вариант мапы поля в QObject
@@ -111,6 +111,6 @@ template <typename T> T variantMapToGadget(const QVariantMap& map) {
 // ------------------------------------------------------------------
 
 // сериализация и восстановление схемы отдельно потому что она обернута в вариант
-QVariantMap            readSchemeToVariant(const QSpace::IO::ReadScheme& scheme);
-QSpace::IO::ReadScheme variantToReadScheme(const QVariantMap& map);
-} // namespace QSpace::Reflection
+QVariantMap          readSchemeToVariant(const GVis::IO::ReadScheme& scheme);
+GVis::IO::ReadScheme variantToReadScheme(const QVariantMap& map);
+} // namespace GVis::Reflection

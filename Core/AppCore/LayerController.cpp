@@ -5,7 +5,7 @@
 #include "Core/ObjectRegistry/ObjectRegistry.h"
 #include "Core/ViewManager/ViewManager.h"
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 
 LayerController::LayerController(Core::ObjectRegistry* objectRegistry,
                                  Core::LayerManager*   layerManager,
@@ -17,7 +17,8 @@ LayerController::LayerController(Core::ObjectRegistry* objectRegistry,
       m_viewManager(viewManager) {
 }
 
-std::shared_ptr<Visualize::Layers::Layer> LayerController::getLayerById(const QUuid& layerId) const {
+std::shared_ptr<Visualize::Layers::Layer>
+LayerController::getLayerById(const QUuid& layerId) const {
     return m_layerManager ? m_layerManager->getLayer(layerId) : nullptr;
 }
 
@@ -41,8 +42,8 @@ void LayerController::createDefaultLayers(const QUuid& nodeId) {
     emit markSessionDirty();
 }
 
-void LayerController::createLayer(const QUuid&                          nodeId,
-                                  const QUuid&                          viewId,
+void LayerController::createLayer(const QUuid&                       nodeId,
+                                  const QUuid&                       viewId,
                                   Visualize::Layers::RenderLayerType renderType) {
     if (!m_objectRegistry || !m_layerManager || !m_viewManager)
         return;
@@ -117,4 +118,4 @@ void LayerController::onNodeDataLoaded(const QUuid& nodeId) {
     emit sceneUpdateRequested();
 }
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

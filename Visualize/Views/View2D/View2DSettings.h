@@ -2,7 +2,7 @@
 #include <QColor>
 #include <QObject>
 
-namespace QSpace::Visualize::Views::View2D {
+namespace GVis::Visualize::Views::View2D {
 
 // ============================================================
 // Сетка на графике (major/minor gridlines QCustomPlot)
@@ -158,4 +158,4 @@ class View2DSettings : public QObject {
     ViewportSettings* m_viewport;
 };
 
-} // namespace QSpace::Visualize::Views::View2D
+} // namespace GVis::Visualize::Views::View2D

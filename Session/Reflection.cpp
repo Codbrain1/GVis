@@ -15,7 +15,7 @@
 #include <qvariant.h>
 #include <variant>
 
-namespace QSpace::Reflection {
+namespace GVis::Reflection {
 namespace details {
 
 QMetaEnum enumeratorForMetaType(const QMetaType& mt) {
@@ -23,7 +23,7 @@ QMetaEnum enumeratorForMetaType(const QMetaType& mt) {
     if (!mo)
         return QMetaEnum();
 
-    // mt.name() обычно выглядит как "QSpace::Visualize::EntityType"
+    // mt.name() обычно выглядит как "GVis::Visualize::EntityType"
     QByteArray typeName = mt.name();
     int        sep      = typeName.lastIndexOf("::");
     QByteArray enumName = sep >= 0 ? typeName.mid(sep + 2) : typeName;
@@ -280,7 +280,7 @@ DeserializationResult variantMapToQObject(const QVariantMap& map, QObject* obj) 
 } // namespace details
 
 // восстанавливает гаджет из варианта
-QVariantMap readSchemeToVariant(const QSpace::IO::ReadScheme& scheme) {
+QVariantMap readSchemeToVariant(const GVis::IO::ReadScheme& scheme) {
     QVariantMap out;
     std::visit(
         [&out](auto&& s) {
@@ -290,7 +290,7 @@ QVariantMap readSchemeToVariant(const QSpace::IO::ReadScheme& scheme) {
             } else if constexpr (std::is_same_v<T, std::monostate>) {
                 out["type"] = QStringLiteral("None");
             } else {
-                // T::staticMetaObject.className() может вернуть "QSpace::IO::ColumnScheme"
+                // T::staticMetaObject.className() может вернуть "GVis::IO::ColumnScheme"
                 // Берем только последнее имя для корректного матчинга
                 QString fullClassName = QString::fromLatin1(T::staticMetaObject.className());
                 out["type"]           = fullClassName.split(QStringLiteral("::")).last();
@@ -301,7 +301,7 @@ QVariantMap readSchemeToVariant(const QSpace::IO::ReadScheme& scheme) {
     return out;
 }
 
-QSpace::IO::ReadScheme variantToReadScheme(const QVariantMap& map) {
+GVis::IO::ReadScheme variantToReadScheme(const QVariantMap& map) {
     const QString     type = map.value(QStringLiteral("type")).toString();
     const QVariantMap data = map.value(QStringLiteral("data")).toMap();
 
@@ -331,4 +331,4 @@ QSpace::IO::ReadScheme variantToReadScheme(const QVariantMap& map) {
     return std::monostate{};
 }
 
-} // namespace QSpace::Reflection
+} // namespace GVis::Reflection

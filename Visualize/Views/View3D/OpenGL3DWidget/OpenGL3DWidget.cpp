@@ -4,7 +4,7 @@
 #include <qcontainerfwd.h>
 #include "Logger/Logger.h"
 
-namespace QSpace::Visualize::Views::View3D {
+namespace GVis::Visualize::Views::View3D {
 
 OpenGL3DWidget::OpenGL3DWidget(QObject* parent)
     : AbstractView3D(parent), m_viewport(new GLViewport(m_settings.get())) {
@@ -62,4 +62,4 @@ void OpenGL3DWidget::detachRenderLayer(const QUuid& layerId) {
     m_viewport->detachRenderLayer(layerId);
 }
 
-} // namespace QSpace::Visualize::Views::View3D
+} // namespace GVis::Visualize::Views::View3D

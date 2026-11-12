@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 
 void SPHRendererLayer::buildShaders() {
     m_splatProgram.addShaderFromSourceFile(QOpenGLShader::Vertex, ":/shaders/splat.vert");
@@ -87,13 +87,11 @@ void SPHRendererLayer::computeRange(QOpenGLFunctions_3_3_Core* gl) {
     }
 
     const float calculatedMinimum =
-        hasValidParticles && std::isfinite(minimum) && std::isfinite(maximum) &&
-                minimum <= maximum
+        hasValidParticles && std::isfinite(minimum) && std::isfinite(maximum) && minimum <= maximum
             ? minimum
             : 0.0f;
     const float calculatedMaximum =
-        hasValidParticles && std::isfinite(minimum) && std::isfinite(maximum) &&
-                minimum <= maximum
+        hasValidParticles && std::isfinite(minimum) && std::isfinite(maximum) && minimum <= maximum
             ? maximum
             : 1.0f;
 
@@ -144,7 +142,7 @@ void SPHRendererLayer::uploadBuffers(QOpenGLFunctions_3_3_Core* gl) {
 
     m_particleCount = positions.size();
     m_settings->setParticleCount(m_particleCount);
-    m_normMode      = normMode;
+    m_normMode = normMode;
 
     auto bounds = vtkAdapter::getBounds(node);
 
@@ -283,7 +281,7 @@ void SPHRendererLayer::render(QOpenGLFunctions_3_3_Core* gl, const Visualize::Re
     gl->glActiveTexture(GL_TEXTURE1);
     gl->glBindTexture(GL_TEXTURE_1D, ColorMapTexture::getOrCreate(gl, m_settings->colorMapId()));
 
-    float scaleFactor = QSpace::Physics::fieldPhysicalScale(pu, m_settings->colorByField());
+    float scaleFactor = GVis::Physics::fieldPhysicalScale(pu, m_settings->colorByField());
 
     m_resolveProgram.bind();
     m_resolveProgram.setUniformValue("uPhysicalTex", 0);
@@ -345,4 +343,4 @@ bool SPHRendererLayer::boundingBox(QVector3D& outMin, QVector3D& outMax) const {
     return true;
 }
 
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers

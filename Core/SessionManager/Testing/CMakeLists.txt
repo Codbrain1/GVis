@@ -1,1 +1,1 @@
-qspace_add_test(TestSessionManager QSpace::Core QSpace::Common QSpace::Session QSpace::Visualize)
+GVis_add_test(TestSessionManager GVis::Core GVis::Common GVis::Session GVis::Visualize)

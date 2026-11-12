@@ -8,7 +8,7 @@
 #include "Physics/Math/MetaDataCalculating.h"
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 ObjectRegistry::ObjectRegistry(QObject* parent) : QObject(parent) {
 }
 
@@ -21,7 +21,7 @@ void ObjectRegistry::registerNode(std::shared_ptr<DataNode> node) {
     }
     m_nodes.insert(node->id, node);
     if (node->data != nullptr) {
-        node->stats = QSpace::Physics::Math::calculateMetaData(node->data, node->stats.timestamp);
+        node->stats = GVis::Physics::Math::calculateMetaData(node->data, node->stats.timestamp);
         touchNodeInMemory(node->id);
     }
     emit nodeAdded(node, QUuid());
@@ -34,7 +34,7 @@ void ObjectRegistry::registerNodeToSnapshot(std::shared_ptr<DataNode> node, cons
 
     m_nodes.insert(node->id, node);
     if (node->data != nullptr) {
-        node->stats = QSpace::Physics::Math::calculateMetaData(node->data, node->stats.timestamp);
+        node->stats = GVis::Physics::Math::calculateMetaData(node->data, node->stats.timestamp);
         touchNodeInMemory(node->id);
     }
 
@@ -314,7 +314,7 @@ void ObjectRegistry::updateNodeData(const QUuid& id, vtkSmartPointer<vtkDataSet>
 
     if (!turningIntoNull) {
         // Данные появились/обновились в ОЗУ -> регистрируем в LRU
-        node->stats = QSpace::Physics::Math::calculateMetaData(node->data, timestamp);
+        node->stats = GVis::Physics::Math::calculateMetaData(node->data, timestamp);
         touchNodeInMemory(id);
 
         // На случай, если лимит кэша жестко изменился в настройках,
@@ -379,4 +379,4 @@ void ObjectRegistry::clear() {
     m_lruMap.clear();
     emit cleared();
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

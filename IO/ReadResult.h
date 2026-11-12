@@ -4,7 +4,7 @@
 #include <vtkDataSet.h>
 #include <vtkMultiBlockDataSet.h>
 
-namespace QSpace::IO {
+namespace GVis::IO {
 struct ReadResult { // результат чтения одного файла
     vtkSmartPointer<vtkDataSet> data = nullptr;
     QString                     path;
@@ -30,4 +30,4 @@ struct BatchResult { // результат чтения пакета файло�
         return fail_count > 0;
     }
 };
-} // namespace QSpace::IO
+} // namespace GVis::IO

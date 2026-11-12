@@ -8,7 +8,7 @@
 #include "Session/ProjectFormatFactory.h"
 #include "Structures/SessionStructures.h"
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 
 ProjectController::ProjectController(Core::SessionManager* sessionManager,
                                      Core::ObjectRegistry* objectRegistry,
@@ -107,4 +107,4 @@ void ProjectController::savePalette(const Visualize::ColorMap& map, const QStrin
     }
 }
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

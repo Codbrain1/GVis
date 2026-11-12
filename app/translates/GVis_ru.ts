@@ -63,7 +63,7 @@
     <name>MainWindow</name>
     <message>
         <location filename="../../UI/Home/newmainwindow.ui" line="14"/>
-        <source>QSpace Professional</source>
+        <source>GVis Professional</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -184,7 +184,7 @@
     </message>
 </context>
 <context>
-    <name>QSpace::UI::LayerExplorerWidget</name>
+    <name>GVis::UI::LayerExplorerWidget</name>
     <message>
         <location filename="../../UI/Home/LayerExplorerWidget.cpp" line="145"/>
         <source>Пожалуйста выберите директорию</source>
@@ -308,7 +308,7 @@
     </message>
 </context>
 <context>
-    <name>QSpace::UI::MainWindow</name>
+    <name>GVis::UI::MainWindow</name>
     <message>
         <location filename="../../UI/Home/MainWindow.cpp" line="132"/>
         <source>View - %1</source>
@@ -326,7 +326,7 @@
     </message>
     <message>
         <location filename="../../UI/Home/MainWindow.cpp" line="327"/>
-        <source>QSpace Project (*.qsp)</source>
+        <source>GVis Project (*.gvs)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -336,7 +336,7 @@
     </message>
     <message>
         <location filename="../../UI/Home/MainWindow.cpp" line="415"/>
-        <source>QSpace Project (*.qsp);;All Files (*)</source>
+        <source>GVis Project (*.gvs);;All Files (*)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

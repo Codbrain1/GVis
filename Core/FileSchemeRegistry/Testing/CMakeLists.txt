@@ -1,1 +1,1 @@
-qspace_add_test(TestFileSchemeRegistry FileSchemeRegistry)
+GVis_add_test(TestFileSchemeRegistry FileSchemeRegistry)

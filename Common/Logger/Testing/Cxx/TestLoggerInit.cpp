@@ -18,7 +18,7 @@ private slots:
   void testFileCreation() {
     QString testLogName = "test_output.log";
     QFile::remove(testLogName);
-    QSpace::Common::Logger::init(testLogName);
+    GVis::Common::Logger::init(testLogName);
     qInfo(LogCommon) << "Test Message";
     QVERIFY(QFile::exists(testLogName));
     QFile file(testLogName);
@@ -27,7 +27,7 @@ private slots:
 
     QString file_text = file.readAll();
     QVERIFY(file_text.contains("[INF]"));
-    QVERIFY(file_text.contains("[QSpace.Common]"));
+    QVERIFY(file_text.contains("[GVis.Common]"));
     QVERIFY(file_text.contains("Test Message"));
   }
   void cleanupTestCase() { QFile::remove("test_output.log"); }

@@ -27,11 +27,11 @@
 #include <vtkDataArray.h>
 #include <vtkPointData.h>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 PropertyInspector::PropertyInspector(Core::AppCore* app, QWidget* parent)
     : QWidget(parent), ui(new Ui::PropertyInspector), m_app(app) {
     ui->setupUi(this);
-    ui->colorbarWidget->setColorMap(QSpace::Visualize::ColorMapPresets::getPresetByName("Plasma"));
+    ui->colorbarWidget->setColorMap(GVis::Visualize::ColorMapPresets::getPresetByName("Plasma"));
     m_dynamicEditor = new SettingsEditorWidget(this);
     if (ui->scrollArea_DynamicProperties) {
         // Если у ScrollArea еще нет внутреннего виджета-контейнера, создаем его
@@ -121,7 +121,7 @@ void PropertyInspector::handleCreateCustomPalete() {
     // 1. Берем текущую палитру как базовую (чтобы было что редактировать)
     auto layer      = m_app->layerController()->getLayerById(m_currentElementId);
     auto paleteId   = layer->getSettings()->colorMapId();
-    auto baseMapOpt = QSpace::Visualize::ColorMapManager::instance().getMap(paleteId);
+    auto baseMapOpt = GVis::Visualize::ColorMapManager::instance().getMap(paleteId);
     if (!baseMapOpt.has_value()) {
         QMessageBox::warning(this, "Ошибка", "Текущая палитра не найдена. Невозможно создать на ее основе.");
         return;
@@ -136,13 +136,13 @@ void PropertyInspector::handleCreateCustomPalete() {
     connect(&dialog,
             &ColorMapEditorDialog::savePaletteRequested,
             m_app->projectController(),
-            &QSpace::Core::Controllers::ProjectController::savePalette);
+            &GVis::Core::Controllers::ProjectController::savePalette);
     connect(&dialog,
             &ColorMapEditorDialog::loadPaletteRequested,
             m_app->projectController(),
-            &QSpace::Core::Controllers::ProjectController::loadPalette);
+            &GVis::Core::Controllers::ProjectController::loadPalette);
     connect(m_app->projectController(),
-            &QSpace::Core::Controllers::ProjectController::paletteLoaded,
+            &GVis::Core::Controllers::ProjectController::paletteLoaded,
             &dialog,
             &ColorMapEditorDialog::onPaletteLoaded);
     // 3. Открываем окно и ждем. Выполнение кода здесь останавливается,
@@ -152,7 +152,7 @@ void PropertyInspector::handleCreateCustomPalete() {
         Visualize::ColorMap customMap = dialog.getEditedMap();
 
         // 5. Сохраняем в менеджер
-        auto& manager = QSpace::Visualize::ColorMapManager::instance();
+        auto& manager = GVis::Visualize::ColorMapManager::instance();
         manager.AddCustomMap(customMap);
     }
 }
@@ -162,7 +162,7 @@ void PropertyInspector::handleEditPalete() {
 
     auto layer      = m_app->layerController()->getLayerById(m_currentElementId);
     auto nodeId     = layer->getSettings()->colorMapId();
-    auto baseMapOpt = QSpace::Visualize::ColorMapManager::instance().getMap(nodeId);
+    auto baseMapOpt = GVis::Visualize::ColorMapManager::instance().getMap(nodeId);
 
     if (!baseMapOpt.has_value()) {
         QMessageBox::warning(this, "Ошибка", "Текущая палитра не найдена. Невозможно отредактировать.");
@@ -180,13 +180,13 @@ void PropertyInspector::handleEditPalete() {
     connect(&dialog,
             &ColorMapEditorDialog::savePaletteRequested,
             m_app->projectController(),
-            &QSpace::Core::Controllers::ProjectController::savePalette);
+            &GVis::Core::Controllers::ProjectController::savePalette);
     connect(&dialog,
             &ColorMapEditorDialog::loadPaletteRequested,
             m_app->projectController(),
-            &QSpace::Core::Controllers::ProjectController::loadPalette);
+            &GVis::Core::Controllers::ProjectController::loadPalette);
     connect(m_app->projectController(),
-            &QSpace::Core::Controllers::ProjectController::paletteLoaded,
+            &GVis::Core::Controllers::ProjectController::paletteLoaded,
             &dialog,
             &ColorMapEditorDialog::onPaletteLoaded);
     if (dialog.exec() == QDialog::Accepted) {
@@ -196,7 +196,7 @@ void PropertyInspector::handleEditPalete() {
         editedMap.name     = baseMap.name;
         editedMap.isPreset = false;
 
-        auto& manager = QSpace::Visualize::ColorMapManager::instance();
+        auto& manager = GVis::Visualize::ColorMapManager::instance();
         manager.AddCustomMap(editedMap);
     }
 }
@@ -276,7 +276,7 @@ void PropertyInspector::handlePaletteChange(int index) {
     // Достаем тип палитры из выбранного пункта
     auto colorMapId   = ui->combo_colormap->itemData(index).value<QUuid>();
     auto layer        = m_app->layerController()->getLayerById(m_currentElementId);
-    auto colorMap_ptr = QSpace::Visualize::ColorMapManager::instance().getMap(colorMapId);
+    auto colorMap_ptr = GVis::Visualize::ColorMapManager::instance().getMap(colorMapId);
     if (colorMap_ptr.has_value()) {
         ui->colorbarWidget->setColorMap(colorMap_ptr.value());
     }
@@ -284,4 +284,4 @@ void PropertyInspector::handlePaletteChange(int index) {
     layer->getView().lock()->render();
 }
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

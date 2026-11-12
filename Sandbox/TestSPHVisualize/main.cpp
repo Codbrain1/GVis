@@ -24,18 +24,18 @@ int main(int argc, char* argv[]) {
                                true); // до QApplication — многооконность
     QApplication app(argc, argv);
 
-    const QString dataPath = "D:/NIR/NIR_6_semestr/QSpace/Sandbox/TEST_DATA/TF250_v2/G_    0.bin";
+    const QString dataPath = "D:/NIR/NIR_6_semestr/GVis/Sandbox/TEST_DATA/TF250_v2/G_    0.bin";
 
     // ================ Чтение файла — без изменений от вашего пайплайна ================
-    auto reader = QSpace::IO::createReader(QSpace::IO::FileFormat::BIN);
+    auto reader = GVis::IO::createReader(GVis::IO::FileFormat::BIN);
     if (!reader) {
         qCritical() << "Failed to create reader";
         return 1;
     }
-    reader->setPolicy(QSpace::IO::FilePolicy::ForceStandart);
+    reader->setPolicy(GVis::IO::FilePolicy::ForceStandart);
 
-    auto scheme = QSpace::IO::SchemeFactory::createScheme_v2(QSpace::Visualize::EntityType::Gas,
-                                                             QSpace::IO::FileFormat::BIN);
+    auto scheme = GVis::IO::SchemeFactory::createScheme_v2(GVis::Visualize::EntityType::Gas,
+                                                           GVis::IO::FileFormat::BIN);
 
     QElapsedTimer readTimer;
     readTimer.start();
@@ -55,16 +55,16 @@ int main(int argc, char* argv[]) {
     qDebug() << "Точек прочитано:" << polyData->GetPoints()->GetNumberOfPoints();
 
     // ================ Оборачиваем в DataNode — узел модели данных ================
-    auto dataNode = std::make_shared<QSpace::Core::DataNode>(
+    auto dataNode = std::make_shared<GVis::Core::DataNode>(
         vtkSmartPointer<vtkDataSet>(polyData), // vtkPolyData наследует vtkDataSet
         "DarkMatter snapshot 0",
         0.0,
-        QSpace::Visualize::EntityType::Gas);
+        GVis::Visualize::EntityType::Gas);
 
     // ================ Создаём рендер-слой через LayerFactory ================
-    auto renderLayer = QSpace::Visualize::Layers::LayerFactory::createLayerRenderer(
+    auto renderLayer = GVis::Visualize::Layers::LayerFactory::createLayerRenderer(
         dataNode,
-        QSpace::Visualize::Layers::RenderLayerType::SPH);
+        GVis::Visualize::Layers::RenderLayerType::SPH);
 
     if (!renderLayer) {
         qCritical() << "Failed to create render layer";
@@ -72,7 +72,7 @@ int main(int argc, char* argv[]) {
     }
 
     // ---- настройки слоя — конкретно ParticlePointsLayerSettings ----
-    auto layerSettings = std::make_shared<QSpace::Visualize::Layers::SPHPointsLayerSettings>();
+    auto layerSettings = std::make_shared<GVis::Visualize::Layers::SPHPointsLayerSettings>();
     layerSettings->setColorByField(
         "Density"); // если поля Mass/Density нет — просто одноцветные точки
     layerSettings->setUseLogScale(false);
@@ -81,14 +81,14 @@ int main(int argc, char* argv[]) {
     renderLayer->setSettings(layerSettings);
 
     // ================ Создаём View через ViewFactory ================
-    auto view = QSpace::Visualize::Views::ViewFactory::createView(
-        QSpace::Visualize::Views::ViewType::OpenGL3D);
+    auto view =
+        GVis::Visualize::Views::ViewFactory::createView(GVis::Visualize::Views::ViewType::OpenGL3D);
     if (!view) {
         qCritical() << "Failed to create view";
         return 1;
     }
 
-    auto view3d = std::dynamic_pointer_cast<QSpace::Visualize::Views::AbstractView3D>(view);
+    auto view3d = std::dynamic_pointer_cast<GVis::Visualize::Views::AbstractView3D>(view);
     if (!view3d) {
         qCritical() << "View is not a 3D view";
         return 1;

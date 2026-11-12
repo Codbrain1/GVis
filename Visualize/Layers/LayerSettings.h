@@ -10,7 +10,7 @@
 #include <algorithm>
 #include <limits>
 
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 
 class LAYERS_EXPORT LayerSettings : public QObject {
     Q_OBJECT
@@ -306,22 +306,23 @@ class LAYERS_EXPORT LayerSettings : public QObject {
     }
 
     virtual QString propertyDisplayName(const QString& propName) const {
-        static const QMap<QString, QString> baseNames = {{"isVisible", "Видимость слоя"},
-                                                         {"opacity", "Непрозрачность частиц"},
-                                                         {"colorByField", "Окрашивать по полю"},
-                                                         {"colorMapId", "Цветовая карта"},
-                                                         {"useLogScale", "Логарифмическая шкала"},
-                                                         {"rangeMin", "Мин. значение диапазона"},
-                                                         {"rangeMax", "Макс. значение диапазона"},
-                                                         {"baseRangeMin", "Глобальный минимум"},
-                                                         {"baseRangeMax", "Глобальный максимум"},
-                                                         {"autoRange", "Авто-диапазон"},
-                                                         {"showOutRangeParticles", "Отображать частицы вне диапазона значений"},
-                                                         {"show_all_particles", "Показать все частицы"},
-                                                         {"particle_number_min", "Первый номер частицы"},
-                                                         {"particle_number_max", "Последний номер частицы"},
-                                                         {"zOrder", "Порядок отображения (Z)"},
-                                                         {"blendMode", "Режим смешивания"}};
+        static const QMap<QString, QString> baseNames = {
+            {"isVisible", "Видимость слоя"},
+            {"opacity", "Непрозрачность частиц"},
+            {"colorByField", "Окрашивать по полю"},
+            {"colorMapId", "Цветовая карта"},
+            {"useLogScale", "Логарифмическая шкала"},
+            {"rangeMin", "Мин. значение диапазона"},
+            {"rangeMax", "Макс. значение диапазона"},
+            {"baseRangeMin", "Глобальный минимум"},
+            {"baseRangeMax", "Глобальный максимум"},
+            {"autoRange", "Авто-диапазон"},
+            {"showOutRangeParticles", "Отображать частицы вне диапазона значений"},
+            {"show_all_particles", "Показать все частицы"},
+            {"particle_number_min", "Первый номер частицы"},
+            {"particle_number_max", "Последний номер частицы"},
+            {"zOrder", "Порядок отображения (Z)"},
+            {"blendMode", "Режим смешивания"}};
         //  {"pickable", "Доступен для выбора"}};
         return baseNames.value(propName, propName); // Если не нашли, вернем английское имя
     }
@@ -344,9 +345,9 @@ class LAYERS_EXPORT LayerSettings : public QObject {
             c.step     = 0.05;
             c.decimals = 4;
         } else if (propName == "particle_number_min" || propName == "particle_number_max") {
-            c.min      = 0.0;
-            c.max      = m_particleCount > 0 ? m_particleCount - 1 : std::numeric_limits<int>::max();
-            c.step     = 1.0;
+            c.min  = 0.0;
+            c.max  = m_particleCount > 0 ? m_particleCount - 1 : std::numeric_limits<int>::max();
+            c.step = 1.0;
             c.decimals = 0;
         } else if (propName == "rangeMin" || propName == "rangeMax" || propName == "baseRangeMin" ||
                    propName == "baseRangeMax") {
@@ -395,17 +396,17 @@ class LAYERS_EXPORT LayerSettings : public QObject {
     double    m_baseRangeMax = 100.0; // глобальное максимальное значение
     bool      m_autoRange    = true;  // автоматически ли подбирать диапазон окрашивания частиц
     bool      m_showOutOfRangeParticles = false;
-    int       m_zOrder       = 0;
-    BlendMode m_blendMode    = BlendMode::Alpha;
-    double    m_physicalKm   = 3.72;
-    double    m_physicalKr   = 0.9;
-    double    m_physicalGamma     = 5.0 / 3.0;
-    bool m_showAllParticles  = true;
-    int  m_particleNumberMin = 0;
-    int  m_particleNumberMax = std::numeric_limits<int>::max();
-    int  m_particleCount     = 0;
+    int       m_zOrder                  = 0;
+    BlendMode m_blendMode               = BlendMode::Alpha;
+    double    m_physicalKm              = 3.72;
+    double    m_physicalKr              = 0.9;
+    double    m_physicalGamma           = 5.0 / 3.0;
+    bool      m_showAllParticles        = true;
+    int       m_particleNumberMin       = 0;
+    int       m_particleNumberMax       = std::numeric_limits<int>::max();
+    int       m_particleCount           = 0;
 
     bool m_hasPhysicalGamma = true;
 };
 
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers

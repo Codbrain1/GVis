@@ -43,15 +43,15 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
-    auto reader = QSpace::IO::createReader(QSpace::IO::FileFormat::BIN);
-    reader->setPolicy(QSpace::IO::FilePolicy::ForceMapped);
+    auto reader = GVis::IO::createReader(GVis::IO::FileFormat::BIN);
+    reader->setPolicy(GVis::IO::FilePolicy::ForceMapped);
 
 
-    auto targetKey = QSpace::IO::PresetKey{QSpace::Visualize::EntityType::Stars,
-                                           QSpace::IO::FileFormat::BIN,
-                                           QSpace::IO::ModelingProgrammVersion::V2};
+    auto targetKey = GVis::IO::PresetKey{GVis::Visualize::EntityType::Stars,
+                                         GVis::IO::FileFormat::BIN,
+                                         GVis::IO::ModelingProgrammVersion::V2};
 
-    const auto presets = QSpace::IO::ReadSchemePresets::getStandardPresets();
+    const auto presets = GVis::IO::ReadSchemePresets::getStandardPresets();
     auto       it = std::find_if(presets.begin(), presets.end(), [&targetKey](const auto& pair) {
         return pair.first == targetKey;
     });

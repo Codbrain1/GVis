@@ -13,7 +13,7 @@
 #include "Common/Structures/ObjectRegistryStructures.h" // Путь к файлу с DataNode
 #include "Core/ObjectRegistry/ObjectRegistry.h"
 
-using namespace QSpace::Core;
+using namespace GVis::Core;
 
 class TestRemovalNode : public QObject {
     Q_OBJECT
@@ -53,11 +53,11 @@ class TestRemovalNode : public QObject {
     }
 
     void testRemoveExperimentCascadesToSnapshotsAndNodes() {
-        auto experiment = std::make_shared<Experiment>("Experiment");
-        auto firstSnapshot = std::make_shared<Snapshot>("First", 1.0);
+        auto experiment     = std::make_shared<Experiment>("Experiment");
+        auto firstSnapshot  = std::make_shared<Snapshot>("First", 1.0);
         auto secondSnapshot = std::make_shared<Snapshot>("Second", 2.0);
-        auto firstNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First node");
-        auto secondNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Second node");
+        auto firstNode      = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "First node");
+        auto secondNode     = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Second node");
         firstSnapshot->addComponent(firstNode);
         secondSnapshot->addComponent(secondNode);
         experiment->addSnapshot(firstSnapshot);
@@ -79,11 +79,11 @@ class TestRemovalNode : public QObject {
     }
 
     void testRemoveSnapshotCascadesToNodesAndUnlinksExperiment() {
-        auto experiment = std::make_shared<Experiment>("Experiment");
+        auto experiment        = std::make_shared<Experiment>("Experiment");
         auto removableSnapshot = std::make_shared<Snapshot>("Remove", 1.0);
-        auto retainedSnapshot = std::make_shared<Snapshot>("Keep", 2.0);
-        auto removableNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Remove node");
-        auto retainedNode = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Keep node");
+        auto retainedSnapshot  = std::make_shared<Snapshot>("Keep", 2.0);
+        auto removableNode     = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Remove node");
+        auto retainedNode      = std::make_shared<DataNode>(vtkSmartPointer<vtkPolyData>::New(), "Keep node");
         removableSnapshot->addComponent(removableNode);
         retainedSnapshot->addComponent(retainedNode);
         experiment->addSnapshot(removableSnapshot);
@@ -110,7 +110,7 @@ class TestRemovalNode : public QObject {
 
 // Не забудь зарегистрировать shared_ptr в метасистеме,
 // если это еще не сделано в основном коде, иначе QSignalSpy его не вытащит.
-Q_DECLARE_METATYPE(std::shared_ptr<QSpace::Core::DataNode>)
+Q_DECLARE_METATYPE(std::shared_ptr<GVis::Core::DataNode>)
 
 QTEST_MAIN(TestRemovalNode)
 #include "TestRemovalNode.moc"

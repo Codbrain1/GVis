@@ -8,11 +8,9 @@
 #include <qpushbutton.h>
 #include <qtablewidget.h>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
-ColorMapEditorDialog::ColorMapEditorDialog(const Visualize::ColorMap& baseMap,
-                                           Mode                              mode,
-                                           QWidget*                          parent)
+ColorMapEditorDialog::ColorMapEditorDialog(const Visualize::ColorMap& baseMap, Mode mode, QWidget* parent)
     : QDialog(parent), ui(new Ui::ColorMapEditorDialog), m_baseMap(baseMap), m_mode(mode) {
     ui->setupUi(this);
 
@@ -111,7 +109,7 @@ void ColorMapEditorDialog::on_loadButton_clicked() {
     }
     emit loadPaletteRequested(colorMapPath);
 }
-void ColorMapEditorDialog::onPaletteLoaded(QSpace::Visualize::ColorMap colorMap) {
+void ColorMapEditorDialog::onPaletteLoaded(GVis::Visualize::ColorMap colorMap) {
     m_baseMap = colorMap;
     populateTable();
 }
@@ -283,4 +281,4 @@ void ColorMapEditorDialog::on_spinBoxChanged(double value) {
     ui->tableWidget->setUpdatesEnabled(true);
 }
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

@@ -12,7 +12,7 @@
 #include "GridRenderer.h"
 #include <memory>
 
-namespace QSpace::Visualize::Views::View3D {
+namespace GVis::Visualize::Views::View3D {
 
 class GLViewport : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     Q_OBJECT
@@ -90,4 +90,4 @@ class GLViewport : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core {
     QSet<QUuid> m_pendingColorMapInvalidations;
 };
 
-} // namespace QSpace::Visualize::Views::View3D
+} // namespace GVis::Visualize::Views::View3D

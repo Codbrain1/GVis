@@ -1,6 +1,6 @@
 
 add_library(IO STATIC)
-add_library(QSpace::IO ALIAS IO)
+add_library(GVis::IO ALIAS IO)
 set(IO_BIN
 BIN/BINReader.h
 BIN/BINReader.cpp
@@ -25,7 +25,7 @@ target_sources(IO PUBLIC
 
 target_include_directories(IO PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(IO PUBLIC
-        QSpace::Common
+        GVis::Common
         Qt6::Core
         OpenMP::OpenMP_CXX
 )

@@ -6,8 +6,8 @@ target_sources(FileSchemeRegistry PRIVATE
 target_include_directories(FileSchemeRegistry PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 target_link_libraries(FileSchemeRegistry PUBLIC
             project_config
-            QSpace::Common
-            QSpace::IO
+            GVis::Common
+            GVis::IO
 )
 
 if(ENABLE_TESTS)

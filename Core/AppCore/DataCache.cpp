@@ -1,12 +1,13 @@
 #include "DataCache.h"
 #include "Common/Logger/Logger.h"
+#include "Common/Structures/ObjectRegistryStructures.h"
 #include "Core/DataManager/DataManager.h"
 #include "Core/FileSchemeRegistry/FileSchemeRegistry.h"
 #include "Core/ObjectRegistry/ObjectRegistry.h"
-#include "Common/Structures/ObjectRegistryStructures.h"
 #include <QFileInfo>
 
-namespace QSpace::Core::Controllers {
+
+namespace GVis::Core::Controllers {
 
 DataCache::DataCache(Core::DataManager*        dataManager,
                      Core::ObjectRegistry*     objectRegistry,
@@ -21,7 +22,10 @@ DataCache::DataCache(Core::DataManager*        dataManager,
 void DataCache::initialize() {
     connect(m_dataManager, &Core::DataManager::fileReady, this, &DataCache::handleFileReady);
     connect(m_dataManager, &Core::DataManager::ioFinished, this, &DataCache::handleIoFinished);
-    connect(m_objectRegistry, &Core::ObjectRegistry::dataLoadRequested, this, &DataCache::requestLoad);
+    connect(m_objectRegistry,
+            &Core::ObjectRegistry::dataLoadRequested,
+            this,
+            &DataCache::requestLoad);
 }
 
 void DataCache::setCapacity(int capacity) {
@@ -48,13 +52,13 @@ void DataCache::requestLoad(const QUuid& nodeId) {
 
     if (!scheme.has_value() && m_fileSchemeRegistry) {
         IO::PresetKey key;
-        key.format = node->format;
-        key.type = node->type;
-        key.mpv = IO::ModelingProgrammVersion::V2;
+        key.format          = node->format;
+        key.type            = node->type;
+        key.mpv             = IO::ModelingProgrammVersion::V2;
         const auto schemeId = m_fileSchemeRegistry->findPresetId(key);
         if (schemeId.has_value()) {
             node->scheme = schemeId.value();
-            scheme = m_fileSchemeRegistry->getReadScheme(schemeId.value());
+            scheme       = m_fileSchemeRegistry->getReadScheme(schemeId.value());
         }
     }
 
@@ -63,7 +67,8 @@ void DataCache::requestLoad(const QUuid& nodeId) {
         return;
     }
 
-    const auto taskId = m_dataManager->importDataAsync(node->path, *scheme, IO::ImportRole::ProjectData);
+    const auto taskId =
+        m_dataManager->importDataAsync(node->path, *scheme, IO::ImportRole::ProjectData);
     if (taskId.isNull())
         return;
 
@@ -71,7 +76,9 @@ void DataCache::requestLoad(const QUuid& nodeId) {
     m_tasks.insert(taskId, LoadingTask{nodeId});
 }
 
-void DataCache::handleFileReady(const QUuid& taskId, const IO::ReadResult& result, IO::ImportRole role) {
+void DataCache::handleFileReady(const QUuid&          taskId,
+                                const IO::ReadResult& result,
+                                IO::ImportRole        role) {
     if (role != IO::ImportRole::ProjectData || !m_tasks.contains(taskId) || !result.isSuccess())
         return;
 
@@ -88,4 +95,4 @@ void DataCache::handleIoFinished(const QUuid& taskId, bool) {
         m_loadingNodes.remove(task.nodeId);
 }
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

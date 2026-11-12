@@ -12,7 +12,7 @@
 #include <qpushbutton.h>
 #include <qwidget.h>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 ColorMapComboBox::ColorMapComboBox(QWidget* parent) : QComboBox(parent) {
     this->view()->setAutoScroll(false); // отключаем автоскролл, чтобы кнопка не уезжала при открытии меню
     this->view()->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
@@ -74,4 +74,4 @@ bool ColorMapComboBox::eventFilter(QObject* obj, QEvent* event) {
     }
     return QComboBox::eventFilter(obj, event);
 }
-} // namespace QSpace::UI
+} // namespace GVis::UI

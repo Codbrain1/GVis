@@ -1,14 +1,14 @@
 #pragma once
 #include "Common/Structures/SessionStructures.h"
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class FileSchemeRegistry;
 }
 
-namespace QSpace::Session {
+namespace GVis::Session {
 class FileSchemeRegistrySerializer {
   public:
     static FileSchemeRegistryDTO toDTO(Core::FileSchemeRegistry* registry);
     bool fromDTO(const FileSchemeRegistryDTO& dto, Core::FileSchemeRegistry* registry);
 };
-} // namespace QSpace::Session
+} // namespace GVis::Session

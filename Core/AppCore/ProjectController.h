@@ -4,17 +4,17 @@
 #include <QString>
 #include "Structures/SessionStructures.h"
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class SessionManager;
 class ObjectRegistry;
 class DataManager;
-} // namespace QSpace::Core
+} // namespace GVis::Core
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 class ImportController;
 }
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 // ---------------------------------------------------------
 // @SECTION: обработка проектов и палитр
 // ---------------------------------------------------------
@@ -45,8 +45,8 @@ class ProjectController : public QObject {
     /**
      * @brief уведомляет об изменении состояния сессии
      */
-    void sessionStateChanged(QSpace::Session::CurrentSession session);
-    void paletteLoaded(QSpace::Visualize::ColorMap colorMap);
+    void sessionStateChanged(GVis::Session::CurrentSession session);
+    void paletteLoaded(GVis::Visualize::ColorMap colorMap);
 
   private:
     Core::SessionManager* m_sessionManager;
@@ -58,4 +58,4 @@ class ProjectController : public QObject {
     Session::CurrentSession m_sessionState;
 };
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

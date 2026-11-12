@@ -6,7 +6,7 @@
 #include <QString>
 #include <qcontainerfwd.h>
 
-namespace QSpace::IO {
+namespace GVis::IO {
 struct ColumnMapping {
     // регистрируем поля в метасистеме qt
     Q_GADGET
@@ -30,7 +30,7 @@ struct ColumnMapping {
 struct ColumnScheme {
     Q_GADGET
     // Чтобы Qt понял QList<Mapping>, тип внутри свойства должен быть полностью квалифицирован
-    Q_PROPERTY(QList<QSpace::IO::ColumnMapping> columnsPolicy MEMBER columnsPolicy)
+    Q_PROPERTY(QList<GVis::IO::ColumnMapping> columnsPolicy MEMBER columnsPolicy)
     Q_PROPERTY(int headerOffsetBytes MEMBER headerOffsetBytes)
     Q_PROPERTY(bool isInterleaved MEMBER isInterleaved)
     Q_PROPERTY(QString delimiter MEMBER delimiter)
@@ -68,9 +68,9 @@ struct PresetKey {
         return qHashMulti(seed, int(k.type), int(k.format), int(k.mpv));
     }
 };
-} // namespace QSpace::IO
+} // namespace GVis::IO
 
 // Регистрируем типы, чтобы QVariant их знал
-Q_DECLARE_METATYPE(QSpace::IO::ColumnMapping)
-Q_DECLARE_METATYPE(QSpace::IO::ColumnScheme)
-Q_DECLARE_METATYPE(QSpace::IO::DefaultScheme)
+Q_DECLARE_METATYPE(GVis::IO::ColumnMapping)
+Q_DECLARE_METATYPE(GVis::IO::ColumnScheme)
+Q_DECLARE_METATYPE(GVis::IO::DefaultScheme)

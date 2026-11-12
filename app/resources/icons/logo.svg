@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="spiralGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00D2FF" />
+      <stop offset="100%" stop-color="#7B2CBF" />
+    </linearGradient>
+    <linearGradient id="spiralGrad2" x1="100%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#38BDF8" />
+      <stop offset="100%" stop-color="#C084FC" />
+    </linearGradient>
+  </defs>
+
+  <!-- Фон -->
+  <rect width="512" height="512" rx="96" fill="#0B0F19" />
+
+  <!-- Внешняя орбита (N-Body) -->
+  <ellipse cx="256" cy="210" rx="145" ry="56" transform="rotate(-24 256 210)" fill="none" stroke="url(#spiralGrad1)" stroke-width="4" stroke-dasharray="10 8" opacity="0.75" />
+  <ellipse cx="256" cy="210" rx="108" ry="40" transform="rotate(-24 256 210)" fill="none" stroke="url(#spiralGrad2)" stroke-width="5" />
+
+  <!-- Спиральные рукава и ядро -->
+  <path d="M 164 250 C 145 195, 225 145, 295 162 C 345 174, 368 215, 342 248" fill="none" stroke="#00D2FF" stroke-width="7" stroke-linecap="round" />
+  <path d="M 348 170 C 367 225, 287 275, 217 258 C 167 246, 144 205, 170 172" fill="none" stroke="#9D4EDD" stroke-width="7" stroke-linecap="round" />
+
+  <!-- Центральное ядро -->
+  <circle cx="256" cy="210" r="18" fill="#FFFFFF" />
+  <circle cx="256" cy="210" r="28" fill="#00D2FF" opacity="0.25" />
+
+  <!-- Частицы SPH / N-Body -->
+  <circle cx="132" cy="264" r="6" fill="#00D2FF" />
+  <circle cx="380" cy="156" r="6" fill="#C084FC" />
+  <circle cx="195" cy="158" r="4.5" fill="#38BDF8" />
+  <circle cx="318" cy="262" r="4.5" fill="#A855F7" />
+  <circle cx="242" cy="144" r="3.5" fill="#FFFFFF" opacity="0.85" />
+  <circle cx="274" cy="276" r="3.5" fill="#FFFFFF" opacity="0.85" />
+  <circle cx="168" cy="222" r="3" fill="#00D2FF" />
+  <circle cx="344" cy="198" r="3" fill="#C084FC" />
+
+  <!-- Название программы -->
+  <text x="256" y="395" text-anchor="middle" font-family="system-ui, -apple-system, &#39;Segoe UI&#39;, Roboto, Helvetica, Arial, sans-serif" font-weight="800" font-size="84" letter-spacing="6" fill="#FFFFFF">GVis</text>
+</svg>

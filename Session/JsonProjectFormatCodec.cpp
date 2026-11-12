@@ -3,14 +3,14 @@
 #include <QJsonDocument>
 #include <QJsonParseError>
 
-namespace QSpace::Session {
+namespace GVis::Session {
 
 QByteArray JsonProjectFormatCodec::encode(const QVariantMap& data) const {
     return QJsonDocument::fromVariant(data).toJson(QJsonDocument::Indented);
 }
 
 std::optional<QVariantMap> JsonProjectFormatCodec::decode(const QByteArray& data) const {
-    QJsonParseError parseError;
+    QJsonParseError     parseError;
     const QJsonDocument document = QJsonDocument::fromJson(data, &parseError);
 
     if (parseError.error != QJsonParseError::NoError || !document.isObject()) {
@@ -20,4 +20,4 @@ std::optional<QVariantMap> JsonProjectFormatCodec::decode(const QByteArray& data
     return document.toVariant().toMap();
 }
 
-} // namespace QSpace::Session
+} // namespace GVis::Session

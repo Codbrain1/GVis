@@ -7,22 +7,22 @@
 #include <quuid.h>
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class ViewManager;
 class LayerManager;
 class ObjectRegistry;
 // class VideoExportManager;
-} // namespace QSpace::Core
+} // namespace GVis::Core
 
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 class Layer;
 }
 
-namespace QSpace::Visualize::Views {
+namespace GVis::Visualize::Views {
 class AbstractView;
 }
 
-namespace QSpace::Core::Controllers {
+namespace GVis::Core::Controllers {
 // ---------------------------------------------------------
 // @SECTION: Экспорт видео
 // ---------------------------------------------------------
@@ -82,17 +82,17 @@ class VideoController : public QObject {
     void restorePlayerLayersWhenReady();
 
     const int floatWindow = 15;
-    QMap<QSpace::Visualize::EntityType,
-         QList<std::shared_ptr<QSpace::Visualize::Layers::Layer>>>
-        m_snapshotPlayerSate; // слои для текущего snapshot
-    QHash<QUuid, QUuid> m_playerLayerSources;
+    QMap<GVis::Visualize::EntityType,
+         QList<std::shared_ptr<GVis::Visualize::Layers::Layer>>>
+                                        m_snapshotPlayerSate; // слои для текущего snapshot
+    QHash<QUuid, QUuid>                 m_playerLayerSources;
     QList<Session::VideoPlayerLayerDTO> m_restoredPlayerLayers;
 
     QUuid m_currentVisualizeSnapshotId; // текущий отображаемый кадр
     QUuid m_referenceSnapshotId;
     QUuid m_targetExperimentId; // эксперимент отображаемый с помощью плеера кадров
     std::vector<SnapshotToTimestamp> m_timeSliderSnapshots;
-    bool m_restorePending = false;
+    bool                             m_restorePending = false;
 
 
     Core::ObjectRegistry* m_objectRegistry;
@@ -100,4 +100,4 @@ class VideoController : public QObject {
     Core::LayerManager*   m_layerManager;
 };
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

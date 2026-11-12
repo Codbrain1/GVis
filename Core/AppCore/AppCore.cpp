@@ -17,15 +17,16 @@
 #include <qloggingcategory.h>
 #include <qnamespace.h>
 #include <quuid.h>
+#include "ExperimentController.h"
 #include "ImportController.h"
 #include "LayerController.h"
-#include "ExperimentController.h"
 #include "Models/DataTreeModel/DataTreeModel.h"
 #include "ProjectController.h"
 #include "VideoController.h"
 #include "ViewController.h"
 
-namespace QSpace::Core {
+
+namespace GVis::Core {
 AppCore::AppCore(QObject* parent) : QObject(parent) {
     // 1. Инициализация менеджеров (Базовый слой)
     m_taskManager        = std::make_unique<TaskManager>();
@@ -43,14 +44,17 @@ AppCore::AppCore(QObject* parent) : QObject(parent) {
                                                                      m_layerManager.get(),
                                                                      m_objectRegistry.get());
 
-    m_importController = std::make_unique<Controllers::ImportController>(m_dataManager.get(),
-                                                                          m_objectRegistry.get(),
-                                                                          m_fileSchemeRegistry.get());
-    m_layerController  = std::make_unique<Controllers::LayerController>(m_objectRegistry.get(),
+    m_importController =
+        std::make_unique<Controllers::ImportController>(m_dataManager.get(),
+                                                        m_objectRegistry.get(),
+                                                        m_fileSchemeRegistry.get());
+    m_layerController = std::make_unique<Controllers::LayerController>(m_objectRegistry.get(),
                                                                        m_layerManager.get(),
                                                                        m_viewManager.get());
-    m_experimentController = std::make_unique<Controllers::ExperimentController>(
-        m_objectRegistry.get(), m_layerManager.get(), m_viewManager.get());
+    m_experimentController =
+        std::make_unique<Controllers::ExperimentController>(m_objectRegistry.get(),
+                                                            m_layerManager.get(),
+                                                            m_viewManager.get());
 
     m_projectController =
         std::make_unique<Controllers::ProjectController>(m_sessionManager.get(),
@@ -64,10 +68,12 @@ AppCore::AppCore(QObject* parent) : QObject(parent) {
     m_sessionManager->setVideoPlayerStateHandlers(
         [this] { return m_videoController->playerState(); },
         [this] { return m_videoController->playerLayerIds(); },
-        [this](const Session::VideoPlayerDTO& state) { m_videoController->restorePlayerState(state); });
+        [this](const Session::VideoPlayerDTO& state) {
+            m_videoController->restorePlayerState(state);
+        });
     // 3. Инициализация моделей данных
-    m_dataTreeModel = std::make_unique<QSpace::Models::DataTreeModel>(m_objectRegistry.get(),
-                                                                      m_layerManager.get());
+    m_dataTreeModel =
+        std::make_unique<GVis::Models::DataTreeModel>(m_objectRegistry.get(), m_layerManager.get());
 }
 
 AppCore::~AppCore() = default;
@@ -146,4 +152,4 @@ DataManager* AppCore::dataManager() const {
     return m_dataManager.get();
 }
 
-} // namespace QSpace::Core
+} // namespace GVis::Core

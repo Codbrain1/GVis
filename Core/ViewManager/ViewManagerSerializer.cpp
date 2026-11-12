@@ -7,8 +7,7 @@
 #include "ViewManager.h"
 #include <optional>
 
-
-namespace QSpace::Core {
+namespace GVis::Core {
 
 std::optional<Session::ViewManagerDTO> ViewManagerSerializer::toDTO(Core::ViewManager* viewManager) {
     if (!viewManager) {
@@ -107,4 +106,4 @@ std::shared_ptr<Visualize::Views::AbstractView> ViewManagerSerializer::fromDTO(c
     }
     return view;
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

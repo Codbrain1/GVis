@@ -1,6 +1,6 @@
 include(GenerateExportHeader)
 add_library(LayerManager SHARED)
-add_library(QSpace::CoreLayerManager ALIAS LayerManager)
+add_library(GVis::CoreLayerManager ALIAS LayerManager)
 generate_export_header(LayerManager)
 
 target_sources(LayerManager PRIVATE
@@ -12,10 +12,10 @@ target_sources(LayerManager PRIVATE
 target_include_directories(LayerManager PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../.. ${CMAKE_CURRENT_BINARY_DIR})
 target_link_libraries(LayerManager PUBLIC
             project_config
-            QSpace::CoreObjectRegistry
-            QSpace::CoreViewManager
-            QSpace::Visualize
-            QSpace::Common
+            GVis::CoreObjectRegistry
+            GVis::CoreViewManager
+            GVis::Visualize
+            GVis::Common
             Qt6::Core
 ) 
 add_subdirectory(Testing)

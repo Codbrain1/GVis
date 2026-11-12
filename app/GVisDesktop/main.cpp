@@ -45,8 +45,8 @@ int main(int argc, char* argv[]) {
 
     QSurfaceFormat::setDefaultFormat(fmt);
 
-    QSpace::Core::LogManager::setup(); // инициализируем запись логов
-    QSpace::Core::AppCore core;
+    GVis::Core::LogManager::setup(); // инициализируем запись логов
+    GVis::Core::AppCore core;
 
     QTranslator       translator; // создание экземпляра переводчика на разные языки
     const QStringList uiLanguages =
@@ -56,7 +56,7 @@ int main(int argc, char* argv[]) {
 
     for (const QString& locale : uiLanguages) {
         QLocale loc(locale);
-        if (translator.load(loc, "QSpace", "_", ":/i18n")) {
+        if (translator.load(loc, "GVis", "_", ":/i18n")) {
             app.installTranslator(&translator);
             qCInfo(LogSystem) << "Lainguage loaded:" << loc.name();
             isTanslatesLoaded = true;
@@ -66,11 +66,11 @@ int main(int argc, char* argv[]) {
     if (!isTanslatesLoaded)
         qCWarning(LogSystem, "No suitable translation found. Falling back to defult (English)");
 
-    qCInfo(LogSystem) << "Application (QSpace) Starting...";
+    qCInfo(LogSystem) << "Application (GVis) Starting...";
     qCDebug(LogSystem) << "Built with Qt version:" << QT_VERSION_STR;
     qCDebug(LogSystem) << "Running with Qt version:" << qVersion();
 
-    QSpace::UI::MainWindow window(&core); // создание экземпляра окна
-    window.show();                        // отображение окна
+    GVis::UI::MainWindow window(&core); // создание экземпляра окна
+    window.show();                      // отображение окна
     return app.exec();
 }

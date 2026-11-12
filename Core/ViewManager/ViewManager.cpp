@@ -1,18 +1,19 @@
 #include "ViewManager.h"
 #include "Visualize/Views/AbstractView.h"
 #include "Visualize/Views/View3D/AbstractView3D.h"
-#include "Physics/DimensionConverter/PhysicalUnits.h"
 #include "Visualize/Views/ViewFactory.h"
 #include <qobject.h>
 #include <quuid.h>
+#include "Physics/DimensionConverter/PhysicalUnits.h"
 #include <memory>
 
-namespace QSpace::Core {
+
+namespace GVis::Core {
 ViewManager::ViewManager(QObject* parent) : QObject(parent) {
 }
 
 QUuid ViewManager::createView(Visualize::Views::ViewType type) {
-    auto newView = QSpace::Visualize::Views::ViewFactory::createView(type);
+    auto newView = GVis::Visualize::Views::ViewFactory::createView(type);
     // Проверка на случай неудачного создания или нереализованного типа (как Widget_2D сейчас)
     if (!newView) {
         return QUuid();
@@ -95,8 +96,7 @@ void ViewManager::removeView(const QUuid& id) {
     if (it == m_views.end())
         return;
 
-    const auto type = it->second ? it->second->viewType()
-                                 : Visualize::Views::ViewType::OpenGL3D;
+    const auto type = it->second ? it->second->viewType() : Visualize::Views::ViewType::OpenGL3D;
     m_views.erase(it);
 
     if (m_mainViewId == id)
@@ -116,7 +116,7 @@ void ViewManager::clear() {
     for (const auto& id : ids)
         removeView(id);
 
-    m_mainViewId = QUuid();
+    m_mainViewId          = QUuid();
     m_hasActiveExperiment = false;
 }
 
@@ -144,16 +144,14 @@ void ViewManager::renderView(const QUuid& id) {
     }
 }
 
-void ViewManager::applyActiveExperimentToView(
-    const std::shared_ptr<Visualize::Views::AbstractView>& view) {
+void ViewManager::applyActiveExperimentToView(const std::shared_ptr<Visualize::Views::AbstractView>& view) {
     if (!m_hasActiveExperiment || !view)
         return;
     if (auto view3d = std::dynamic_pointer_cast<Visualize::Views::AbstractView3D>(view)) {
-        const auto units = Physics::PhysicalUnits::fromSimParams(
-            m_activeExperimentProfile.Km,
-            m_activeExperimentProfile.Kr,
-            m_activeExperimentProfile.gamma,
-            m_activeExperimentProfile.haveGamma);
+        const auto units = Physics::PhysicalUnits::fromSimParams(m_activeExperimentProfile.Km,
+                                                                 m_activeExperimentProfile.Kr,
+                                                                 m_activeExperimentProfile.gamma,
+                                                                 m_activeExperimentProfile.haveGamma);
         if (auto settings = view3d->sceneSettings())
             settings->axis()->setLengthScale(units.lengthScale);
     }
@@ -161,8 +159,8 @@ void ViewManager::applyActiveExperimentToView(
 
 void ViewManager::setActiveExperiment(const Physics::PhysicalUnitsProfile& profile) {
     m_activeExperimentProfile = profile;
-    m_hasActiveExperiment = true;
+    m_hasActiveExperiment     = true;
     for (auto& [id, view] : m_views)
         applyActiveExperimentToView(view);
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

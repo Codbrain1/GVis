@@ -19,7 +19,7 @@
 #include <quuid.h>
 #include <qvariant.h>
 
-namespace QSpace::Models {
+namespace GVis::Models {
 
 // ==========================================
 //    РЕАЛИЗАЦИЯ ВСПОМОГАТЕЛЬНОГО DataTreeItem
@@ -664,7 +664,7 @@ QVariant DataTreeModel::data(const QModelIndex& index, int role) const {
 
     // Для всех необработанных ролей возвращаем пустой QVariant (Qt применит дефолты)
     return QVariant();
-} // namespace QSpace::Models
+} // namespace GVis::Models
 
 // --- Обработка клика по чекбоксу (Изменение видимости) ---
 bool DataTreeModel::setData(const QModelIndex& index, const QVariant& value, int role) {
@@ -931,4 +931,4 @@ QString DataTreeModel::entityTypeToString(Visualize::EntityType type) const {
     }
 }
 
-} // namespace QSpace::Models
+} // namespace GVis::Models

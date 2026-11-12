@@ -1,4 +1,4 @@
-"""Create renderable BIN files compatible with QSpace Stars / BIN / V2.
+"""Create renderable BIN files compatible with GVis Stars / BIN / V2.
 
 File layout:
     int32   particle_count (little-endian)
@@ -122,7 +122,7 @@ def create_file(path: Path, count: int, chunk_size: int, seed: int) -> int:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Create QSpace Stars V2 BIN stress-test files"
+        description="Create GVis Stars V2 BIN stress-test files"
     )
     parser.add_argument(
         "--output-dir",

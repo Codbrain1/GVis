@@ -30,7 +30,7 @@
 #include <limits>
 #include <variant>
 
-namespace QSpace::IO {
+namespace GVis::IO {
 BINReader::~BINReader() = default;
 
 ReadResult BINReader::read(const QString& path, const ReadScheme& scheme) const {
@@ -259,8 +259,8 @@ bool BINReader::validate(const QFile& file, const ReadScheme& scheme) const {
         qCritical(LogIO) << "BinReader requires ComlumnScheme! file:" << file.fileName();
         return false;
     }
-    const auto& config = std::get<ColumnScheme>(scheme);
-    bool hasCoordinates = false;
+    const auto& config         = std::get<ColumnScheme>(scheme);
+    bool        hasCoordinates = false;
     for (const auto& col : config.columnsPolicy) {
         if (col.isCoordinate) {
             if (hasCoordinates || col.numberOfComponents != 3)
@@ -599,8 +599,11 @@ bool BINReader::readInterleavedMmap(const uchar* startPtr,
         if (!destination)
             return false;
 
-        targets.append(
-            {column.vtkDataType, column.numberOfComponents, byteOffset, column.isCoordinate, destination});
+        targets.append({column.vtkDataType,
+                        column.numberOfComponents,
+                        byteOffset,
+                        column.isCoordinate,
+                        destination});
         byteOffset += typeSize * static_cast<size_t>(column.numberOfComponents);
     }
 
@@ -610,7 +613,8 @@ bool BINReader::readInterleavedMmap(const uchar* startPtr,
         for (const ColumnTarget& target : targets) {
             const uchar* sourcePtr = particlePtr + target.byteOffset;
             if (target.isCoordinate) {
-                double* destination = static_cast<double*>(target.data) + static_cast<size_t>(i) * 3;
+                double* destination =
+                    static_cast<double*>(target.data) + static_cast<size_t>(i) * 3;
                 if (target.vtkDataType == VTK_DOUBLE) {
                     const double* source = reinterpret_cast<const double*>(sourcePtr);
                     for (int component = 0; component < 3; ++component)
@@ -626,25 +630,25 @@ bool BINReader::readInterleavedMmap(const uchar* startPtr,
 
             switch (target.vtkDataType) {
                 case VTK_DOUBLE: {
-                    const double* source = reinterpret_cast<const double*>(sourcePtr);
-                    double* destination = static_cast<double*>(target.data) +
-                                          static_cast<size_t>(i) * target.componentCount;
+                    const double* source      = reinterpret_cast<const double*>(sourcePtr);
+                    double*       destination = static_cast<double*>(target.data) +
+                                                static_cast<size_t>(i) * target.componentCount;
                     for (int component = 0; component < target.componentCount; ++component)
                         destination[component] = qFromLittleEndian(source[component]);
                     break;
                 }
                 case VTK_FLOAT: {
-                    const float* source = reinterpret_cast<const float*>(sourcePtr);
-                    float* destination = static_cast<float*>(target.data) +
-                                         static_cast<size_t>(i) * target.componentCount;
+                    const float* source      = reinterpret_cast<const float*>(sourcePtr);
+                    float*       destination = static_cast<float*>(target.data) +
+                                               static_cast<size_t>(i) * target.componentCount;
                     for (int component = 0; component < target.componentCount; ++component)
                         destination[component] = qFromLittleEndian(source[component]);
                     break;
                 }
                 case VTK_INT: {
-                    const int* source = reinterpret_cast<const int*>(sourcePtr);
-                    int* destination = static_cast<int*>(target.data) +
-                                       static_cast<size_t>(i) * target.componentCount;
+                    const int* source      = reinterpret_cast<const int*>(sourcePtr);
+                    int*       destination = static_cast<int*>(target.data) +
+                                             static_cast<size_t>(i) * target.componentCount;
                     for (int component = 0; component < target.componentCount; ++component)
                         destination[component] = qFromLittleEndian(source[component]);
                     break;
@@ -870,8 +874,11 @@ bool BINReader::readInterleavedStream(QFile&       file,
         if (!destination)
             return false;
 
-        targets.append(
-            {column.vtkDataType, column.numberOfComponents, byteOffset, column.isCoordinate, destination});
+        targets.append({column.vtkDataType,
+                        column.numberOfComponents,
+                        byteOffset,
+                        column.isCoordinate,
+                        destination});
         byteOffset += typeSize * static_cast<size_t>(column.numberOfComponents);
     }
 
@@ -879,9 +886,9 @@ bool BINReader::readInterleavedStream(QFile&       file,
     if (stride == 0 || stride > static_cast<size_t>(std::numeric_limits<int>::max()))
         return false;
 
-    constexpr size_t bufferSize = 4 * 1024 * 1024;
-    const size_t rowsPerRead = std::max<size_t>(1, bufferSize / stride);
-    QByteArray buffer(static_cast<qsizetype>(rowsPerRead * stride), Qt::Uninitialized);
+    constexpr size_t bufferSize  = 4 * 1024 * 1024;
+    const size_t     rowsPerRead = std::max<size_t>(1, bufferSize / stride);
+    QByteArray       buffer(static_cast<qsizetype>(rowsPerRead * stride), Qt::Uninitialized);
 
     for (int firstRow = 0; firstRow < context.N;) {
         const int rowsToRead = static_cast<int>(
@@ -894,13 +901,13 @@ bool BINReader::readInterleavedStream(QFile&       file,
 
         const uchar* bufferStart = reinterpret_cast<const uchar*>(buffer.constData());
         for (int row = 0; row < rowsToRead; ++row) {
-            const int particleIndex = firstRow + row;
-            const uchar* particlePtr = bufferStart + static_cast<size_t>(row) * stride;
+            const int    particleIndex = firstRow + row;
+            const uchar* particlePtr   = bufferStart + static_cast<size_t>(row) * stride;
             for (const ColumnTarget& target : targets) {
                 const uchar* sourcePtr = particlePtr + target.byteOffset;
                 if (target.isCoordinate) {
-                    double* destination = static_cast<double*>(target.data) +
-                                          static_cast<size_t>(particleIndex) * 3;
+                    double* destination =
+                        static_cast<double*>(target.data) + static_cast<size_t>(particleIndex) * 3;
                     if (target.vtkDataType == VTK_DOUBLE) {
                         const double* source = reinterpret_cast<const double*>(sourcePtr);
                         for (int component = 0; component < 3; ++component)
@@ -917,27 +924,27 @@ bool BINReader::readInterleavedStream(QFile&       file,
                 switch (target.vtkDataType) {
                     case VTK_DOUBLE: {
                         const double* source = reinterpret_cast<const double*>(sourcePtr);
-                        double* destination = static_cast<double*>(target.data) +
-                                              static_cast<size_t>(particleIndex) *
-                                                  target.componentCount;
+                        double*       destination =
+                            static_cast<double*>(target.data) +
+                            static_cast<size_t>(particleIndex) * target.componentCount;
                         for (int component = 0; component < target.componentCount; ++component)
                             destination[component] = qFromLittleEndian(source[component]);
                         break;
                     }
                     case VTK_FLOAT: {
                         const float* source = reinterpret_cast<const float*>(sourcePtr);
-                        float* destination = static_cast<float*>(target.data) +
-                                             static_cast<size_t>(particleIndex) *
-                                                 target.componentCount;
+                        float*       destination =
+                            static_cast<float*>(target.data) +
+                            static_cast<size_t>(particleIndex) * target.componentCount;
                         for (int component = 0; component < target.componentCount; ++component)
                             destination[component] = qFromLittleEndian(source[component]);
                         break;
                     }
                     case VTK_INT: {
                         const int* source = reinterpret_cast<const int*>(sourcePtr);
-                        int* destination = static_cast<int*>(target.data) +
-                                           static_cast<size_t>(particleIndex) *
-                                               target.componentCount;
+                        int*       destination =
+                            static_cast<int*>(target.data) +
+                            static_cast<size_t>(particleIndex) * target.componentCount;
                         for (int component = 0; component < target.componentCount; ++component)
                             destination[component] = qFromLittleEndian(source[component]);
                         break;
@@ -969,4 +976,4 @@ bool BINReader::readNonInterleavedStream(QFile&       file,
     return true;
 }
 
-} // namespace QSpace::IO
+} // namespace GVis::IO

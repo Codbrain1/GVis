@@ -27,7 +27,7 @@ class LayerExplorerWidget;
 }
 QT_END_NAMESPACE
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 class LayerExplorerWidget : public QWidget {
     Q_OBJECT
@@ -161,4 +161,4 @@ class LayerExplorerWidget : public QWidget {
                                   QList<QModelIndex>& results);
     QString buildItemContextString(const QModelIndex& index, QAbstractItemModel* model);
 };
-} // namespace QSpace::UI
+} // namespace GVis::UI

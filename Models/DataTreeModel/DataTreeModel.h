@@ -9,15 +9,15 @@
 #include <memory>
 #include <qnamespace.h>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 class ObjectRegistry;
 class LayerManager;
 class DataNode;
 class Snapshot;
 class Layer;
-} // namespace QSpace::Core
+} // namespace GVis::Core
 
-namespace QSpace::Models {
+namespace GVis::Models {
 
 /**
  * @brief Внутренний узел дерева для маппинга QModelIndex в структуры ядра
@@ -55,7 +55,7 @@ class DataTreeItem {
  */
 class DataTreeModel : public QAbstractItemModel {
     Q_OBJECT
-    Q_PROPERTY(QSpace::Models::DataTreeModel::TreeMode treeMode READ treeMode WRITE setTreeMode NOTIFY treeModeChanged)
+    Q_PROPERTY(GVis::Models::DataTreeModel::TreeMode treeMode READ treeMode WRITE setTreeMode NOTIFY treeModeChanged)
     Q_PROPERTY(int registeredItemsCount READ registeredItemsCount NOTIFY treeRebuilt)
   public:
     enum class TreeMode { SnapShotView, ComponentView };
@@ -120,7 +120,7 @@ class DataTreeModel : public QAbstractItemModel {
     void refreshNode(const QUuid& nodeId);
 
   signals:
-    void treeModeChanged(QSpace::Models::DataTreeModel::TreeMode mode);
+    void treeModeChanged(GVis::Models::DataTreeModel::TreeMode mode);
     void treeRebuilt();
     void sceneUpdateRequested();
 
@@ -137,10 +137,10 @@ class DataTreeModel : public QAbstractItemModel {
     void buildComponentBranch(const Visualize::EntityType& entityType, const QList<std::shared_ptr<Core::DataNode>>& nodes, DataTreeItem* parentItem);
     void buildNodeBranch(std::shared_ptr<Core::DataNode> node, DataTreeItem* parentItem);
     void cleanItemMapRecursively(DataTreeItem* item);
-    Qt::CheckState calculateExperimentCheckState(std::shared_ptr<QSpace::Core::Experiment> exp) const;
+    Qt::CheckState calculateExperimentCheckState(std::shared_ptr<GVis::Core::Experiment> exp) const;
     Qt::CheckState calculateSnapshotheckState(std::shared_ptr<Core::Snapshot> container) const;
     Qt::CheckState calculateComponentGroupCheckState(DataTreeItem* groupItem) const;
     QString        entityTypeToString(Visualize::EntityType type) const;
 };
 
-} // namespace QSpace::Models
+} // namespace GVis::Models

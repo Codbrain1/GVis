@@ -3,10 +3,11 @@
 #include <qdebug.h>
 #include <qlogging.h>
 #include <qloggingcategory.h>
-#include <variant>
 #include <vtkType.h>
+#include <variant>
 
-namespace QSpace::IO {
+
+namespace GVis::IO {
 bool BINWriter::write(const QString& path, vtkDataSet* data, const WriteScheme& scheme) {
     QFile file(path);
     auto  isValide = validate(file, scheme);
@@ -19,13 +20,15 @@ bool BINWriter::write(const QString& path, vtkDataSet* data, const WriteScheme& 
     }
     const auto config = std::get<ColumnScheme>(scheme);
 }
+
 bool BINWriter::validate(QFile& file, const WriteScheme& scheme) {
     if (!std::holds_alternative<ColumnScheme>(scheme)) {
         qCCritical(LogIO) << "BinWriter requires ColumnScheme! file: " << file.fileName();
     }
     auto config = std::get<ColumnScheme>(scheme);
     for (const auto& col : config.columnsPolicy) {
-        if (col.vtkDataType != VTK_DOUBLE && col.vtkDataType != VTK_FLOAT && col.vtkDataType != VTK_INT) {
+        if (col.vtkDataType != VTK_DOUBLE && col.vtkDataType != VTK_FLOAT &&
+            col.vtkDataType != VTK_INT) {
             qCCritical(LogIO) << "Unsuported type in column: " << col.name;
             return false;
         }
@@ -39,4 +42,4 @@ bool BINWriter::validate(QFile& file, const WriteScheme& scheme) {
         }
     }
 }
-} // namespace QSpace::IO
+} // namespace GVis::IO

@@ -8,24 +8,23 @@
 #include <QToolButton>
 #include <QVBoxLayout>
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 namespace {
-constexpr int kMargin = 16;
+constexpr int kMargin     = 16;
 constexpr int kDurationMs = 6000;
-}
+} // namespace
 
 ToastNotification::ToastNotification(QWidget* parent) : QFrame(parent) {
     setObjectName("toastNotification");
     setFrameShape(QFrame::StyledPanel);
     setMaximumWidth(420);
-    setStyleSheet(
-        "QFrame#toastNotification { background-color: #4a2020; border: 1px solid #d85a5a; "
-        "border-radius: 6px; }"
-        "QLabel#toastTitle { color: #ffffff; font-weight: bold; }"
-        "QLabel#toastMessage { color: #f4dddd; }"
-        "QToolButton { color: #ffffff; border: none; padding: 2px; }"
-        "QToolButton:hover { background-color: #713030; }");
+    setStyleSheet("QFrame#toastNotification { background-color: #4a2020; border: 1px solid #d85a5a; "
+                  "border-radius: 6px; }"
+                  "QLabel#toastTitle { color: #ffffff; font-weight: bold; }"
+                  "QLabel#toastMessage { color: #f4dddd; }"
+                  "QToolButton { color: #ffffff; border: none; padding: 2px; }"
+                  "QToolButton:hover { background-color: #713030; }");
 
     auto* layout = new QHBoxLayout(this);
     layout->setContentsMargins(12, 10, 8, 10);
@@ -73,8 +72,7 @@ void ToastNotification::showError(const QString& title, const QString& message) 
 }
 
 bool ToastNotification::eventFilter(QObject* watched, QEvent* event) {
-    if (watched == parentWidget() &&
-        (event->type() == QEvent::Resize || event->type() == QEvent::Move)) {
+    if (watched == parentWidget() && (event->type() == QEvent::Resize || event->type() == QEvent::Move)) {
         positionInParent();
     }
     return QFrame::eventFilter(watched, event);
@@ -104,4 +102,4 @@ void ToastNotification::positionInParent() {
     move(area.right() - width() - kMargin, area.bottom() - height() - kMargin);
 }
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

@@ -2,14 +2,15 @@
 #include "Common/Logger/Logger.h"
 #include "Core/LayerManager/LayerManager.h"
 #include "Core/ObjectRegistry/ObjectRegistry.h"
-#include "Session/Reflection.h"
 #include "Visualize/Layers/Layer.h"
 #include "Visualize/Views/View3D/AbstractView3D.h"
 #include <qtmetamacros.h>
 #include <quuid.h>
+#include "Session/Reflection.h"
 #include <memory>
 
-namespace QSpace::Core::Controllers {
+
+namespace GVis::Core::Controllers {
 
 VideoController::VideoController(Core::ObjectRegistry* objectRegistry,
                                  Core::ViewManager*    viewManager,
@@ -26,9 +27,9 @@ void VideoController::initialize() {
 
 Session::VideoPlayerDTO VideoController::playerState() const {
     Session::VideoPlayerDTO state;
-    state.experimentId       = m_targetExperimentId;
+    state.experimentId        = m_targetExperimentId;
     state.referenceSnapshotId = m_referenceSnapshotId;
-    state.currentSnapshotId  = m_currentVisualizeSnapshotId;
+    state.currentSnapshotId   = m_currentVisualizeSnapshotId;
 
     for (const auto& layers : m_snapshotPlayerSate) {
         for (const auto& layer : layers) {
@@ -150,15 +151,17 @@ void VideoController::handleFixedEtalonSnapshot(const QUuid& referenceSnapshotId
     for (const auto& restoredLayer : restoredLayers) {
         for (const auto& layers : m_snapshotPlayerSate) {
             for (const auto& layer : layers) {
-                if (!layer || m_playerLayerSources.value(layer->layerId()) != restoredLayer.sourceLayerId)
+                if (!layer ||
+                    m_playerLayerSources.value(layer->layerId()) != restoredLayer.sourceLayerId)
                     continue;
 
                 if (const auto settings = layer->getSettings()) {
                     const auto result =
                         Reflection::variantMapToQObject(restoredLayer.settings, settings.get());
                     if (!result.success) {
-                        qCWarning(LogCore) << "VideoController: failed to restore player layer settings"
-                                           << layer->layerId();
+                        qCWarning(LogCore)
+                            << "VideoController: failed to restore player layer settings"
+                            << layer->layerId();
                         continue;
                     }
                     layer->setVisible(settings->isVisible());
@@ -174,7 +177,7 @@ void VideoController::handleFixedEtalonSnapshot(const QUuid& referenceSnapshotId
         return;
     }
 
-    QMap<QSpace::Visualize::EntityType, std::shared_ptr<DataNode>> nodesByType;
+    QMap<GVis::Visualize::EntityType, std::shared_ptr<DataNode>> nodesByType;
     for (const auto& node : currentSnapshot->components) {
         if (node) {
             nodesByType.insert(node->type, node);
@@ -222,7 +225,7 @@ void VideoController::handleActivateVisualizeSnapshot(int index) {
         return;
     }
 
-    QMap<QSpace::Visualize::EntityType, std::shared_ptr<DataNode>> nodesByType;
+    QMap<GVis::Visualize::EntityType, std::shared_ptr<DataNode>> nodesByType;
     for (const auto& node : snapshot->components) {
         if (node) {
             nodesByType.insert(node->type, node);
@@ -291,11 +294,12 @@ void VideoController::restorePlayerLayersWhenReady() {
     m_restorePending = false;
     handleFixedEtalonSnapshot(m_referenceSnapshotId);
 
-    const auto currentIndex = std::find_if(m_timeSliderSnapshots.cbegin(),
-                                           m_timeSliderSnapshots.cend(),
-                                           [this](const SnapshotToTimestamp& snapshot) {
-                                               return snapshot.targetSnapshot == m_currentVisualizeSnapshotId;
-                                           });
+    const auto currentIndex =
+        std::find_if(m_timeSliderSnapshots.cbegin(),
+                     m_timeSliderSnapshots.cend(),
+                     [this](const SnapshotToTimestamp& snapshot) {
+                         return snapshot.targetSnapshot == m_currentVisualizeSnapshotId;
+                     });
     if (currentIndex != m_timeSliderSnapshots.cend())
         handleActivateVisualizeSnapshot(
             static_cast<int>(std::distance(m_timeSliderSnapshots.cbegin(), currentIndex)) + 1);
@@ -325,4 +329,4 @@ void VideoController::requestLoadFloatWindow(int index) {
         }
     }
 }
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

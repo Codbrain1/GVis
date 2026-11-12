@@ -5,7 +5,7 @@
 #include "Structures/FileSchemeStructures.h"
 #include <optional>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 FileSchemeRegistry::FileSchemeRegistry(QObject* parent) : QObject(parent) {
 }
 
@@ -130,4 +130,4 @@ std::optional<QUuid> FileSchemeRegistry::findUserOverrideFor(const IO::PresetKey
         return it.value();
     return std::nullopt;
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

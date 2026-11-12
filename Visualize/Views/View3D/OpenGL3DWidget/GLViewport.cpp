@@ -15,7 +15,7 @@
 #include <algorithm>
 #include <cmath>
 
-namespace QSpace::Visualize::Views::View3D {
+namespace GVis::Visualize::Views::View3D {
 
 GLViewport::GLViewport(View3DSettings* settings, QWidget* parent)
     : QOpenGLWidget(parent), m_settings(settings) {
@@ -373,4 +373,4 @@ void GLViewport::wheelEvent(QWheelEvent* event) {
     update();
 }
 
-} // namespace QSpace::Visualize::Views::View3D
+} // namespace GVis::Visualize::Views::View3D

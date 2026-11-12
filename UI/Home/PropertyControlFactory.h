@@ -2,10 +2,9 @@
 #include <QString>
 #include <QWidget>
 
-
 class QMetaProperty;
 
-namespace QSpace::UI {
+namespace GVis::UI {
 
 // Единственное место, создающее редакторы под Q_PROPERTY. И AutoSettingsToolBar,
 // и попап-формы групп используют ТОЛЬКО эту фабрику — сама компоновка (тулбар vs
@@ -33,4 +32,4 @@ class PropertyControlFactory {
                                      const QString&       iconLookupKey);
 };
 
-} // namespace QSpace::UI
+} // namespace GVis::UI

@@ -8,7 +8,7 @@
 #include "Session/Reflection.h"
 #include <memory>
 
-namespace QSpace::Core {
+namespace GVis::Core {
 
 LayerManager::LayerManager(QObject* parent) : QObject(parent) {
 }
@@ -80,9 +80,9 @@ std::shared_ptr<Visualize::Layers::Layer> LayerManager::createLayerCopy(const QU
     }
 
     if (const auto etalonSettings = etalonLayer->getSettings()) {
-        const auto settingsMap = QSpace::Reflection::QObjectToVariantMap(etalonSettings.get());
+        const auto settingsMap = GVis::Reflection::QObjectToVariantMap(etalonSettings.get());
         if (!settingsMap.isEmpty()) {
-            const auto result = QSpace::Reflection::variantMapToQObject(settingsMap, layerSettings.get());
+            const auto result = GVis::Reflection::variantMapToQObject(settingsMap, layerSettings.get());
             if (!result.success) {
                 qCWarning(LogCore) << "LayerManager::createLayerCopy: failed to restore settings" << etalonLayerId;
                 return nullptr;
@@ -147,7 +147,7 @@ void LayerManager::removeLayer(const QUuid& layerId) {
             if (m_viewToLayers[rawViewPtr].isEmpty())
                 m_viewToLayers.remove(rawViewPtr);
         }
-        if (auto view3D = dynamic_cast<QSpace::Visualize::Views::AbstractView3D*>(rawViewPtr)) {
+        if (auto view3D = dynamic_cast<GVis::Visualize::Views::AbstractView3D*>(rawViewPtr)) {
             view3D->detachRenderLayer(layerId);
         }
     }
@@ -287,4 +287,4 @@ bool LayerManager::isNodeVisible(const QUuid& nodeId) {
     }
     return false;
 }
-} // namespace QSpace::Core
+} // namespace GVis::Core

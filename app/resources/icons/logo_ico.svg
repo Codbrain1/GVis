@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   width="512"
+   height="512"
+   version="1.1"
+   id="svg14"
+   sodipodi:docname="logo_ico5.svg"
+   inkscape:version="1.4.4 (dcaf3e7, 2026-05-05)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview14"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="1.2382812"
+     inkscape:cx="255.59622"
+     inkscape:cy="256.00001"
+     inkscape:window-width="1440"
+     inkscape:window-height="878"
+     inkscape:window-x="-6"
+     inkscape:window-y="-6"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg14" />
+  <defs
+     id="defs6">
+    <linearGradient
+       id="orbitGrad"
+       x1="29.607914"
+       y1="262.56493"
+       x2="299.94104"
+       y2="532.89806"
+       gradientTransform="matrix(1.9116726,0,-1.1472606e-8,0.81855964,-193.99546,6.0554633)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#00D2FF"
+         id="stop1" />
+      <stop
+         offset="100%"
+         stop-color="#9D4EDD"
+         id="stop2" />
+    </linearGradient>
+    <linearGradient
+       id="armGrad1"
+       x1="77.549254"
+       y1="442.78602"
+       x2="303.00598"
+       y2="217.32929"
+       gradientTransform="matrix(1.6335782,0,0,0.95675982,-56.748013,-92.618669)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#00D2FF"
+         id="stop3" />
+      <stop
+         offset="100%"
+         stop-color="#38BDF8"
+         id="stop4" />
+    </linearGradient>
+    <linearGradient
+       id="armGrad2"
+       x1="302.87829"
+       y1="246.29131"
+       x2="77.421565"
+       y2="471.74804"
+       gradientTransform="matrix(1.6335782,0,0,0.95675982,-56.748013,-92.618669)"
+       gradientUnits="userSpaceOnUse">
+      <stop
+         offset="0%"
+         stop-color="#C084FC"
+         id="stop5" />
+      <stop
+         offset="100%"
+         stop-color="#7B2CBF"
+         id="stop6" />
+    </linearGradient>
+  </defs>
+  <!-- Фон иконки -->
+  <!-- Крупная наклонная орбита N-Body -->
+  <ellipse
+     cx="120.99937"
+     cy="331.62244"
+     rx="252.24197"
+     ry="104.28316"
+     transform="matrix(0.87099044,-0.49129997,0.44807519,0.89399588,0,0)"
+     fill="none"
+     stroke="url(#orbitGrad)"
+     stroke-width="12.5093"
+     opacity="0.7"
+     id="ellipse6"
+     style="stroke:url(#orbitGrad)" />
+  <!-- Спиральные рукава галактики (утолщённые для читаемости в 16x16 и 32x32) -->
+  <path
+     d="M 86.478676,319.43227 C 50.065111,206.11827 195.71937,97.954879 324.38063,134.00935 414.20076,159.76253 455.46946,242.17271 406.91805,309.131"
+     fill="none"
+     stroke="url(#armGrad1)"
+     stroke-width="22.5032"
+     stroke-linecap="round"
+     id="path6"
+     style="stroke:url(#armGrad1)" />
+  <path
+     d="M 421.48347,154.61189 C 457.89704,267.9259 312.24278,376.08927 183.58152,340.03482 93.761391,314.28163 52.492682,231.87143 101.0441,164.91316"
+     fill="none"
+     stroke="url(#armGrad2)"
+     stroke-width="22.5032"
+     stroke-linecap="round"
+     id="path7"
+     style="stroke:url(#armGrad2)" />
+  <!-- Центральное галактическое ядро -->
+  <ellipse
+     cx="253.98106"
+     cy="237.02209"
+     fill="#00d2ff"
+     opacity="0.22"
+     id="circle7"
+     rx="55.834133"
+     ry="59.232323"
+     style="stroke-width:1.25017" />
+  <ellipse
+     cx="253.98106"
+     cy="237.02209"
+     fill="#ffffff"
+     id="circle8"
+     rx="33.985996"
+     ry="36.054459"
+     style="stroke-width:1.25017" />
+  <!-- Крупные частицы SPH / узлы N-Body -->
+  <ellipse
+     cx="54.920258"
+     cy="347.76071"
+     fill="#00d2ff"
+     id="circle9"
+     rx="16.992998"
+     ry="18.027229"
+     style="stroke-width:1.25017" />
+  <ellipse
+     cx="453.0419"
+     cy="126.28339"
+     fill="#c084fc"
+     id="circle10"
+     rx="16.992998"
+     ry="18.027229"
+     style="stroke-width:1.25017" />
+  <ellipse
+     cx="156.87822"
+     cy="121.13277"
+     fill="#38bdf8"
+     id="circle11"
+     rx="13.351641"
+     ry="14.16425"
+     style="stroke-width:1.25017" />
+  <ellipse
+     cx="351.08392"
+     cy="352.91138"
+     fill="#a855f7"
+     id="circle12"
+     rx="13.351641"
+     ry="14.16425"
+     style="stroke-width:1.25017" />
+  <ellipse
+     cx="236.98805"
+     cy="90.228935"
+     fill="#ffffff"
+     id="circle13"
+     rx="9.7102833"
+     ry="10.301274"
+     style="stroke-width:1.25017" />
+  <ellipse
+     cx="270.97406"
+     cy="383.81522"
+     fill="#ffffff"
+     id="circle14"
+     rx="9.7102833"
+     ry="10.301274"
+     style="stroke-width:1.25017" />
+</svg>

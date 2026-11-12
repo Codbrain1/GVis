@@ -12,17 +12,17 @@ add_subdirectory(StyleManager)
 add_subdirectory(FileSchemeRegistry)
 
 add_library(Core INTERFACE)
-add_library(QSpace::Core ALIAS Core)
+add_library(GVis::Core ALIAS Core)
 target_include_directories(Core INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(Core INTERFACE
             project_config
             TaskManager
-            QSpace::CoreObjectRegistry
+            GVis::CoreObjectRegistry
             DataManager
             LogManager
-            QSpace::CoreLayerManager
+            GVis::CoreLayerManager
             AppCore
-            QSpace::CoreViewManager
+            GVis::CoreViewManager
             StyleManager
             # VideoExportManager
             FileSchemeRegistry

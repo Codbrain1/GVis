@@ -1,1 +1,1 @@
-qspace_add_test(TestDataTreeModel DataTreeModel QSpace::Core QSpace::Common QSpace::Visualize)
+GVis_add_test(TestDataTreeModel DataTreeModel GVis::Core GVis::Common GVis::Visualize)

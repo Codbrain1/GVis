@@ -7,7 +7,7 @@
 #include <vtkMultiBlockDataSet.h>
 #include <vtkSmartPointer.h>
 
-namespace QSpace
+namespace GVis
 {
 class IReader
 {
@@ -42,4 +42,4 @@ public:
     return batchResult;
   }
 };
-} // namespace QSpace
+} // namespace GVis

@@ -2,7 +2,7 @@
 #include <qtmetamacros.h>
 #include "../../LayerSettings.h"
 
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 // ============================================================
 // Настройки для ParticleRendererLayer — обычные точки-частицы
 // ============================================================
@@ -34,7 +34,7 @@ public:
     // круглый спрайт с псевдо-затенением (sqrt(1-r^2)) вместо плоского квадрата
     bool shadeAsSphere() const { return m_shadeAsSphere; }
     void setShadeAsSphere(bool v) { if (m_shadeAsSphere != v) { m_shadeAsSphere = v; emit changed(); } }
-  
+
     // clang-format on
 
     // Внутри ParticlePointsLayerSettings
@@ -70,4 +70,4 @@ public:
     bool m_shadeAsSphere = true;
 };
 
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers

@@ -6,7 +6,7 @@
 #include "IO/BIN/BINReader.h"
 #include <memory>
 
-namespace QSpace::IO {
+namespace GVis::IO {
 std::unique_ptr<IReader> createReader(IO::FileFormat format) {
     if (format == FileFormat::BIN) {
         return std::make_unique<BINReader>();
@@ -37,4 +37,4 @@ Visualize::EntityType Utils::getEntityType(const QString& name) {
         return Visualize::EntityType::DarkMatter;
     return Visualize::EntityType::Unknown;
 }
-} // namespace QSpace::IO
+} // namespace GVis::IO

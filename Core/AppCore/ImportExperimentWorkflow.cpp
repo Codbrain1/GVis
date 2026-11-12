@@ -3,13 +3,14 @@
 #include "Common/Structures/ObjectRegistryStructures.h"
 #include "Core/AppCore/ImportFilesWorkflow.h"
 #include "Core/ObjectRegistry/ObjectRegistry.h"
-#include "IO/PhysicalUnitsIniReader.h"
 #include <QDir>
 #include <QDirIterator>
 #include <qloggingcategory.h>
+#include "IO/PhysicalUnitsIniReader.h"
 #include <memory>
 
-namespace QSpace::Core::Controllers {
+
+namespace GVis::Core::Controllers {
 
 ImportExperimentWorkflow::ImportExperimentWorkflow(ImportFilesWorkflow*  filesWorkflow,
                                                    Core::ObjectRegistry* objectRegistry,
@@ -41,7 +42,7 @@ void ImportExperimentWorkflow::start(const QString&              experimentPath,
     if (files.isEmpty())
         return;
 
-    auto experiment = std::make_shared<Core::Experiment>(dir.dirName());
+    auto              experiment = std::make_shared<Core::Experiment>(dir.dirName());
     const QStringList iniFiles =
         dir.entryList({QStringLiteral("*.ini")}, QDir::Files, QDir::Name | QDir::IgnoreCase);
     if (!iniFiles.isEmpty()) {
@@ -69,4 +70,4 @@ void ImportExperimentWorkflow::start(const QStringList&          filePaths,
     m_filesWorkflow->start(filePaths, version, experiment->id);
 }
 
-} // namespace QSpace::Core::Controllers
+} // namespace GVis::Core::Controllers

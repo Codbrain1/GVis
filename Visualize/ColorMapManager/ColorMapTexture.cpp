@@ -5,8 +5,7 @@
 #include "ColorMapManager.h"
 #include <algorithm>
 
-
-namespace QSpace::Visualize::Layers {
+namespace GVis::Visualize::Layers {
 
 QMap<QOpenGLContext*, ColorMapTexture::ContextCache> ColorMapTexture::s_caches;
 
@@ -145,4 +144,4 @@ void ColorMapTexture::releaseForContext(QOpenGLContext* ctx) {
     s_caches.erase(it);
 }
 
-} // namespace QSpace::Visualize::Layers
+} // namespace GVis::Visualize::Layers
